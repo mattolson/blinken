@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "node-spi": "git@github.com:RussTheAerialist/node-spi.git"
+    "spi": "git://github.com/RussTheAerialist/node-spi.git",
+    "node-static": "*",
+    "socket.io": "*",
+    "easing": "*"
   }
 }

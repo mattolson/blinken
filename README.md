@@ -17,16 +17,7 @@ to an SD card. See [this page](http://elinux.org/RPi_Easy_SD_Card_Setup) for mor
 
 ### Installation
 
-* Clone this repository and get its submodules
-    * `git clone git://github.com/mattolson/blinken.git`
-    * `cd blinken`
-    * `git submodule init`
-    * `git submodule update`
-* Build/install node modules inside `driver` directory
-    * `cd driver`
-    * `npm build node_modules/spi`
-    * `npm install node-static`
-    * `npm install socket.io`
-    * `npm install easing`
-    * `npm install bindings`
-
+* Clone this repository: `git clone git://github.com/mattolson/blinken.git`
+* Build/install node modules: `cd driver && npm install`
+* Start server: `sudo node index.js`
+* [Visit server in browser](http://ip_of_rpi:8888/)
