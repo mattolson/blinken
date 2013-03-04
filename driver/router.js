@@ -1,32 +1,43 @@
-var static = require('node-static');
+var url = require("url");
+var util = require('util');
 
-var webroot = "./static";
-var file = new(static.Server)(webroot, {
+// Instantitate static file server
+var StaticServer = require('node-static').Server;
+var file_server = new StaticServer("./static", {
   cache: 600,
   headers: { 'X-Powered-By': 'node-static' }
 });
 
+// Instantiate route map to be populated by handlers
+var routeMap = {};
+
 // route incoming requests
-function routeHttp(handler, path, request, response) {
-  //console.log("routing for: " + path);
-  // if there is a function for that path, call it
-  if (typeof handler[path] === 'function') {
-    handler[path](request, response);
+function routeHttp(request, response) {
+  var path = url.parse(request.url).pathname;
+  console.log("Received request for: " + path);
+
+  // if there is a function registered for that path, call it
+  if (typeof(routeMap[path]) === 'function') {
+    routeMap[path](request, response);
   }
   else {
-    // otherwise try to serve a file
-    file.serve(request, response, function(err, result) {
+    // otherwise try to serve a static file
+    file_server.serve(request, response, function(err, result) {
       if (err) {
         console.error('Error serving %s - %s', request.url, err.message);
         response.writeHead(err.status, err.headers);
-	response.write("404 not found");
+        response.write(util.format("Error %d", err.status));
         response.end();
       } 
-      else {
-        console.log('%s - %s', request.url, response.message);
-      }
     });
   }
 }
 
+// Add a handler to the route map
+function addHandler(path, handler) {
+  routeMap[path] = handler;
+}
+
+// Export public methods
 exports.routeHttp = routeHttp;
+exports.addHandler = addHandler;

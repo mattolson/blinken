@@ -1,13 +1,12 @@
 // var formidable = require("formidable");
 var util = require("util");
 var sys = require('sys');
-
+var router = require('./router');
 
 var Pixel = require('./pixel').Pixel;
 var pixels = new Pixel('/dev/spidev0.0', 36);
 pixels.all(0, 0, 0);
 pixels.sync();
-
 
 var MAX_LEDS = 36;
 var MAX_STEPS = 10;
@@ -162,5 +161,6 @@ function handleSocket(socket) {
   });
 }
 
-exports.leds = renderLeds;
+// Register handlers
+router.addHandler("/leds", renderLeds);
 exports.handleSocket = handleSocket;

@@ -1,10 +1,9 @@
 var server = require("./server.js");
-var router = require("./router.js");
-var handlers = require("./handlers.js");
 var sockets = require("./sockets.js");
+var handlers = require('./handlers.js');
 
-var handler = {};
-handler["/leds"] = handlers.leds;
+// Start http server
+server.start();
 
-server.start(router.routeHttp, handler);
+// Start web sockets
 sockets.start(server.app, handlers.handleSocket);
