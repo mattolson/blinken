@@ -5,7 +5,7 @@ var app;
 
 function start() {
   app = http.createServer(function(request, response) {
-    router.routeHttp(handler, path, request, response);
+    router.routeHttp(request, response);
   });
   app.listen(8888);
   exports.app = app;
