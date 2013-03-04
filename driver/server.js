@@ -11,7 +11,7 @@ function start() {
   app.use(express.static('static'));
 
   // Register http handlers
-  handlers.register_http_handlers(app);
+  handlers.registerHttpHandlers(app);
 
   // Start server
   app.listen(8888);
