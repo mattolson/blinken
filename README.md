@@ -20,7 +20,8 @@ to an SD card. See [this page](http://elinux.org/RPi_Easy_SD_Card_Setup) for mor
 * Clone this repository
 * Build spi module: `npm build node_modules/spi`
 * Install some third-party modules
-** `npm install node-static`
-** `npm install socket.io`
-** `npm install easing`
-** `npm install bindings`
+    * `npm install node-static`
+    * `npm install socket.io`
+    * `npm install easing`
+    * `npm install bindings`
+
