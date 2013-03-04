@@ -1,0 +1,6 @@
+[submodule "driver/node_modules/spi"]
+	path = driver/node_modules/spi
+	url = https://github.com/RussTheAerialist/node-spi.git
+[submodule "driver/node_modules/adafruit_pixel"]
+	path = driver/node_modules/adafruit_pixel
+	url = https://github.com/RussTheAerialist/node-adafruit-pixel.git
