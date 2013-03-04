@@ -3,7 +3,7 @@ var util = require("util");
 var sys = require('sys');
 
 
-var Pixel = require('adafruit_pixel').Pixel;
+var Pixel = require('./pixel').Pixel;
 var pixels = new Pixel('/dev/spidev0.0', 36);
 pixels.all(0, 0, 0);
 pixels.sync();
