@@ -1,3 +1,0 @@
-[submodule "driver/node_modules/spi"]
-	path = driver/node_modules/spi
-	url = https://github.com/RussTheAerialist/node-spi.git
