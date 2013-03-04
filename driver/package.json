@@ -1,0 +1,9 @@
+{
+  "name": "blinken-driver",
+  "description": "Low level API for WS2801 LED array",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "node-spi": "git@github.com:RussTheAerialist/node-spi.git"
+  }
+}
