@@ -1,9 +1,7 @@
 var server = require("./server.js");
 var sockets = require("./sockets.js");
-var handlers = require('./handlers.js');
 
-// Start http server
+// Start everything up
 server.start();
+sockets.start(server.app);
 
-// Start web sockets
-sockets.start(server.app, handlers.handleSocket);

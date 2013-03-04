@@ -1,7 +1,5 @@
-// var formidable = require("formidable");
 var util = require("util");
 var sys = require('sys');
-var router = require('./router');
 
 var Pixel = require('./pixel').Pixel;
 var pixels = new Pixel('/dev/spidev0.0', 36);
@@ -148,19 +146,22 @@ function animate(socket, leds) {
   }
 }
 
-// handle socket events
-function handleSocket(socket) {
+// Register socket handlers
+exports.registerSocketHandlers = function(socket) {
   socket.on("change:led", function(data) {
     changeLed(socket, data);
   });
+
   socket.on("startAnimation", function(data) {
     startAnimation(socket, leds);
   });
+
   socket.on("stopAnimation", function(data) {
     stopAnimation(socket);
   });
 }
 
-// Register handlers
-router.addHandler("/leds", renderLeds);
-exports.handleSocket = handleSocket;
+// Register http handlers
+exports.registerHttpHandlers = function(app) {
+  app.get('/leds', renderLeds);
+}

@@ -1,12 +1,15 @@
-var socket = require("socket.io");
+var http = require('http');
+var socket = require('socket.io');
+var handlers = require('./handlers');
 
-function start(app, handleSocket) {
-  var io = socket.listen(app);
+function start(app) {
+  var io = socket.listen(http.createServer(app));
+  console.log("web socket started...");
+
   io.set('log level', 1);  
   io.sockets.on("connection", function(socket) {
-    handleSocket(socket);
+    handlers.registerSocketHandlers(socket);
   });
-  console.log("socket started ...");
 }
 
 exports.start = start;
