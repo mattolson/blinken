@@ -1,4 +1,4 @@
-var spi = require('node-spi');
+var spi = require('spi');
 var Easing = require('easing');
 
 var STEPS = 25;
