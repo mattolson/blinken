@@ -15,3 +15,12 @@ to an SD card. See [this page](http://elinux.org/RPi_Easy_SD_Card_Setup) for mor
 * Download and compile node.js from source. Sadly, the binary distribution in the Raspbian repository did not work for us. Follow 
 [this guide](https://gist.github.com/3301813) but use the latest version of node. Compiling node on a 700Mhz ARM chip takes a long time, so grab a beer.
 
+### Installation
+
+* Clone this repository
+* Build spi module: `npm build node_modules/spi`
+* Install some third-party modules
+** `npm install node-static`
+** `npm install socket.io`
+** `npm install easing`
+** `npm install bindings`
