@@ -10,8 +10,8 @@
 </head>
 <body ng-controller="LedCtrl" id="body" ng-mouseup="mouseUp($event)" style="background-color:rgb(50, 50, 50)">
 
-  <div class="container" style="max-width: 600px" ng-mouseout="mouseOut($event)" >
-    <div class="row span5 ledGrid" ng-mousemove="mouseMove($event)" > 
+  <div class="container" style="max-width: 700px" ng-mouseout="mouseOut($event)" >
+    <div class="row span6 ledGrid" ng-mousemove="mouseMove($event)" > 
       <ul class="thumbnails">
         <li ng-repeat="led in leds" class="span1">
           <div class="thumbnail2" style="background-color:rgb({{led.r}}, {{led.g}}, {{led.b}})"

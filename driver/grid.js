@@ -64,16 +64,16 @@ Grid.prototype.setPixelColor = function(x, y, r, g, b) {
     return;
   }
 
-  // Set pixel data
+  // set pixel data
   this.pixels[index] = r;
   this.pixels[index+1] = g;
   this.pixels[index+2] = b;
 };
 
-Grid.prototype.getPixelColor = function(x, y) {
+grid.prototype.getPixelColor = function(x, y) {
   var index = this.getStrandIndex(x,y);
   if (index == null) {
-    return;
+    return null;
   }
 
   return { 
@@ -88,9 +88,12 @@ Grid.prototype.toJson = function() {
   for (var y = 0; y < this.num_pixels_y; y++) {
     for (var x = 0; x < this.num_pixels_x; x++) {
       var index = (y*this.num_pixels_x)+x;
-      json[index] = this.getPixelColor(x,y);
-      json[index]['x'] = x;
-      json[index]['y'] = y;
+      var led = this.getPixelColor(x,y);
+      if (led != null) {
+        led['x'] = x;
+        led['y'] = y;
+        json[index] = led;
+      }
     }
   }
   return json;
