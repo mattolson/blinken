@@ -9,6 +9,8 @@ function renderLeds(request, response) {
 
 // Handle change events on the socket
 function changeLed(socket, x, y, r, g, b) {
+  console.log("changing led (%d, %d) to (%d, %d, %d)", x, y, r, g, b);
+      
   // Change the color
   grid.setPixelColor(x, y, r, g, b);
   grid.sync();

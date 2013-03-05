@@ -34,7 +34,7 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
           // in the docs folder for details on the wiring layout. We start by
           // figuring out for the given position how many panels came before us.
           panel_index = (i*this.num_panels_y);
-          panel_index += (i % 2 == 0) ? (y / this.num_pixels_per_panel_y) : ((this.num_pixels_y - y) / this.num_pixels_per_panel_y);
+          panel_index += (i % 2 == 0) ? (y / this.num_pixels_per_panel_y) : ((this.num_pixels_y - y - 1) / this.num_pixels_per_panel_y);
           strand_index = panel_index * this.num_pixels_per_panel_x * this.num_pixels_per_panel_y;
 
           // Now just worry about the index within the current panel. Note that the
@@ -52,6 +52,8 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
       }
     }
   }
+
+  console.log(this.pixel_map);
 
   // Instantiate SPI device
   this.device = new spi.Spi(device, {
