@@ -20,20 +20,34 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
 
   // Instantiate pixels. Loop through in logical order, and then
   // calculate the strand index.
-  var i, j, k, l, strand_index, current_x, current_y;
-  strand_index = current_x = current_y = 0;
+  var i, j, k, l, x, y, panel_index, strand_index;
+  panel_index = strand_index = x = y = 0;
   for (i = 0; i < this.num_panels_x; i++) {
     for (j = 0; j < this.num_panels_y; j++) {
       for (k = 0; k < this.num_pixels_per_panel_x; k++) {
         for (l = 0; l < this.num_pixels_per_panel_y; l++) {
           // Figure out where we are in the logical grid.
-          current_x = (i * this.num_pixels_per_panel_x) + k;
-          current_y = (j * this.num_pixels_per_panel_y) + l;
+          x = (i * this.num_pixels_per_panel_x) + k;
+          y = (j * this.num_pixels_per_panel_y) + l;
 
-          // Figure out where we are in the strand.
-          strand_index = (current_y * this.num_pixels_x);
-          strand_index += (current_y % 2 == 1) ? current_x : (this.num_pixels_per_panel_x - current_x - 1);
-          this.pixel_map[(this.num_pixels_x * current_y) + current_x] = strand_index;
+          // Figure out where we are in the strand. See the wiring diagrams
+          // in the docs folder for details on the wiring layout. We start by
+          // figuring out for the given position how many panels came before us.
+          panel_index = (i*this.num_panels_y);
+          panel_index += (i % 2 == 0) ? (y / this.num_pixels_per_panel_y) : ((this.num_pixels_y - y) / this.num_pixels.per_panel_y);
+          strand_index = panel_index * this.num_pixels_per_panel_x * this.num_pixels_per_panel_y;
+
+          // Now just worry about the index within the current panel. Note that the
+          // wiring is reversed on odd-numbered columns.
+          if (i % 2 == 0) {
+            strand_index += (l * this.num_pixels_per_panel_x);
+            strand_index += (y % 2 == 1) ? x : (this.num_pixels_per_panel_x - x - 1);
+          } else {
+            strand_index += ((this.num_pixels_per_panel_y - l - 1) * this.num_pixels_per_panel_x);
+            strand_index += (y % 2 == 1) ? x : (this.num_pixels_per_panel_x - x - 1);
+          }
+
+          this.pixel_map[(this.num_pixels_x * y) + x] = strand_index;
         }
       }
     }
