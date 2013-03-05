@@ -70,7 +70,7 @@ Grid.prototype.setPixelColor = function(x, y, r, g, b) {
   this.pixels[index+2] = b;
 };
 
-grid.prototype.getPixelColor = function(x, y) {
+Grid.prototype.getPixelColor = function(x, y) {
   var index = this.getStrandIndex(x,y);
   if (index == null) {
     return null;
