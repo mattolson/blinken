@@ -31,8 +31,8 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
           current_y = (j * this.num_pixels_per_panel_y) + l;
 
           // Figure out where we are in the strand.
-          strand_index = (current_x * this.num_pixels_y);
-          strand_index += (current_x % 2 == 0) ? current_y : (this.num_pixels_per_panel_y - current_y - 1);
+          strand_index = (current_y * this.num_pixels_x);
+          strand_index += (current_y % 2 == 1) ? current_x : (this.num_pixels_per_panel_x - current_x - 1);
           this.pixel_map[(this.num_pixels_x * current_y) + current_x] = strand_index;
         }
       }
@@ -64,14 +64,6 @@ Grid.prototype.setPixelColor = function(x, y, r, g, b) {
     return;
   }
 
-  // Massage input value
-  r = parseInt(r);
-  g = parseInt(g);
-  b = parseInt(b);
-  r = r < 0 ? 0 : (r > 255 ? 255 : r);
-  g = g < 0 ? 0 : (g > 255 ? 255 : g);
-  b = b < 0 ? 0 : (b > 255 ? 255 : b);
-
   // Set pixel data
   this.pixels[index] = r;
   this.pixels[index+1] = g;
@@ -95,9 +87,10 @@ Grid.prototype.toJson = function() {
   var json = new Array(this.num_pixels_x * this.num_pixels_y);
   for (var i = 0; i < this.num_pixels_x; i++) {
     for (var j = 0; j < this.num_pixels_y; j++) {
-      json[i] = this.getPixelColor(i,j);
-      json[i]['x'] = i;
-      json[i]['y'] = j;
+      var index = this.getPixelIndex(i,j);
+      json[index] = this.getPixelColor(i,j);
+      json[index]['x'] = i;
+      json[index]['y'] = j;
     }
   }
   return json;

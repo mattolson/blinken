@@ -8,17 +8,21 @@ function renderLeds(request, response) {
 }
 
 // Handle change events on the socket
-function changeLed(socket, led) {
+function changeLed(socket, x, y, r, g, b) {
   // Change the color
-  grid.setPixelColor(led.x, led.y, led.r, led.g, led.b);
+  grid.setPixelColor(x, y, r, g, b);
   grid.sync();
 
   // Get pixel color (for debugging: make sure it worked)
-  var pixelColor = grid.getPixelColor(led.x, led.y);
+  var pixelColor = grid.getPixelColor(x, y);
 
   // send the changed led to all other clients
   socket.broadcast.emit("changed:led", {
-    x: led.x, y: led.y, r: pixelColor.r, g: pixelColor.g, b: pixelColor.b
+    x: x, 
+    y: y, 
+    r: pixelColor.r, 
+    g: pixelColor.g, 
+    b: pixelColor.b
   }); 
 }
 
@@ -104,7 +108,17 @@ function animate(socket, leds) {
 // Register socket handlers
 exports.registerSocketHandlers = function(socket) {
   socket.on("change:led", function(data) {
-    changeLed(socket, data);
+    // Massage input value
+    var x = parseInt(data.x);
+    var y = parseInt(data.y);
+    var r = parseInt(data.r);
+    var g = parseInt(data.g);
+    var b = parseInt(data.b);
+    r = r < 0 ? 0 : (r > 255 ? 255 : r);
+    g = g < 0 ? 0 : (g > 255 ? 255 : g);
+    b = b < 0 ? 0 : (b > 255 ? 255 : b);
+
+    changeLed(socket, x, y, r, g, b);
   });
 
   //socket.on("startAnimation", function(data) {
