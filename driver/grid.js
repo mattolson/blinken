@@ -41,10 +41,10 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
           // wiring is reversed on odd-numbered columns.
           if (i % 2 == 0) {
             strand_index += (l * this.num_pixels_per_panel_x);
-            strand_index += (y % 2 == 1) ? x : (this.num_pixels_per_panel_x - x - 1);
+            strand_index += (l % 2 == 1) ? k : (this.num_pixels_per_panel_x - k - 1);
           } else {
             strand_index += ((this.num_pixels_per_panel_y - l - 1) * this.num_pixels_per_panel_x);
-            strand_index += (y % 2 == 1) ? x : (this.num_pixels_per_panel_x - x - 1);
+            strand_index += (l % 2 == 1) ? k : (this.num_pixels_per_panel_x - k - 1);
           }
 
           this.pixel_map[(this.num_pixels_x * y) + x] = strand_index;
