@@ -20,4 +20,4 @@ to an SD card. See [this page](http://elinux.org/RPi_Easy_SD_Card_Setup) for mor
 * Clone this repository: `git clone git://github.com/mattolson/blinken.git`
 * Build/install node modules: `cd driver && npm install`
 * Start server: `sudo node index.js`
-* [Visit server in browser](http://ip_of_rpi:8888/)
+* Open Chrome and visit [http://ip_of_rpi:8888/](http://ip_of_rpi:8888/)

@@ -16,14 +16,6 @@ function LedCtrl($scope, $http, socket) {
     $scope.leds = data;
   });
 
-  $scope.startAnimation = function() {
-    socket.emit("startAnimation", {});
-  }
-
-  $scope.stopAnimation = function() {
-    socket.emit("stopAnimation", {});
-  }
-
   $scope.turnOff = function() {
     socket.emit("off", {});
   }

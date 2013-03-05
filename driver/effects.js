@@ -1,4 +1,3 @@
-var spi = require('spi');
 var Easing = require('easing');
 
 var STEPS = 25;
@@ -64,46 +63,6 @@ Throb.prototype.tick = function() {
         setTimeout(function() { self.tick(); },
             this.duration*DURATION_SCALE);
     }
-}
-
-function Pixel(device, num_pixels) {
-    this.num_pixels = num_pixels;
-    this.pixel_buffer = new Buffer(num_pixels*3);
-    this.off_buffer = new Buffer(num_pixels*3);
-    this.device = new spi.Spi(device, {
-        "mode": spi.MODE['MODE_0'],
-        "chipSelect": spi.CS['none'],
-        "maxSpeed": 1000000
-    }, function(d) { d.open(); });
-
-    this.pixel_buffer.fill(0);
-    this.off_buffer.fill(0);
-    this.device.write(this.pixel_buffer);
-    this.animate = null;
-};
-
-Pixel.prototype.off = function() {
-    this.device.write(this.off_buffer);
-};
-
-Pixel.prototype.sync = function() {
-    this.device.write(this.pixel_buffer);
-};
-
-Pixel.prototype.all = function(r,g,b) {
-    for(var i = 0; i < this.num_pixels; i++) {
-        this.set(i, r, g, b);
-    }
-}
-
-Pixel.prototype.clear = function() {
-    this.pixel_buffer.fill(0);
-}
-
-Pixel.prototype.set = function(pixel, r, g, b) {
-    this.pixel_buffer[pixel*3] = r;
-    this.pixel_buffer[pixel*3+1] = g;
-    this.pixel_buffer[pixel*3+2] = b;
 }
 
 Pixel.prototype.throb = function(pixels, start_color, end_color, duration, options) {
