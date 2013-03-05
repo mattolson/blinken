@@ -13,7 +13,6 @@ function LedCtrl($scope, $http, socket) {
 
   // fetch all leds from server at startup
   $http.get('leds').success(function(data) {
-    console.log(data);
     $scope.leds = data;
   });
 

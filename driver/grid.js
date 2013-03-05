@@ -53,8 +53,6 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
     }
   }
 
-  console.log(this.pixel_map);
-
   // Instantiate SPI device
   this.device = new spi.Spi(device, {
     "mode": spi.MODE['MODE_0'],
@@ -81,9 +79,9 @@ Grid.prototype.setPixelColor = function(x, y, r, g, b) {
   }
 
   // set pixel data
-  this.pixels[index] = r;
-  this.pixels[index+1] = g;
-  this.pixels[index+2] = b;
+  this.pixels[index*3] = r;
+  this.pixels[(index*3)+1] = g;
+  this.pixels[(index*3)+2] = b;
 };
 
 Grid.prototype.getPixelColor = function(x, y) {
@@ -94,8 +92,8 @@ Grid.prototype.getPixelColor = function(x, y) {
 
   return { 
     r: this.pixels[index], 
-    g: this.pixels[index+1], 
-    b: this.pixels[index+2] 
+    g: this.pixels[(index*3)+1], 
+    b: this.pixels[(index*3)+2] 
   };
 };
 
