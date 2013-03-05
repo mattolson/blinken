@@ -25,10 +25,18 @@ function LedCtrl($scope, $http, socket) {
     socket.emit("stopAnimation", {});
   }
 
+  $scope.turnOff = function() {
+    socket.emit("off", {});
+  }
+
   // submit a changed led via socket
   $scope.submitLed = function(led) {
     socket.emit("change:led", {
-      x: led.x, y: led.y, r: led.r, g: led.g, b: led.b
+      x: led.x, 
+      y: led.y, 
+      r: led.r, 
+      g: led.g, 
+      b: led.b
     });
   }
 
@@ -64,7 +72,6 @@ function LedCtrl($scope, $http, socket) {
       mouseDown = false;
     }
   }
-
 
   //--- touch events on mobile -----
 
@@ -125,6 +132,5 @@ function LedCtrl($scope, $http, socket) {
     }
     return [Math.floor(r * 255), Math.floor(g * 255), Math.floor(b * 255)];
   }
-
 }
 

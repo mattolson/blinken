@@ -121,6 +121,10 @@ exports.registerSocketHandlers = function(socket) {
     changeLed(socket, x, y, r, g, b);
   });
 
+  socket.on("off", function(data) {
+    grid.off();
+  });
+
   //socket.on("startAnimation", function(data) {
   //  startAnimation(socket, leds);
   //});
