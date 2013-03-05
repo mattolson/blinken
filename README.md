@@ -14,6 +14,7 @@ To get the Raspberry PI ready:
 to an SD card. See [this page](http://elinux.org/RPi_Easy_SD_Card_Setup) for more details on flashing the OS.
 * Download and compile node.js from source. Sadly, the binary distribution in the Raspbian repository did not work for us. Follow 
 [this guide](https://gist.github.com/3301813) but use the latest version of node. Compiling node on a 700Mhz ARM chip takes a long time, so grab a beer.
+* Wire up your lights [like so](http://learn.adafruit.com/light-painting-with-raspberry-pi/hardware).
 
 ### Installation
 
