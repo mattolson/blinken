@@ -8,7 +8,7 @@ We're using a [NodeJS v0.8.21](https://github.com/joyent/node) server on a [Rasp
 
 ### Requirements
 
-To get the Raspberry PI ready:
+To get the hardware ready:
 
 * Download and flash the [Occidentalis v0.2](http://learn.adafruit.com/adafruit-raspberry-pi-educational-linux-distro/occidentalis-v0-dot-2) distribution
 to an SD card. See [this page](http://elinux.org/RPi_Easy_SD_Card_Setup) for more details on flashing the OS.
