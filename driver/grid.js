@@ -1,5 +1,6 @@
 // The grid object maps the 2D logical space to the 1D physical space
 // and handles device operations
+var spi = require('spi');
 
 function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pixels_per_panel_y) {
   // Store dimensions for later
@@ -46,7 +47,7 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
   }, function(d) { d.open(); });
 
   // Clear the display
-  grid.off();
+  this.off();
 }
 
 Grid.prototype.getPixelIndex = function(x, y) {
@@ -116,4 +117,4 @@ Grid.prototype.sync = function() {
 };
 
 // Export public interface
-module.exports = Grid;
+exports.Grid = Grid;

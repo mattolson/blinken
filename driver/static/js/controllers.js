@@ -8,6 +8,8 @@ function LedCtrl($scope, $http, socket) {
   var currentLed;
   var lastX = 0;
   var lastY = 0;
+  var numPixelsX = 6;
+  var numPixelsY = 6;
 
   // fetch all leds from server at startup
   $http.get('leds').success(function(data) {
@@ -25,16 +27,16 @@ function LedCtrl($scope, $http, socket) {
   // submit a changed led via socket
   $scope.submitLed = function(led) {
     socket.emit("change:led", {
-      id: led.id, r: led.r, g: led.g, b: led.b
+      x: led.x, y: led.y, r: led.r, g: led.g, b: led.b
     });
   }
 
   // handle incoming change events
   socket.on("changed:led", function(data) {
-    var id = data.id;
-    $scope.leds[id].r = data.r;
-    $scope.leds[id].g = data.g;
-    $scope.leds[id].b = data.b;
+    var index = (data.y * numPixelsX) + data.x;
+    $scope.leds[index].r = data.r;
+    $scope.leds[index].g = data.g;
+    $scope.leds[index].b = data.b;
   });
 
   socket.on("update", function(data) {
@@ -78,7 +80,8 @@ function LedCtrl($scope, $http, socket) {
     mouseDown = true;
     lastX = clientX;
     lastY = clientY;
-    currentLed = $scope.leds[led.id];
+    var index = (led.y * numPixelsX) + led.x;
+    currentLed = $scope.leds[index];
     if (typeof currentLed.hue === "undefined") {
       currentLed.hue = 0.5;
       currentLed.light = 0.5;
