@@ -1,70 +1,33 @@
-var util = require("util");
-var sys = require('sys');
+// Setup grid
+var Grid = require('./grid').Grid;
+var grid = new Grid('/dev/spidev0.0', 2, 1, 3, 6);
 
-var Pixel = require('./pixel').Pixel;
-var pixels = new Pixel('/dev/spidev0.0', 36);
-pixels.all(0, 0, 0);
-pixels.sync();
+// Output current leds as json
+function renderLeds(request, response) {
+  response.send(grid.toJson());
+}
 
-var MAX_LEDS = 36;
+// Handle change events on the socket
+function changeLed(socket, led) {
+  // Change the color
+  grid.setPixelColor(led.x, led.y, led.r, led.g, led.b);
+  grid.sync();
+
+  // Get pixel color (for debugging: make sure it worked)
+  var pixelColor = grid.getPixelColor(led.x, led.y);
+
+  // send the changed led to all other clients
+  socket.broadcast.emit("changed:led", {
+    x: led.x, y: led.y, r: pixelColor.r, g: pixelColor.g, b: pixelColor.b
+  }); 
+}
+
+/*
 var MAX_STEPS = 10;
-
 var animation = {
   running: false,
   step: 0
 };
-
-var leds = [];
-var ledBuffer = [];
-for (var i = 0; i < MAX_LEDS; i++) {
-  leds[i] = { id: i, r: 0, g: 0, b: 0 };
-  ledBuffer[i] = {};
-}
-
-// send current leds as json
-function renderLeds(request, response) {
-  response.writeHead(200, {"Content-Type": "application/json"});
-  response.write(JSON.stringify(leds));
-  response.end();
-}
-
-/*
-function postLed(request, response) {
-  console.log("postLed");
-  var led = {};
-  var form = new formidable.IncomingForm();
-  form.on('error', function(err) {
-    response.writeHead(500, {'content-type': 'text/plain'});
-    response.end('error:\n\n'+util.inspect(err));
-    console.log('error: ' + util.inspect(err));
-  });
-  form.on('end', function() {
-    console.log('-> post done');
-    response.writeHead(200, {'content-type': 'text/plain'});
-    response.end();
-  });
-  form.parse(request, function(err, fields, files) {
-    console.log("updating led: " + fields.id + ", " + fields.r + ", " + fields.g + ", " + fields.b);
-    leds[fields.id].r = parseInt(fields.r); 
-    leds[fields.id].g = parseInt(fields.g); 
-    leds[fields.id].b = parseInt(fields.b); 
-    //pixels.set(fields.id, leds[fields.id].r, leds[fields.id].g, leds[fields.id].b);
-    //pixels.sync();
-  });
-}
-*/
-
-// set a single led
-function setLed(id, r, g, b) {
-  var ir = parseInt(r);
-  var ig = parseInt(g);
-  var ib = parseInt(b);
-  leds[id].r = (ir < 0) ? 0 : (ir > 255) ? 255 : ir;
-  leds[id].g = (ig < 0) ? 0 : (ig > 255) ? 255 : ig;
-  leds[id].b = (ib < 0) ? 0 : (ib > 255) ? 255 : ib;
-  pixels.set(id, leds[id].r, leds[id].g, leds[id].b);
-  pixels.sync();
-}
 
 function syncLeds() {
   for (var i = 0; i < MAX_LEDS; i++) {
@@ -72,15 +35,6 @@ function syncLeds() {
     pixels.set(i, led.r, led.g, led.b);
   }
   pixels.sync();
-}
-
-// handle change events on the socket
-function changeLed(socket, led) {
-  setLed(led.id, led.r, led.g, led.b);
-  // send the changed led to all other clients
-  socket.broadcast.emit("changed:led", {
-    id: led.id, r: leds[led.id].r, g: leds[led.id].g, b: leds[led.id].b
-  }); 
 }
 
 function startAnimation(socket, leds) {
@@ -145,6 +99,7 @@ function animate(socket, leds) {
     }, 100);
   }
 }
+*/
 
 // Register socket handlers
 exports.registerSocketHandlers = function(socket) {
@@ -152,13 +107,13 @@ exports.registerSocketHandlers = function(socket) {
     changeLed(socket, data);
   });
 
-  socket.on("startAnimation", function(data) {
-    startAnimation(socket, leds);
-  });
+  //socket.on("startAnimation", function(data) {
+  //  startAnimation(socket, leds);
+  //});
 
-  socket.on("stopAnimation", function(data) {
-    stopAnimation(socket);
-  });
+  //socket.on("stopAnimation", function(data) {
+  //  stopAnimation(socket);
+  //});
 }
 
 // Register http handlers

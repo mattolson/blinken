@@ -13,13 +13,13 @@
   <div class="container" style="max-width: 600px" ng-mouseout="mouseOut($event)" >
     <div class="row span5 ledGrid" ng-mousemove="mouseMove($event)" > 
       <ul class="thumbnails">
-	<li ng-repeat="led in leds" class="span1">
-	  <div class="thumbnail2" style="background-color:rgb({{led.r}}, {{led.g}}, {{led.b}})"
-	    ng-mousedown="mouseDown(led, $event)"
-	    te-touchstart="touchStart(led, $event)"
-	    te-touchmove="touchMove($event)"
-	    te-touchend="mouseUp($event)">&nbsp;</div>
-	</li>
+        <li ng-repeat="led in leds" class="span1">
+          <div class="thumbnail2" style="background-color:rgb({{led.r}}, {{led.g}}, {{led.b}})"
+            ng-mousedown="mouseDown(led, $event)"
+            te-touchstart="touchStart(led, $event)"
+            te-touchmove="touchMove($event)"
+            te-touchend="mouseUp($event)">&nbsp;</div>
+        </li>
       </ul>
     </div>
   </div>

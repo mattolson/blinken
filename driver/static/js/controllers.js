@@ -24,18 +24,6 @@ function LedCtrl($scope, $http, socket) {
 
   // submit a changed led via socket
   $scope.submitLed = function(led) {
-    /*
-    $http({
-      method: 'POST',
-      url: "/led",
-      data:  $.param({ id : led.id, r : led.r, g : led.g, b : led.b }),
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-    }).success(function (data, status, headers, config) {
-    }).error(function (data, status, headers, config) {
-      alert("failed");
-    });
-    */
-
     socket.emit("change:led", {
       id: led.id, r: led.r, g: led.g, b: led.b
     });
