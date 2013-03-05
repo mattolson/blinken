@@ -35,7 +35,7 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
           // figuring out for the given position how many panels came before us.
           panel_index = (i*this.num_panels_y);
           panel_index += (i % 2 == 0) ? (y / this.num_pixels_per_panel_y) : ((this.num_pixels_y - y - 1) / this.num_pixels_per_panel_y);
-          strand_index = panel_index * this.num_pixels_per_panel_x * this.num_pixels_per_panel_y;
+          strand_index = (panel_index-1) * this.num_pixels_per_panel_x * this.num_pixels_per_panel_y;
 
           // Now just worry about the index within the current panel. Note that the
           // wiring is reversed on odd-numbered columns.
