@@ -64,18 +64,3 @@ Throb.prototype.tick = function() {
             this.duration*DURATION_SCALE);
     }
 }
-
-Pixel.prototype.throb = function(pixels, start_color, end_color, duration, options) {
-    this.stop();
-    this.animate = new Throb(this, pixels, start_color, end_color, duration, options);
-    this.animate.start();
-}
-
-Pixel.prototype.stop = function() {
-    if (this.animate !== null) {
-        this.animate.stop();
-        this.animate = null;
-    }
-}
-
-module.exports.Pixel = Pixel;
