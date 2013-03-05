@@ -9,23 +9,12 @@ function renderLeds(request, response) {
 
 // Handle change events on the socket
 function changeLed(socket, x, y, r, g, b) {
-  console.log("changing led (%d, %d) to (%d, %d, %d)", x, y, r, g, b);
-      
   // Change the color
   grid.setPixelColor(x, y, r, g, b);
   grid.sync();
 
-  // Get pixel color (for debugging: make sure it worked)
-  var pixelColor = grid.getPixelColor(x, y);
-
-  // send the changed led to all other clients
-  socket.broadcast.emit("changed:led", {
-    x: x, 
-    y: y, 
-    r: pixelColor.r, 
-    g: pixelColor.g, 
-    b: pixelColor.b
-  }); 
+  // Broadcast change to all other clients
+  socket.broadcast.emit("changed:led", { x: x, y: y, r: r, g: g, b: b }); 
 }
 
 /*
