@@ -3,7 +3,7 @@
 We are working with strands of [Adafruit WS2801 LED pixels](https://www.adafruit.com/products/322), configured in a grid installed
 on ceiling tiles. For more information on basic wiring and led function, see [Adafruit's tutorial](http://learn.adafruit.com/12mm-led-pixels/).
 
-We're using a [node.js v0.8.21](https://github.com/joyent/node) server on a [Raspberry PI Model B](http://www.raspberrypi.org/) with a 
+We're using a [NodeJS v0.8.21](https://github.com/joyent/node) server on a [Raspberry PI Model B](http://www.raspberrypi.org/) with a 
 [breakout kit](http://adafruit.com/products/914) to drive the array.
 
 ### Requirements
@@ -21,3 +21,9 @@ to an SD card. See [this page](http://elinux.org/RPi_Easy_SD_Card_Setup) for mor
 * Build/install node modules: `cd driver && npm install`
 * Start server: `sudo node index.js`
 * Open Chrome and visit [http://ip_of_rpi:8888/](http://ip_of_rpi:8888/)
+
+### Thanks
+
+Big thanks go to [Alexander Weber](https://github.com/tinkerlog) for writing [node-pixel](https://github.com/tinkerlog/node-pixel), upon which 
+some of this project is based, and [Russell Hay](https://github.com/RussTheAerialist) for writing [node-spi](https://github.com/RussTheAerialist/node-spi),
+a NodeJS interface to the SPI bus.
