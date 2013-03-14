@@ -20,13 +20,15 @@ function changeLed(socket, x, y, rgb) {
   // Change the pixel color
   grid.setPixelColor(x, y, rgb);
   grid.sync();
-
-  // Broadcast change to all other clients
-  socket.broadcast.emit("changed:led", { x: x, y: y, rgb: rgb }); 
 }
 
 // Register socket handlers
 exports.registerSocketHandlers = function(socket) {
+  // Add grid listener
+  grid.addListener(function() {
+    socket.emit("update", grid.toJson());
+  });
+
   socket.on("change:led", function(data) {
     // Validate input values
     var x = parseInt(data.x);
@@ -44,12 +46,10 @@ exports.registerSocketHandlers = function(socket) {
   socket.on("off", function(data) {
     controller.deregister_all();
     grid.off();
-    socket.emit("update", grid.toJson());
   });
 
   socket.on("throb", function(data) {
     controller.register_effect(new Throb(grid, 40, [0,0,0], [255,255,255]));
-    //socket.emit("update", grid.toJson());
   });
 }
 

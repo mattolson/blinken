@@ -33,12 +33,6 @@ function LedCtrl($scope, $http, socket) {
     });
   }
 
-  // handle incoming change events
-  socket.on("changed:led", function(data) {
-    var index = (data.y * numPixelsX) + data.x;
-    $scope.leds[index].rgb = data.rgb;
-  });
-
   socket.on("update", function(data) {
     $scope.leds = data;
   });

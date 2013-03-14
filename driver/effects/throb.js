@@ -9,7 +9,7 @@ var STEPS = 25;
 // options = {}, optional, valid keys: 'easing' => type of easing to perform (defaults to 'linear')
 function Throb(grid, period, start_color, end_color, options)
 {
-  Throb.super_.call(this, grid, period);
+  Throb.super_.call(this, 'throb', grid, period);
   this.start_color = start_color;
   this.end_color = end_color;
   this.current_step = 0;

@@ -19,6 +19,9 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
   this.pixels = new Buffer(this.num_pixels_x * this.num_pixels_y * 3); // 3 octets per pixel, stores color values
   this.pixels.fill(0);
 
+  // Setup list of listeners
+  this.listeners = [];
+
   // Instantiate pixels. Loop through in logical order, and then
   // calculate the strand index.
   var i, j, k, l, x, y, panel_index, strand_index;
@@ -134,7 +137,19 @@ Grid.prototype.off = function() {
 };
 
 Grid.prototype.sync = function() {
+  // Blast out updates
   this.device.write(this.pixels);
+
+  // Notify listeners
+  for (var i = 0; i < this.listeners.length; i++) {
+    this.listeners[i]();
+  }
+};
+
+Grid.prototype.addListener = function(listener) {
+  if (typeof(listener) === 'function') {
+    this.listeners.push(listener);
+  }
 };
 
 // Export constructor directly

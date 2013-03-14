@@ -1,6 +1,8 @@
+// name = a unique short name for this effect (used for registration)
 // grid = the instantiated Grid object
 // period = number if milliseconds between steps
-function Effect(grid, period) {
+function Effect(name, grid, period) {
+  this.name = name;
   this.grid = grid;
   this.period = period;
   this.started_at = 0; // when did this effect first begin?
