@@ -17,6 +17,7 @@ Controller.prototype.deregister_effect = function(effect) {
       this.effects.splice(i,1);
       return;
     }
+  }
 };
 
 Controller.prototype.deregister_all = function() {
