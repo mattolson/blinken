@@ -29,9 +29,10 @@ Controller.prototype.run = function() {
     return;
   }
 
+  var controller = this;
   this.timer = setInterval(function() { 
-    if (!this.rendering) {
-      this.render(); 
+    if (!controller.rendering) {
+      controller.render(); 
     }
   }, 2);
 };
