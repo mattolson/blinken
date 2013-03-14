@@ -28,7 +28,7 @@ ColorWipe.prototype.step = function() {
 
   // Calculate current x,y
   var x = this.current_pixel % this.grid.num_pixels_x;
-  var y = this.current_pixel / this.grid.num_pixels_x;
+  var y = Math.floor(this.current_pixel / this.grid.num_pixels_x);
 
   // Set color of next pixel in the sequence
   this.grid.setPixelColor(x, y, this.color);
