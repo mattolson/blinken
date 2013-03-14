@@ -1,66 +1,53 @@
+var util = require('util');
 var Easing = require('easing');
+var Effect = require('../effect');
 
 var STEPS = 25;
-var DURATION_SCALE = 1000/STEPS;
 
-function Throb(setter, pixels, start_color, end_color, duration, options)
+// start_color = [r,g,b], the color to start with
+// end_color = [r,g,b], the color to end up with after period*STEPS milliseconds
+// options = {}, optional, valid keys: 'easing' => type of easing to perform (defaults to 'linear')
+function Throb(grid, period, start_color, end_color, options)
 {
-    this.setter = setter;
-    this.pixels = pixels;
-    this.start_color = start_color;
-    this.end_color = end_color;
-    this.duration = duration;
-    if (options !== undefined && "easing" in options) {
-        this.easing = Easing(STEPS, options.easing, {
-            endToEnd:true
-        });
-    } else {
-        this.easing = Easing(STEPS, 'linear', {
-            endToEnd:true
-        });
-    }
-    this.step = 0;
-    this.running = false;
+  this.super_.call(this, grid, period);
+  this.start_color = start_color;
+  this.end_color = end_color;
+  this.step = 0;
+
+  options = options || {};
+  options['easing'] = ('easing' in options ? options['easing'] : 'linear');
+
+  this.easing = Easing(STEPS, options.easing, {
+    endToEnd: true
+  });
 }
 
-Throb.prototype.start = function() {
-    console.log(this.easing);
-    this.running = true;
-    this.tick();
-}
-
-Throb.prototype.stop = function() {
-    this.running = false;
-}
+// Set up inheritance from Effect
+util.inherits(Throb, Effect);
 
 Throb.prototype.calculate_single = function(start_value, end_value) {
-    var retval = start_value + (end_value-start_value)*this.easing[this.step];
-    return retval;
+  return start_value + (end_value-start_value) * this.easing[this.step];
 }
 
 Throb.prototype.calculate_rgb = function() {
-    var r = this.calculate_single(this.start_color[0],
-                                  this.end_color[0]);
-    var g = this.calculate_single(this.start_color[1],
-                                  this.end_color[1]);
-    var b = this.calculate_single(this.start_color[2],
-                                  this.end_color[2]);
-
-    return [r,g,b];
+  var r = this.calculate_single(this.start_color[0], this.end_color[0]);
+  var g = this.calculate_single(this.start_color[1], this.end_color[1]);
+  var b = this.calculate_single(this.start_color[2], this.end_color[2]);
+  return [r,g,b];
 }
 
-Throb.prototype.tick = function() {
-    var self = this;
-    rgb = this.calculate_rgb();
-    // Loop through all of the pixels in pixels, and call set
-    this.pixels.forEach(function(element, index, array) {
-        self.setter.set(element, rgb[0], rgb[1], rgb[2]);
-    });
-    self.setter.sync();
+Throb.prototype.step = function() {
+  // Set entire grid to the new color
+  var color = this.calculate_rgb();
+  this.grid.setGridColor(color);
 
-    this.step = (this.step+=1)%STEPS;
-    if (this.running) {
-        setTimeout(function() { self.tick(); },
-            this.duration*DURATION_SCALE);
-    }
+  // Update step number
+  this.step++;
+  this.step = this.step % STEPS;
+
+  // Keep going forever
+  return true;
 }
+
+// Export constructor directly
+module.exports = Throb;

@@ -12,6 +12,7 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
   // Figure out overall dimensions
   this.num_pixels_x = num_panels_x * num_pixels_per_panel_x;
   this.num_pixels_y = num_panels_y * num_pixels_per_panel_y;
+  this.num_pixels = num_pixels_x * num_pixels_y;
 
   // Setup data structures for pixels
   this.pixel_map = new Array(this.num_pixels_x * this.num_pixels_y); // Maps logical index to strand index
@@ -84,6 +85,15 @@ Grid.prototype.setPixelColor = function(x, y, r, g, b) {
   this.pixels[(index*3)+2] = b;
 };
 
+Grid.prototype.setGridColor = function(r, g, b) {
+  for (var i = 0; i < this.num_pixels; i++) {
+    this.pixels[i*3] = r;
+    this.pixels[(i*3)+1] = g;
+    this.pixels[(i*3)+2] = b;
+  }
+};
+
+
 Grid.prototype.getPixelColor = function(x, y) {
   var index = this.getStrandIndex(x,y);
   if (index == null) {
@@ -126,5 +136,5 @@ Grid.prototype.sync = function() {
   this.device.write(this.pixels);
 };
 
-// Export public interface
-exports.Grid = Grid;
+// Export constructor directly
+module.exports = Grid;

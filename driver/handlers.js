@@ -2,6 +2,14 @@
 var Grid = require('./grid').Grid;
 var grid = new Grid('/dev/spidev0.0', 2, 1, 3, 6);
 
+// Setup controller
+var Controller = require('./controller');
+var controller = new Controller(grid);
+controller.run();
+
+// Import effects
+var Throb = require('./effects/throb');
+
 // Output current leds as json
 function renderLeds(request, response) {
   response.send(grid.toJson());
@@ -34,8 +42,14 @@ exports.registerSocketHandlers = function(socket) {
   });
 
   socket.on("off", function(data) {
+    controller.deregister_all();
     grid.off();
     socket.emit("update", grid.toJson());
+  });
+
+  socket.on("throb", function(data) {
+    controller.register_effect(new Throb(grid, 40));
+    //socket.emit("update", grid.toJson());
   });
 }
 
