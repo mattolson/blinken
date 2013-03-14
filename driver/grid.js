@@ -12,7 +12,7 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
   // Figure out overall dimensions
   this.num_pixels_x = num_panels_x * num_pixels_per_panel_x;
   this.num_pixels_y = num_panels_y * num_pixels_per_panel_y;
-  this.num_pixels = num_pixels_x * num_pixels_y;
+  this.num_pixels = this.num_pixels_x * this.num_pixels_y;
 
   // Setup data structures for pixels
   this.pixel_map = new Array(this.num_pixels_x * this.num_pixels_y); // Maps logical index to strand index
