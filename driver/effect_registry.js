@@ -4,9 +4,10 @@ function EffectRegistry() {
   this.effects = {};
 
   // Loop through effects directory and add them to the registry
+  var registry = this;
   require("fs").readdirSync("./effects").forEach(function(file) {
     var effect = require("./effects/" + file);
-    this.effects[effect.name] = effect.constructor;
+    registry.effects[effect.name] = effect.constructor;
   });
 }
 
