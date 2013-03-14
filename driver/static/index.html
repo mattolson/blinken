@@ -14,7 +14,7 @@
     <div class="row span6 ledGrid" ng-mousemove="mouseMove($event)" > 
       <ul class="thumbnails">
         <li ng-repeat="led in leds" class="span1">
-          <div class="thumbnail2" style="background-color:rgb({{led.r}}, {{led.g}}, {{led.b}})"
+          <div class="thumbnail2" style="background-color:rgb({{led.rgb[0]}}, {{led.rgb[1]}}, {{led.rgb[2]}})"
             ng-mousedown="mouseDown(led, $event)"
             te-touchstart="touchStart(led, $event)"
             te-touchmove="touchMove($event)"

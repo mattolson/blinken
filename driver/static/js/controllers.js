@@ -29,18 +29,14 @@ function LedCtrl($scope, $http, socket) {
     socket.emit("change:led", {
       x: led.x, 
       y: led.y, 
-      r: led.r, 
-      g: led.g, 
-      b: led.b
+      rgb: led.rgb
     });
   }
 
   // handle incoming change events
   socket.on("changed:led", function(data) {
     var index = (data.y * numPixelsX) + data.x;
-    $scope.leds[index].r = data.r;
-    $scope.leds[index].g = data.g;
-    $scope.leds[index].b = data.b;
+    $scope.leds[index].rgb = data.rgb;
   });
 
   socket.on("update", function(data) {
@@ -99,10 +95,7 @@ function LedCtrl($scope, $http, socket) {
       var newLight = currentLed.light + deltaY;
       currentLed.hue = (newHue > 0.0 && newHue < 1.0) ? newHue : currentLed.hue;
       currentLed.light = (newLight > 0.0 && newLight < 1.0) ? newLight : currentLed.light;
-      var rgb = hsvToRgb(currentLed.hue, 1.0, currentLed.light);
-      currentLed.r = rgb[0];
-      currentLed.g = rgb[1];
-      currentLed.b = rgb[2];
+      currentLed.rgb = hsvToRgb(currentLed.hue, 1.0, currentLed.light);
       $scope.submitLed(currentLed);
       lastX = clientX;
       lastY = clientY;

@@ -73,23 +73,23 @@ Grid.prototype.getStrandIndex = function(x, y) {
   return this.pixel_map[(y*this.num_pixels_x)+x];
 };
 
-Grid.prototype.setPixelColor = function(x, y, r, g, b) {
+Grid.prototype.setPixelColor = function(x, y, rgb) {
   var index = this.getStrandIndex(x,y);
   if (index == null) {
     return;
   }
 
   // set pixel data
-  this.pixels[index*3] = r;
-  this.pixels[(index*3)+1] = g;
-  this.pixels[(index*3)+2] = b;
+  this.pixels[index*3] = rgb[0];
+  this.pixels[(index*3)+1] = rgb[1];
+  this.pixels[(index*3)+2] = rgb[2];
 };
 
-Grid.prototype.setGridColor = function(r, g, b) {
+Grid.prototype.setGridColor = function(rgb) {
   for (var i = 0; i < this.num_pixels; i++) {
-    this.pixels[i*3] = r;
-    this.pixels[(i*3)+1] = g;
-    this.pixels[(i*3)+2] = b;
+    this.pixels[i*3] = rgb[0];
+    this.pixels[(i*3)+1] = rgb[1];
+    this.pixels[(i*3)+2] = rgb[2];
   }
 };
 
@@ -100,11 +100,11 @@ Grid.prototype.getPixelColor = function(x, y) {
     return null;
   }
 
-  return { 
-    r: this.pixels[index], 
-    g: this.pixels[(index*3)+1], 
-    b: this.pixels[(index*3)+2] 
-  };
+  return [
+    this.pixels[index], 
+    this.pixels[(index*3)+1], 
+    this.pixels[(index*3)+2]
+  ]; 
 };
 
 Grid.prototype.toJson = function() {
@@ -112,10 +112,11 @@ Grid.prototype.toJson = function() {
   for (var y = 0; y < this.num_pixels_y; y++) {
     for (var x = 0; x < this.num_pixels_x; x++) {
       var index = (y*this.num_pixels_x)+x;
-      var led = this.getPixelColor(x,y);
-      if (led != null) {
-        led['x'] = x;
-        led['y'] = y;
+      var led = {};
+      led['x'] = x;
+      led['y'] = y;
+      led['rgb'] = this.getPixelColor(x,y);
+      if (led['rgb'] != null) {
         json[index] = led;
       }
     }
