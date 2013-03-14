@@ -9,6 +9,8 @@ controller.run();
 
 // Import effects
 var Throb = require('./effects/throb');
+var ColorWipe = require('./effects/color_wipe');
+var EFFECTS = [Throb, ColorWipe];
 
 // Output current leds as json
 function renderLeds(request, response) {
@@ -52,8 +54,25 @@ exports.registerSocketHandlers = function(socket) {
     socket.emit("update", grid.toJson());
   });
 
-  socket.on("throb", function(data) {
-    controller.register_effect(new Throb(grid, 40, [0,0,0], [255,255,255]));
+  socket.on("effect:register", function(data) {
+    // Pull effect name
+    var effect_name = data['effect'];
+    delete data['effect_name'];
+
+    // Instantiate effect
+    var effect = null;
+    for (var i = 0; i < effects.length; i++) {
+      if (EFFECTS[i].name == effect_name) {
+        effect = new EFFECTS[i](grid, data);
+        controller.register_effect(effect);
+        break;
+      }
+    }
+
+    // Check for errors
+    if (effect == null) {
+      console.log("ERROR: unknown effect '" + effect_name + "'");
+    }
   });
 }
 

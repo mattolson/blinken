@@ -20,8 +20,24 @@ function LedCtrl($scope, $http, socket) {
     socket.emit("off", {});
   }
 
-  $scope.throb = function() {
-    socket.emit("throb", {});
+  $scope.registerEffect = function(effect, options) {
+    if (typeof(options) === 'undefined') {
+      options = {};
+    }
+    options['effect'] = effect;
+
+    // TEMPORARY (until we have an interface for setting options)
+    if (effect == 'throb') {
+      options['period'] = 40;
+      options['start_color'] = [0,0,0];
+      options['end_color'] = [255,255,255];
+    }
+    else if (effect == 'color_wipe') {
+      options['period'] = 40;
+      options['color'] = [255,0,0];
+    }
+
+    socket.emit("effect:register", options);
   }
 
   // submit a changed led via socket

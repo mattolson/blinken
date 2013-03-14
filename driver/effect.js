@@ -1,10 +1,12 @@
 // name = a unique short name for this effect (used for registration)
 // grid = the instantiated Grid object
-// period = number if milliseconds between steps
-function Effect(name, grid, period) {
+// options = {}, optional, valid keys:
+//   'period' = number of milliseconds between steps
+function Effect(name, grid, options) {
+  options = options || {};
   this.name = name;
   this.grid = grid;
-  this.period = period;
+  this.period = options['period'] || 40; // default to 40 ms between steps
   this.started_at = 0; // when did this effect first begin?
   this.rendered_at = 0; // when was the last time we rendered a step?
 }

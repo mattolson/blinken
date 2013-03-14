@@ -4,20 +4,22 @@ var Effect = require('../effect');
 
 var STEPS = 25;
 
-// start_color = [r,g,b], the color to start with
-// end_color = [r,g,b], the color to end up with after period*STEPS milliseconds
-// options = {}, optional, valid keys: 'easing' => type of easing to perform (defaults to 'linear')
-function Throb(grid, period, start_color, end_color, options)
+// This effect uses an easing library to produce a throb effect, alternating
+// between two given colors.
+//
+// options = {}, optional, valid keys:
+//   'period' = number of milliseconds between steps
+//   'start_color':  [r,g,b], the color to start with, defaults to [0,0,0]
+//   'end_color':  [r,g,b], the color to end up with after period*STEPS milliseconds, defaults to [255,255,255]
+//   'easing': string for type of easing to perform, defaults to 'linear'
+function Throb(grid, options)
 {
-  Throb.super_.call(this, 'throb', grid, period);
-  this.start_color = start_color;
-  this.end_color = end_color;
-  this.current_step = 0;
-
   options = options || {};
-  options['easing'] = ('easing' in options ? options['easing'] : 'linear');
-
-  this.easing = Easing(STEPS, options.easing, {
+  Throb.super_.call(this, 'throb', grid, options);
+  this.current_step = 0;
+  this.start_color = options['start_color'] || [0,0,0];
+  this.end_color = options['end_color'] || [255,255,255];
+  this.easing = Easing(STEPS, options['easing'] || 'linear', {
     endToEnd: true
   });
 }
