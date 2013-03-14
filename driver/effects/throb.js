@@ -1,6 +1,6 @@
 var util = require('util');
 var Easing = require('easing');
-var Effect = require('../effect');
+var Effect = require('./effect');
 
 var STEPS = 25;
 
