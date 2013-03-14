@@ -27,14 +27,14 @@ util.inherits(Throb, Effect);
 
 Throb.prototype.calculate_single = function(start_value, end_value) {
   return start_value + (end_value-start_value) * this.easing[this.step];
-}
+};
 
 Throb.prototype.calculate_rgb = function() {
   var r = this.calculate_single(this.start_color[0], this.end_color[0]);
   var g = this.calculate_single(this.start_color[1], this.end_color[1]);
   var b = this.calculate_single(this.start_color[2], this.end_color[2]);
   return [r,g,b];
-}
+};
 
 Throb.prototype.step = function() {
   // Set entire grid to the new color
@@ -47,7 +47,7 @@ Throb.prototype.step = function() {
 
   // Keep going forever
   return true;
-}
+};
 
 // Export constructor directly
 module.exports = Throb;
