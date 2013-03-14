@@ -20,6 +20,10 @@ function LedCtrl($scope, $http, socket) {
     socket.emit("off", {});
   }
 
+  $scope.throb = function() {
+    socket.emit("throb", {});
+  }
+
   // submit a changed led via socket
   $scope.submitLed = function(led) {
     socket.emit("change:led", {
