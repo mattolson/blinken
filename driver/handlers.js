@@ -61,7 +61,7 @@ exports.registerSocketHandlers = function(socket) {
 
     // Instantiate effect
     var effect = null;
-    for (var i = 0; i < effects.length; i++) {
+    for (var i = 0; i < EFFECTS.length; i++) {
       if (EFFECTS[i].name == effect_name) {
         effect = new EFFECTS[i](grid, data);
         controller.register_effect(effect);
