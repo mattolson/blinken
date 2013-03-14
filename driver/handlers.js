@@ -1,5 +1,5 @@
 // Setup grid
-var Grid = require('./grid').Grid;
+var Grid = require('./grid');
 var grid = new Grid('/dev/spidev0.0', 2, 1, 3, 6);
 
 // Setup controller
