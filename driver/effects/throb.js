@@ -12,7 +12,7 @@ function Throb(grid, period, start_color, end_color, options)
   Throb.super_.call(this, grid, period);
   this.start_color = start_color;
   this.end_color = end_color;
-  this.step = 0;
+  this.current_step = 0;
 
   options = options || {};
   options['easing'] = ('easing' in options ? options['easing'] : 'linear');
@@ -26,7 +26,7 @@ function Throb(grid, period, start_color, end_color, options)
 util.inherits(Throb, Effect);
 
 Throb.prototype.calculate_single = function(start_value, end_value) {
-  return start_value + (end_value-start_value) * this.easing[this.step];
+  return start_value + (end_value-start_value) * this.easing[this.current_step];
 };
 
 Throb.prototype.calculate_rgb = function() {
@@ -42,8 +42,8 @@ Throb.prototype.step = function() {
   this.grid.setGridColor(color);
 
   // Update step number
-  this.step++;
-  this.step = this.step % STEPS;
+  this.current_step++;
+  this.current_step = this.current_step % STEPS;
 
   // Keep going forever
   return true;
