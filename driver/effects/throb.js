@@ -1,8 +1,10 @@
+var path = require('path');
 var util = require('util');
 var Easing = require('easing');
 var Effect = require('../effect');
 
-var STEPS = 25;
+var NAME = path.basename(__filename, '.js'); // Our unique name
+var STEPS = 25; // Number of steps between start_color and end_color
 
 // This effect uses an easing library to produce a throb effect, alternating
 // between two given colors.
@@ -15,7 +17,7 @@ var STEPS = 25;
 function Throb(grid, options)
 {
   options = options || {};
-  Throb.super_.call(this, 'throb', grid, options);
+  Throb.super_.call(this, NAME, grid, options);
   this.current_step = 0;
   this.start_color = options['start_color'] || [0,0,0];
   this.end_color = options['end_color'] || [255,255,255];
@@ -51,5 +53,6 @@ Throb.prototype.step = function() {
   return true;
 };
 
-// Export constructor directly
-module.exports = Throb;
+// Export public interface
+exports.constructor = Throb;
+exports.name = NAME;

@@ -1,5 +1,8 @@
+var path = require('path');
 var util = require('util');
 var Effect = require('../effect');
+
+var NAME = path.basename(__filename, '.js'); // Our unique name
 
 // This effect simply loops through each pixel in sequence and changes its color.
 //
@@ -9,7 +12,7 @@ var Effect = require('../effect');
 function ColorWipe(grid, options)
 {
   options = options || {};
-  Throb.super_.call(this, 'color_wipe', grid, options);
+  Throb.super_.call(this, NAME, grid, options);
   this.color = options['color'] || [255,0,0];
   this.current_pixel = 0;
 }
@@ -37,5 +40,6 @@ ColorWipe.prototype.step = function() {
   return true;
 };
 
-// Export constructor directly
-module.exports = ColorWipe;
+// Export public interface
+exports.constructor = ColorWipe;
+exports.name = NAME;
