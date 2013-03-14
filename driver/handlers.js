@@ -48,7 +48,7 @@ exports.registerSocketHandlers = function(socket) {
   });
 
   socket.on("throb", function(data) {
-    controller.register_effect(new Throb(grid, 40));
+    controller.register_effect(new Throb(grid, 40, [0,0,0], [255,255,255]));
     //socket.emit("update", grid.toJson());
   });
 }
