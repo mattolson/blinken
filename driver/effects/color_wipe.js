@@ -17,18 +17,18 @@ function ColorWipe(grid, options)
 // Set up inheritance from Effect
 util.inherits(ColorWipe, Effect);
 
-Throb.prototype.step = function() {
+ColorWipe.prototype.step = function() {
   // Stop animation once we're out of bounds
-  if (this.current_pixel >= this.num_pixels) {
+  if (this.current_pixel >= this.grid.num_pixels) {
     return false;
   }
 
   // Calculate current x,y
-  y = this.current_pixel % grid.num_pixels_x;
-  y = this.current_pixel / grid.num_pixels_x;
+  y = this.current_pixel % this.grid.num_pixels_x;
+  y = this.current_pixel / this.grid.num_pixels_x;
 
   // Set color of next pixel in the sequence
-  this.setPixelColor(x, y, color);
+  this.grid.setPixelColor(x, y, color);
 
   // Update state
   this.current_pixel++;
