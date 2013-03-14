@@ -49,10 +49,10 @@ Controller.prototype.render = function() {
   var changed = this.num_effects > 0;
 
   // Loop through effects and have them render themselves
-  for (var effect in this.effects) {
-    if (!effect.render()) {
+  for (var index in this.effects) {
+    if (!this.effects[index].render()) {
       // Effect has requested removal
-      this.deregister_effect(effect);
+      this.deregister_effect(this.effects[index]);
     }
   }
 
