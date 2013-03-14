@@ -12,7 +12,7 @@ var NAME = path.basename(__filename, '.js'); // Our unique name
 function ColorWipe(grid, options)
 {
   options = options || {};
-  Throb.super_.call(this, NAME, grid, options);
+  ColorWipe.super_.call(this, NAME, grid, options);
   this.color = options['color'] || [255,0,0];
   this.current_pixel = 0;
 }
