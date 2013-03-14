@@ -1,3 +1,4 @@
+var util = require('util');
 var Effect = require('../effect');
 
 // This effect simply loops through each pixel in sequence and changes its color.
