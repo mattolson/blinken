@@ -43,12 +43,21 @@ Controller.prototype.stop = function() {
 };
 
 Controller.prototype.render = function() {
+  // Global lock to make sure this doesn't get called again until we're done
   this.rendering = true;
+
+  // Loop through effects and have them render themselves
   for (var i = 0; i < this.effects.length; i++) {
     if (!this.effects[i].render()) {
+      // Effect has requested removal
       this.deregister_effect(this.effects[i]);
     }
   }
+
+  // Blast updates to strip
+  this.grid.sync();
+
+  // Remove lock
   this.rendering = false;
 };
 
