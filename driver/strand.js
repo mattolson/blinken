@@ -6,7 +6,6 @@ var spi = require('spi');
 function Strand(device, num_pixels) {
   this.num_pixels = num_pixels;
   this.pixels = new Buffer(this.num_pixels); // 3 octets per pixel, stores color values
-  this.pixels.fill(0);
 
   // Instantiate SPI device
   this.device = new spi.Spi(device, {
@@ -14,6 +13,8 @@ function Strand(device, num_pixels) {
     "chipSelect": spi.CS['none'],
     "maxSpeed": 1000000
   }, function(d) { d.open(); });
+
+  this.off();
 }
 
 Strand.prototype.setPixelColor = function(index, rgb) {
