@@ -35,7 +35,7 @@ Static.prototype.options = function() {
       'type': 'color',
       'value': this.color
     }
-  ].concat(Static.super_.prototype.options());
+  ].concat(Static.super_.prototype.options.call(this));;
 }
 
 // Export public interface

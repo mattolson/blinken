@@ -45,7 +45,7 @@ ColorWipe.prototype.options = function() {
       'type': 'color',
       'value': this.color
     }
-  ].concat(ColorWipe.super_.prototype.options());;
+  ].concat(ColorWipe.super_.prototype.options.call(this));;
 }
 
 // Export public interface

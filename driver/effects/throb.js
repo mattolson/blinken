@@ -72,7 +72,7 @@ Throb.prototype.options = function() {
       'type': 'string',
       'value': this.easing_type
     }
-  ].concat(Throb.super_.prototype.options());;
+  ].concat(Throb.super_.prototype.options.call(this));;
 }
 
 // Export public interface
