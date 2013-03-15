@@ -76,6 +76,15 @@ Grid.prototype.getStrandIndex = function(x, y) {
   return this.pixel_map[(y*this.num_pixels_x)+x];
 };
 
+// Used for iteration, if you want to loop through entire grid
+// in source order (left to right, top to bottom)
+Grid.prototype.xy = function(i) {
+  return {
+    x: i % this.num_pixels_x,
+    y: Math.floor(i / this.num_pixels_x)
+  }
+};
+
 Grid.prototype.setPixelColor = function(x, y, rgb) {
   var index = this.getStrandIndex(x,y);
   if (index == null) {
@@ -95,7 +104,6 @@ Grid.prototype.setGridColor = function(rgb) {
     this.pixels[(i*3)+2] = rgb[2];
   }
 };
-
 
 Grid.prototype.getPixelColor = function(x, y) {
   var index = this.getStrandIndex(x,y);
