@@ -1,6 +1,10 @@
 // Setup grid
-var Grid = require('./grid');
-var grid = new Grid('/dev/spidev0.0', 2, 1, 3, 6);
+//var Grid = require('./grid');
+//var grid = new Grid('/dev/spidev0.0', 7, 8, 3, 6);
+
+// Setup strand test
+var Strand = require('./strand');
+var grid = new Strand('/dev/spidev0.0', 64);
 
 // Setup controller
 var Controller = require('./controller');

@@ -37,5 +37,16 @@ Effect.prototype.step = function() {
   return true;
 };
 
+// Return js object containing all params and their types
+Effect.prototype.options = function() {
+  return [
+    {
+      'name': 'period',
+      'type': 'integer',
+      'value': this.period
+    }
+  ];
+}
+
 // Export constructor directly
 module.exports = Effect;
