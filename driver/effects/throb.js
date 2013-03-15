@@ -21,7 +21,8 @@ function Throb(grid, options)
   this.current_step = 0;
   this.start_color = options['start_color'] || [0,0,0];
   this.end_color = options['end_color'] || [255,255,255];
-  this.easing = Easing(STEPS, options['easing'] || 'linear', {
+  this.easing_type = options['easing'] || 'linear';
+  this.easing = Easing(STEPS, this.easing_type, {
     endToEnd: true
   });
 }
@@ -52,6 +53,27 @@ Throb.prototype.step = function() {
   // Keep going forever
   return true;
 };
+
+// Return js object containing all params and their types
+Throb.prototype.options = function() {
+  return [
+    {
+      'name': 'start_color',
+      'type': 'color',
+      'value': this.start_color
+    },
+    {
+      'name': 'end_color',
+      'type': 'color',
+      'value': this.end_color
+    },
+    {
+      'name': 'easing',
+      'type': 'string',
+      'value': this.easing_type
+    }
+  ].concat(Throb.super_.prototype.options());;
+}
 
 // Export public interface
 exports.constructor = Throb;

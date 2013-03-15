@@ -27,6 +27,17 @@ Static.prototype.step = function() {
   return false;
 };
 
+// Return js object containing all params and their types
+Static.prototype.options = function() {
+  return [
+    {
+      'name': 'color',
+      'type': 'color',
+      'value': this.color
+    }
+  ].concat(Static.super_.prototype.options());
+}
+
 // Export public interface
 exports.constructor = Static;
 exports.name = NAME;
