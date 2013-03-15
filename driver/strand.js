@@ -27,7 +27,7 @@ Strand.prototype.setPixelColor = function(index, rgb) {
   this.pixels[(index*3)+2] = rgb[2];
 };
 
-Strand.prototype.setGridColor = function(rgb) {
+Strand.prototype.setStrandColor = function(rgb) {
   for (var i = 0; i < this.num_pixels; i++) {
     this.pixels[i*3] = rgb[0];
     this.pixels[(i*3)+1] = rgb[1];
