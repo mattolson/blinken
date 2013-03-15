@@ -16,6 +16,11 @@ function LedCtrl($scope, $http, socket) {
     $scope.leds = data;
   });
 
+  // fetch all effects from server at startup
+  $http.get('effects').success(function(data) {
+    $scope.effects = data;
+  });
+
   $scope.turnOff = function() {
     socket.emit("off", {});
   }

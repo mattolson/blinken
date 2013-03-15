@@ -15,4 +15,8 @@ EffectRegistry.prototype.find = function(name) {
   return this.effects[name] || null;
 };
 
+EffectRegistry.prototype.toJson = function() {
+  return Object.keys(this.effects);
+};
+
 module.exports = new EffectRegistry();

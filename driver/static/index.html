@@ -24,9 +24,12 @@
     </div>
   </div>
   <div class="container" style="max-width: 600px" >
-    <div class="span1 btn btn-primary" ng-click="turnOff()">reset</div>
-    <div class="span1 btn btn-primary" ng-click="registerEffect('throb')">throb</div>
-    <div class="span1 btn btn-primary" ng-click="registerEffect('color_wipe')">color wipe</div>
+    <ul>
+      <li><div class="span1 btn btn-primary" ng-click="turnOff()">reset</div></li>
+      <li ng-repeat="effect in effects">
+        <div class="span1 btn btn-primary" ng-click="registerEffect('{{effect}}')">{{effect}}</div>
+      </li>
+    </ul>
   </div>
   
   <script src="lib/angular.min.js"></script>
