@@ -38,12 +38,11 @@ Effect.prototype.step = function() {
 };
 
 // Return js object containing all params and their types
-Effect.prototype.options = function() {
+Effect.options = function() {
   return [
     {
       'name': 'period',
-      'type': 'integer',
-      'value': this.period
+      'type': 'integer'
     }
   ];
 }

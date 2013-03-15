@@ -55,24 +55,21 @@ Throb.prototype.step = function() {
 };
 
 // Return js object containing all params and their types
-Throb.prototype.options = function() {
+Throb.options = function() {
   return [
     {
       'name': 'start_color',
-      'type': 'color',
-      'value': this.start_color
+      'type': 'color'
     },
     {
       'name': 'end_color',
-      'type': 'color',
-      'value': this.end_color
+      'type': 'color'
     },
     {
       'name': 'easing',
-      'type': 'string',
-      'value': this.easing_type
+      'type': 'string'
     }
-  ].concat(Throb.super_.prototype.options.call(this));;
+  ].concat(Effect.options());
 }
 
 // Export public interface

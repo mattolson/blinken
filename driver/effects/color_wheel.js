@@ -34,6 +34,9 @@ ColorWheel.prototype.step = function() {
   return true;
 };
 
+// Copy superclass definition
+ColorWheel.options = Effect.options;
+
 // Export public interface
 exports.constructor = ColorWheel;
 exports.name = NAME;

@@ -28,14 +28,13 @@ Static.prototype.step = function() {
 };
 
 // Return js object containing all params and their types
-Static.prototype.options = function() {
+Static.options = function() {
   return [
     {
       'name': 'color',
-      'type': 'color',
-      'value': this.color
+      'type': 'color'
     }
-  ].concat(Static.super_.prototype.options.call(this));;
+  ].concat(Effect.options());
 }
 
 // Export public interface

@@ -38,14 +38,13 @@ ColorWipe.prototype.step = function() {
 };
 
 // Return js object containing all params and their types
-ColorWipe.prototype.options = function() {
+ColorWipe.options = function() {
   return [
     {
       'name': 'color',
-      'type': 'color',
-      'value': this.color
+      'type': 'color'
     }
-  ].concat(ColorWipe.super_.prototype.options.call(this));;
+  ].concat(Effect.options());
 }
 
 // Export public interface
