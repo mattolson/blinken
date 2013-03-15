@@ -17,7 +17,6 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
   // Setup data structures for pixels
   this.pixel_map = new Array(this.num_pixels_x * this.num_pixels_y); // Maps logical index to strand index
   this.pixels = new Buffer(this.num_pixels_x * this.num_pixels_y * 3); // 3 octets per pixel, stores color values
-  this.pixels.fill(0);
 
   // Setup list of listeners
   this.listeners = [];
