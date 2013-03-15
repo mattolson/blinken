@@ -29,7 +29,7 @@ function LedCtrl($scope, $http, socket) {
     if (typeof(options) === 'undefined') {
       options = {};
     }
-    options['effect'] = effect;
+    options['name'] = effect;
 
     // TEMPORARY (until we have an interface for setting options)
     if (effect == 'throb') {

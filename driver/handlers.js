@@ -61,13 +61,14 @@ exports.registerSocketHandlers = function(socket) {
 
   socket.on("effect:register", function(data) {
     // Extract effect name
-    var effect_name = data['effect'];
-    delete data['effect_name'];
+    var effect_name = data['name'];
+    delete data['name'];
 
     // Find and instantiate effect by name
     var effect = effects.find(effect_name);
     if (effect != null) {
       controller.register_effect(new effect(grid, data));
+      console.log("INFO: registered effect '" + effect_name + "'");
     }
     else {
       console.log("ERROR: unknown effect '" + effect_name + "'");
