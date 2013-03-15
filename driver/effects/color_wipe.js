@@ -42,7 +42,8 @@ ColorWipe.options = function() {
   return [
     {
       'name': 'color',
-      'type': 'color'
+      'type': 'color',
+      'default': [255,0,0]
     }
   ].concat(Effect.options());
 }

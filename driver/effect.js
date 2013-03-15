@@ -42,7 +42,8 @@ Effect.options = function() {
   return [
     {
       'name': 'period',
-      'type': 'integer'
+      'type': 'integer',
+      'default': 40
     }
   ];
 }

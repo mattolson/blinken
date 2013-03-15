@@ -32,7 +32,8 @@ Static.options = function() {
   return [
     {
       'name': 'color',
-      'type': 'color'
+      'type': 'color',
+      'default': [255,255,255]
     }
   ].concat(Effect.options());
 }

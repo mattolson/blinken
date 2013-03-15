@@ -59,15 +59,18 @@ Throb.options = function() {
   return [
     {
       'name': 'start_color',
-      'type': 'color'
+      'type': 'color',
+      'default': [0,0,0]
     },
     {
       'name': 'end_color',
-      'type': 'color'
+      'type': 'color',
+      'default': [255,255,255]
     },
     {
       'name': 'easing',
-      'type': 'string'
+      'type': 'string',
+      'default': 'linear'
     }
   ].concat(Effect.options());
 }
