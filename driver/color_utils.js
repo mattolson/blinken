@@ -1,11 +1,11 @@
 // Returns hash of h,s,v as floats between 0 and 1
-exports.rgb_to_hsv = function(r, g, b) {
-  var min_color, max_color, delta, h, s, v;
+exports.rgb_to_hsv = function(rgb) {
+  var min_color, max_color, delta, r, g, b, h, s, v;
 
   // Convert to floats between 0 and 1
-  r = r / 255.0;
-  g = g / 255.0;
-  b = b / 255.0;
+  r = rgb[0] / 255.0;
+  g = rgb[1] / 255.0;
+  b = rgb[2] / 255.0;
 
   min_color = Math.min(Math.min(r,g), b);
   max_color = Math.max(Math.max(r,g), b);
@@ -18,7 +18,7 @@ exports.rgb_to_hsv = function(r, g, b) {
     // r = g = b = 0    // s = 0, v is undefined
     s = 0;
     h = -1;
-    return { h: h, s: s, v: v };
+    return [h,s,v];
   }
 
   if( r == max_color )
@@ -32,17 +32,20 @@ exports.rgb_to_hsv = function(r, g, b) {
   if( h < 0 )
     h += 360;
 
-  return { h: h, s: s, v: v };
+  return [h,s,v];
 };
 
 // Inverse of rgb_to_hsv
-exports.hsv_to_rgb = function(h, s, v) {
-  var i, r, g, b, f, p, q, t;
+exports.hsv_to_rgb = function(hsv) {
+  var i, h, s, v, r, g, b, f, p, q, t;
+  h = hsv[0];
+  s = hsv[1];
+  v = hsv[2];
 
   if( s == 0 ) {
     // achromatic (grey)
     r = g = b = Math.floor(v*255.0);
-    return { r: r, g: g, b: b };
+    return [r,g,b];
   }
 
   h /= 60;      // sector 0 to 5
@@ -88,7 +91,7 @@ exports.hsv_to_rgb = function(h, s, v) {
   r = Math.floor(r*255.0);
   g = Math.floor(g*255.0);
   b = Math.floor(b*255.0);
-  return { r: r, g: g, b: b };
+  return [r,g,b];
 };
 
 exports.wheel = function(position) {
@@ -107,9 +110,5 @@ exports.wheel = function(position) {
     b = 255 - position * 3;
   }
 
-  return {
-    r: r,
-    g: g,
-    b: b
-  };
+  return [r,g,b];
 };
