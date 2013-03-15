@@ -18,7 +18,7 @@ function ledState(request, response) {
 
 // GET /effects
 // List available effects
-function ledState(request, response) {
+function listEffects(request, response) {
   response.send(effects.toJson());
 }
 
