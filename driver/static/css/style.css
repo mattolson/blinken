@@ -1,0 +1,41 @@
+	/*Sean*/
+section, header {
+	position:relative;
+	z-index:11;
+}
+	
+#leds { 
+	position:absolute;
+	top:0px;
+	left:0px;
+	right:0px;
+	bottom:0px;
+	z-index:1;
+}
+li.led {
+/*	margin:0px !important;padding:0px !important; */
+	float:left;
+	display:block;
+/*	background:#000;*/
+/*	border:1px solid #333;*/
+/*	border-width:0 0 1px 1px;*/
+	position:relative;
+}
+
+.led > div {
+/*	position:absolute;*/
+	height:50%;
+	margin:25%;
+/*	border:3px solid #000;*/
+/*	top:0px;*/
+/*	bottom:0px;*/
+/*	left:0px;*/
+/*	right:0px;*/
+}
+
+li.effect { list-style:none; }
+
+.effect label { color:#f0f0f0; display:inline; }
+
+
+#effect-selector {  }

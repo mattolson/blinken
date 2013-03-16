@@ -21,6 +21,11 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
   // Setup list of listeners
   this.listeners = [];
 
+	//Setup Layout Indexes
+	this.bottom_index = 0
+	this.top_index = Math.floor(this.num_pixels/2)
+	this.even_odd = this.num_pixels%2;
+
   // Instantiate pixels. Loop through in logical order, and then
   // calculate the strand index.
   var i, j, k, l, x, y, panel_index, strand_index;
@@ -158,6 +163,61 @@ Grid.prototype.addListener = function(listener) {
     this.listeners.push(listener);
   }
 };
+
+Grid.prototype.HSVtoRGB = function(h, s, v){
+	var r, g, b;
+  var i = Math.floor(h * 6);
+  var f = h * 6 - i;
+  var p = v * (1 - s);
+  var q = v * (1 - f * s);
+  var t = v * (1 - (1 - f) * s);
+
+  switch(i % 6){
+  case 0: r = v, g = t, b = p; break;
+  case 1: r = q, g = v, b = p; break;
+  case 2: r = p, g = v, b = t; break;
+  case 3: r = p, g = q, b = v; break;
+  case 4: r = t, g = p, b = v; break;
+  case 5: r = v, g = p, b = q; break;
+  }
+  return [Math.floor(r * 255), Math.floor(g * 255), Math.floor(b * 255)];
+}
+
+//-FIND INDEX OF HORIZONAL OPPOSITE LED
+Grid.prototype.horizontalIndex = function(i) {
+  //-ONLY WORKS WITH INDEX < TOPINDEX
+  if (i == BOTTOM_INDEX) {return BOTTOM_INDEX;}
+  if (i == TOP_INDEX && EVENODD == 1) {return TOP_INDEX + 1;}
+  if (i == TOP_INDEX && EVENODD == 0) {return TOP_INDEX;}
+  return this.grid.num_pixels - i;  
+}
+
+
+//-FIND INDEX OF ANTIPODAL OPPOSITE LED
+Grid.prototype.antipodalIndex = function(i) {
+  //int N2 = int(this.grid.num_pixels/2);
+  var iN = i + TOP_INDEX;
+  if (i >= TOP_INDEX) {iN = ( i + TOP_INDEX ) % this.grid.num_pixels; }
+  return iN;
+}
+
+
+//-FIND ADJACENT INDEX CLOCKWISE
+Grid.prototype.adjacentCW = function(i) {
+  var r;
+  if (i < this.grid.num_pixels - 1) {r = i + 1;}
+  else {r = 0;}
+  return r;
+}
+
+
+//-FIND ADJACENT INDEX COUNTER-CLOCKWISE
+Grid.prototype.adjacentCCW = function(i) {
+  var r;
+  if (i > 0) {r = i - 1;}
+  else {r = this.grid.num_pixels - 1;}
+  return r;
+}
 
 // Export constructor directly
 module.exports = Grid;

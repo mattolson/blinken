@@ -1,47 +1,57 @@
 'use strict';
 
-/* Controllers */
+var LedsJson, ListEffectsJson;
 
-function LedCtrl($scope, $http, socket) {
+/* Controllers */	
+function LedCtrl($scope, $http, socket, $timeout, Effects, Leds) {
 
   var mouseDown = false;
   var currentLed;
   var lastX = 0;
   var lastY = 0;
-  var numPixelsX = 6;
-  var numPixelsY = 6;
+  var numPixelsX = 60;
+  var numPixelsY = 51;
 
-  // fetch all leds from server at startup
-  $http.get('leds').success(function(data) {
-    $scope.leds = data;
-  });
+  $scope.leds, $scope.effects, $scope.scale = 1;
+
+	var options;
+
+  // Let's get an effects list  via the Effects service.
+	// var effect = Effects.get();
+	ListEffectsJson = function(data) {
+	    $scope.effects = data;
+			console.log(data);
+	}
+	var url = "http://192.168.0.106:8888/effects";
+	$http.jsonp(url);
+	
+	//Let's get the LED's via the Leds service.
+	// var leds = Leds.get();
+	LedsJson = function(data) {
+	    $scope.leds = data;
+			console.log('Updating LED Data');
+	}
+	
+	var updateLeds = $timeout(function myFunction() {
+		    // do sth
+		var url = "http://192.168.0.106:8888/leds";
+		// console.log('timeout');
+		$http.jsonp(url);
+	     updateLeds = $timeout(myFunction, 2000);
+	 },1);
+
 
   // fetch all effects from server at startup
-  $http.get('effects').success(function(data) {
-    $scope.effects = data;
-  });
+  // $scope.effects = Effects.get();
 
   $scope.turnOff = function() {
     socket.emit("off", {});
   }
 
-  $scope.registerEffect = function(effect, options) {
-    if (typeof(options) === 'undefined') {
-      options = {};
-    }
-    options['name'] = effect;
-
-    // TEMPORARY (until we have an interface for setting options)
-    if (effect == 'throb') {
-      options['period'] = 40;
-      options['start_color'] = [0,0,0];
-      options['end_color'] = [255,255,255];
-    }
-    else if (effect == 'color_wipe') {
-      options['period'] = 40;
-      options['color'] = [255,0,0];
-    }
-
+	$scope.registerEffect = function(effect) {
+		var options = {};
+		options.name = effect.name;
+		options.options = effect.options;
     socket.emit("effect:register", options);
   }
 
@@ -54,15 +64,20 @@ function LedCtrl($scope, $http, socket) {
     });
   }
 
-  // handle incoming change events
+  // // handle incoming change events
   socket.on("changed:led", function(data) {
     var index = (data.y * numPixelsX) + data.x;
-    $scope.leds[index].rgb = data.rgb;
+	  $scope.leds[index].rgb = data.rgb;
   });
 
   socket.on("update", function(data) {
     $scope.leds = data;
+		if(console) console.log('Socket');
   });
+
+	socket.on('connect', function(){
+		if(console) console.log('Connected to socket');
+	});
 
   //--- mouse events -----
 

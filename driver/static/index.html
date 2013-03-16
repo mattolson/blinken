@@ -2,42 +2,77 @@
 <html lang="en" ng-app="app">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=800, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LEDs</title>
   <link rel="stylesheet" href="css/bootstrap.css">
   <link rel="stylesheet" href="css/bootstrap-responsive.css">
-  <link rel="stylesheet" href="css/example-fluid-layout.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body ng-controller="LedCtrl" id="body" ng-mouseup="mouseUp($event)" style="background-color:rgb(50, 50, 50)">
-
-  <div class="container" style="max-width: 700px" ng-mouseout="mouseOut($event)" >
-    <div class="row span6 ledGrid" ng-mousemove="mouseMove($event)" > 
-      <ul class="thumbnails">
-        <li ng-repeat="led in leds" class="span1">
-          <div class="thumbnail2" style="background-color:rgb({{led.rgb[0]}}, {{led.rgb[1]}}, {{led.rgb[2]}})"
-            ng-mousedown="mouseDown(led, $event)"
-            te-touchstart="touchStart(led, $event)"
-            te-touchmove="touchMove($event)"
-            te-touchend="mouseUp($event)">&nbsp;</div>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="container" style="max-width: 600px" >
+	
+	<!-- <div class="container" style="max-width: 600px" >
     <ul>
       <li><div class="btn btn-primary" ng-click="turnOff()">reset</div></li>
       <li ng-repeat="effect in effects">
-        <div class="btn btn-primary" ng-click="registerEffect(effect.name)">{{effect.name}}</div>
+        <div class="btn btn-primary" ng-click="registerEffect(effect)">{{effect.name}}</div>
         <div><pre>{{effect.options}}</pre></div>
       </li>
     </ul>
-  </div>
-  
+  </div> -->
+
+	<section id="leds" class="preview on" style="width:{{ledsWidth}}px;" documentwidth>
+		<!-- <div ng-mousemove="mouseMove($event)" >  -->
+      <ul>
+        <li class="led" ng-repeat="led in leds" style="width:{{ledRes}}px;height:{{ledRes}}px;position:relative;">
+          <div style="background-color:rgb({{led.rgb[0]}}, {{led.rgb[1]}}, {{led.rgb[2]}}); width:50%;margin:50%; ">
+            <!-- ng-mousedown="mouseDown(led, $event)" -->
+            <!-- te-touchstart="touchStart(led, $event)" -->
+            <!-- te-touchmove="touchMove($event)" -->
+            <!-- te-touchend="mouseUp($event)"> -->
+&nbsp;</div>
+        </li>
+      </ul>
+    <!-- </div> -->
+	</section>
+	
+	<header>
+		<ul id="effect-selector">
+			<li ng-repeat="effect in effects">
+				<a class="btn btn-primary" href="#" id="{{effect.name}}" ng-click="registerEffect(effect)">{{effect.name}}</a>
+			</li>
+			<a class="btn btn-primary" href="#" id="{{effect.name}}" ng-click="turnOff()">Reset</a>
+		</ul>
+	</header>
+	
+	<section id="parameters">
+		<article class="effect" ng-repeat="effect in effects">
+			<h2>{{effect.name}}</h2>
+			<form id="{{effect.name}}" class="params">
+				<ul>
+					<li ng-repeat="option in effect.options" class="parameter">
+						<label>{{option.name}}</label>
+						<input name="{{option.name}}" ng-change="registerEffect(effect)" value="{{option.default}}" ng-model="option.default" type="text" size="4" />
+					</li>
+				</ul>
+				<!-- <div><pre>{{effect.options}}</pre></div> -->
+			</form>
+		</article>
+	</section>
+
+	
+	
+	
+	
+	<footer>
+		
+	</footer>
+	
   <script src="lib/angular.min.js"></script>
+  <script src="lib/angular-resource.min.js"></script>
   <script src="lib/angular-touchevents.js"></script>
   <script src="js/controllers.js"></script>
   <script src="js/services.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
+  <script src="http://192.168.0.106:8888/socket.io/socket.io.js"></script>
 
 </body>
 </html>
