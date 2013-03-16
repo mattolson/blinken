@@ -25,7 +25,7 @@ function RandomMarch(grid, options)
   options = options || {};
   RandomMarch.super_.call(this, NAME, grid, options);
   this.current_pixel = 0;
-  this.wait = options['wait'] || 0;
+  this.period = options['period'] || 1;
 }
 
 // Set up inheritance from Effect
@@ -41,17 +41,11 @@ RandomMarch.prototype.step = function() {
 	  LEDS[0].g = this[1];
 	  LEDS[0].b = this[2];
 
-	  for(var i = 1; i < this.grid.num_pixels ; i++ ) {  //-GET/SET EACH LED COLOR FROM CCW LED
-	    iCCW = this.grid.adjacentCCW(i);
-	    LEDS[i].r = ledsX[iCCW][0];
-	    LEDS[i].g = ledsX[iCCW][1];
-	    LEDS[i].b = ledsX[iCCW][2];    
-	  }
+    iCCW = this.grid.adjacentCCW(i);
+    LEDS[i].r = ledsX[iCCW][0];
+    LEDS[i].g = ledsX[iCCW][1];
+    LEDS[i].b = ledsX[iCCW][2];    
 
-	  // FastSPI_LED.show();
-	  // delay(idelay);
-
-    // delay(this.wait);
 };
 
 // Export public interface

@@ -22,8 +22,8 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
   this.listeners = [];
 
 	//Setup Layout Indexes
-	this.bottom_index = 0
-	this.top_index = Math.floor(this.num_pixels/2)
+	this.bottom_indices = [];
+	this.top_indices = [];
 	this.even_odd = this.num_pixels%2;
 
   // Instantiate pixels. Loop through in logical order, and then
@@ -101,6 +101,26 @@ Grid.prototype.setPixelColor = function(x, y, rgb) {
   this.pixels[(index*3)+2] = rgb[2];
 };
 
+//Set the color of an entire row
+Grid.prototype.setRowColor = function(rownum, color){
+	var x;
+	for(x=0;x<this.num_pixels_x;x++){
+		var i = this.getStrandIndex(x, rownum);
+		this.setPixelColor(i, color);
+	}
+}
+
+//Set the color of an entire column
+Grid.prototype.setColColor = function(colnum, color){
+	var y;
+	for(y=0;y<this.num_pixels_y;y++){
+		var i = this.getStrandIndex(colnum, y);
+		this.setPixelColor(i, color);
+	}
+}
+Grid.prototype.setColumnColor = function(colnum, color){ this.setColColor(colnum, color); }
+
+//Set Color of grid
 Grid.prototype.setGridColor = function(rgb) {
   for (var i = 0; i < this.num_pixels; i++) {
     this.pixels[i*3] = rgb[0];
@@ -109,6 +129,7 @@ Grid.prototype.setGridColor = function(rgb) {
   }
 };
 
+//Retrieve pixel color
 Grid.prototype.getPixelColor = function(x, y) {
   var index = this.getStrandIndex(x,y);
   if (index == null) {
@@ -183,12 +204,14 @@ Grid.prototype.HSVtoRGB = function(h, s, v){
   return [Math.floor(r * 255), Math.floor(g * 255), Math.floor(b * 255)];
 }
 
+
+
 //-FIND INDEX OF HORIZONAL OPPOSITE LED
 Grid.prototype.horizontalIndex = function(i) {
   //-ONLY WORKS WITH INDEX < TOPINDEX
-  if (i == BOTTOM_INDEX) {return BOTTOM_INDEX;}
-  if (i == TOP_INDEX && EVENODD == 1) {return TOP_INDEX + 1;}
-  if (i == TOP_INDEX && EVENODD == 0) {return TOP_INDEX;}
+  if (i == this.bottom_indices) { return this.bottom_indices; }
+  if (i == this.top_indices && this.even_odd == 1) {return this.top_indices + 1;}
+  if (i == this.top_indices && this.even_odd == 0) {return this.top_indices;}
   return this.grid.num_pixels - i;  
 }
 
@@ -196,8 +219,8 @@ Grid.prototype.horizontalIndex = function(i) {
 //-FIND INDEX OF ANTIPODAL OPPOSITE LED
 Grid.prototype.antipodalIndex = function(i) {
   //int N2 = int(this.grid.num_pixels/2);
-  var iN = i + TOP_INDEX;
-  if (i >= TOP_INDEX) {iN = ( i + TOP_INDEX ) % this.grid.num_pixels; }
+  var iN = i + this.top_indices;
+  if (i >= this.top_indices) {iN = ( i + this.top_indices ) % this.grid.num_pixels; }
   return iN;
 }
 

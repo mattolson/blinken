@@ -40,12 +40,14 @@ Flicker.prototype.step = function() {
   int thisColor[3];
 
   if (random_bool < 10) {
-    this.color = this.grid.HSVtoRGB(this.hue, this.sat, random_bright);
 
-    for(int i = 0 ; i < NUM_LEDS; i++ ) {
-      this.grid.setPixelColor(i, color);
-    }
+    this.color = this.grid.HSVtoRGB(this.hue, this.sat, random_bright);
+		
+		var xy = this.grid.xy(i);
+    this.grid.setPixelColor(xy.x, xy.y, this.color);
+
   }
+
 //Delay here?
   this.current_pixel++;
 

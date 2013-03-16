@@ -25,7 +25,7 @@ function PulseLedsBrightness(grid, options)
   options = options || {};
   PulseLedsBrightness.super_.call(this, NAME, grid, options);
   this.current_pixel = 0;
-  this.wait = options['wait'] || 0;
+  this.period = options['period'] || 1;
 	this.hue = options['hue'] ||
 
 }
@@ -47,10 +47,10 @@ PulseLedsBrightness.prototype.step = function() {
 
 	  this.color = this.grid.HSVtoRGB(this.hue, 255, ibright);
 
-	    for(int i = 0 ; i < this.grid.num_pixels; i++ ) {
-	      this.grid.setPixelColor(xy.x, xy.y, this.color);
-	    }
-	    // delay(this.wait);
+	  var xy = this.grid.xy(this.current_pixel);
+	  this.grid.setPixelColor(xy.x, xy.y, this.color);
+
+		this.current_pixel++;
 };
 
 // Export public interface

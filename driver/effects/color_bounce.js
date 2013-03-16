@@ -32,6 +32,7 @@ function ColorBounce(grid, options)
 util.inherits(ColorBounce, Effect);
 
 ColorBounce.prototype.step = function() {
+	
 	if (bouncedirection == 0) {
     idex = idex + 1;
     if (idex == this.grid.num_pixels) {
@@ -45,11 +46,10 @@ ColorBounce.prototype.step = function() {
       bouncedirection = 0;
     }
   }  
-  for(int i = 0; i < this.grid.num_pixels; i++ ) {
-		var xy = this.grid.xy(i);
-    if (i == idex) {this.grid.setPixelColor(xy.x, xy.y, this.color);}
-    else {this.grid.setPixelColor(xy.x, xy.y, [0, 0, 0]);}
-  }
+
+	var xy = this.grid.xy(this.current_pixel);
+  if (i == idex) 	{ this.grid.setPixelColor(xy.x, xy.y, this.color); }
+ 	else 						{ this.grid.setPixelColor(xy.x, xy.y, [0, 0, 0]); }
   // delay(idelay); //How do we delay?
 
   // Update state
@@ -58,6 +58,7 @@ ColorBounce.prototype.step = function() {
 
   // Keep going for now
   return true;
+
 };
 
 // Export public interface
