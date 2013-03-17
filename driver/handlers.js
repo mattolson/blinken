@@ -13,13 +13,13 @@ var effects = require('./effect_registry');
 // GET /leds
 // Output current leds as json
 function ledState(request, response) {
-  response.send(grid.toJson());
+  response.send('LedsJson('+JSON.stringify(grid.toJson())+');');
 }
 
 // GET /effects
 // List available effects
 function listEffects(request, response) {
-  response.send(effects.toJson());
+  response.send('ListEffectsJson('+JSON.stringify(effects.toJson())+');');
 }
 
 // Handle change events on the socket

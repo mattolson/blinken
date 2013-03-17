@@ -3,7 +3,7 @@ var util = require('util');
 var Effect = require('../effect');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
-var STEPS = 18*63;
+var STEPS; // = this.grid.num_pixels;
 
 var current = {};
 		current.x = 0,
@@ -19,41 +19,35 @@ var current = {};
 function Runner(grid, options)
 {
   options = options || {};
-  Static.super_.call(this, NAME, grid, options);
+  Runner.super_.call(this, NAME, grid, options);
   this.color = options['color'] || [255,255,255];
-  this.speed = options['speed'] || 1;
+	STEPS = this.grid.num_pixels;
 }
 
 // Set up inheritance from Effect
 util.inherits(Runner, Effect);
 
-Static.prototype.step = function() {
+Runner.prototype.step = function() {
 	
-	//Step step step
-	if(current.x >= 60) {
-		current.x = 0;
-		rows++;
-	} else { current.x++; }
-	if(current.y >= 18){
-		current.y=0;
-		cols++;
-	} else { current.y++ }
-	
-  // Set color of the grid
-	this.grid.setGridColor([0,0,0]);
-	this.grid.setPixelColor(current.x, current.y, this.color);
+	for(i=0;i<this.grid.num_pixels;i++) {
+		// Set color of the grid
+		this.grid.setGridColor([0,0,0]);
+
+		var xy = this.grid.xy(this.current_step);
+		this.grid.setPixelColor(xy.x, xy.y, this.color);
+	}
+ 
 	
 	// Update step number
   this.current_step++;
   this.current_step = this.current_step % STEPS;
 
   // We're done!
-  return false;
-
+  return true;
 };
 
 // Return js object containing all params and their types
-Static.options = function() {
+Runner.options = function() {
   return [
     {
       'name': 'color',
@@ -61,7 +55,7 @@ Static.options = function() {
       'default': [255,255,255]
     },
 		{
-      'name': 'speed',
+      'name': 'period',
       'type': 'integer',
       'default': 1
     }
@@ -69,5 +63,5 @@ Static.options = function() {
 }
 
 // Export public interface
-exports.constructor = Static;
+exports.constructor = Runner;
 exports.name = NAME;

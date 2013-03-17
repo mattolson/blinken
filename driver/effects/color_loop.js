@@ -54,6 +54,8 @@ SingleLedColorLoop.prototype.step = function() {
 	return this;
 };
 
+SingleLedColorLoop.options = Effect.options;
+
 // Export public interface
 exports.constructor = SingleLedColorLoop;
 exports.name = NAME;

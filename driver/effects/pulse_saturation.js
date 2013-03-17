@@ -26,8 +26,7 @@ function PulseLedsSaturation(grid, options)
   PulseLedsSaturation.super_.call(this, NAME, grid, options);
   this.current_pixel = 0;
   this.period = options['period'] || 1;
-	this.hue = options['hue'] ||
-
+	this.hue = 100;
 }
 
 // Set up inheritance from Effect
@@ -54,6 +53,8 @@ PulseLedsSaturation.prototype.step = function() {
 		this.current_pixel++;
 	    // delay(this.wait);
 };
+
+PulseLedsSaturation.options = Effect.options;
 
 // Export public interface
 exports.constructor = PulseLedsSaturation;

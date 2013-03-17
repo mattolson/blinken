@@ -22,8 +22,8 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
   this.listeners = [];
 
 	//Setup Layout Indexes
-	this.bottom_indices = [];
-	this.top_indices = [];
+	this.bottom_indices = 0;
+	this.top_indices = this.num_pixels/2;
 	this.even_odd = this.num_pixels%2;
 
   // Instantiate pixels. Loop through in logical order, and then
@@ -65,7 +65,7 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
   this.device = new spi.Spi(device, {
     "mode": spi.MODE['MODE_0'],
     "chipSelect": spi.CS['none'],
-    "maxSpeed": 1000000
+    "maxSpeed": 500000
   }, function(d) { d.open(); });
 
   // Clear the display
@@ -220,7 +220,7 @@ Grid.prototype.horizontalIndex = function(i) {
 Grid.prototype.antipodalIndex = function(i) {
   //int N2 = int(this.grid.num_pixels/2);
   var iN = i + this.top_indices;
-  if (i >= this.top_indices) {iN = ( i + this.top_indices ) % this.grid.num_pixels; }
+  if (i >= this.top_indices) {iN = ( i + this.top_indices ) % this.num_pixels; }
   return iN;
 }
 

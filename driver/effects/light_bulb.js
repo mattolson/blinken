@@ -52,6 +52,29 @@ LightBulb.prototype.step = function() {
 	return true;
 };
 
+// Return js object containing all params and their types
+LightBulb.options = function() {
+  return [
+    {
+      'name': 'temp',
+      'type': 'select',
+      'default': ["CLEAR BLUE SKY"],
+			//Options as in <select><option></option></select>
+			'options' : [
+				"Candle",
+				"-40W TUNG",
+				"-100W TUNG",
+				"HALOGEN",
+				"CARBON ARC",
+				"HIGH NOON SKY",
+				"DIRECT SUN",
+				"OVERCAST SKY",
+				"CLEAR BLUE SKY",
+			]
+    }
+  ].concat(Effect.options());
+}
+
 // Export public interface
 exports.constructor = LightBulb;
 exports.name = NAME;

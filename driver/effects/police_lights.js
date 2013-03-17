@@ -52,6 +52,8 @@ PoliceLights.prototype.step = function() {
   return true;
 };
 
+PoliceLights.options = Effect.options;
+
 // Export public interface
 exports.constructor = PoliceLights;
 exports.name = NAME;

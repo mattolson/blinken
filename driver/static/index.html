@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css/bootstrap.css">
   <link rel="stylesheet" href="css/bootstrap-responsive.css">
   <link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="lib/angular-ui.min.css"/>
 </head>
 <body ng-controller="LedCtrl" id="body" ng-mouseup="mouseUp($event)" style="background-color:rgb(50, 50, 50)">
 	
@@ -45,7 +46,9 @@
 	</header>
 	
 	<section id="parameters">
-		<article class="effect" ng-repeat="effect in effects">
+		<!-- <tabs> -->
+			<!-- <pane title="{{effect.name}}"> -->
+ 			<article class="effect" ng-repeat="effect in effects">
 			<h2>{{effect.name}}</h2>
 			<form id="{{effect.name}}" class="params">
 				<ul>
@@ -54,12 +57,12 @@
 						<input name="{{option.name}}" ng-change="registerEffect(effect)" value="{{option.default}}" ng-model="option.default" type="text" size="4" />
 					</li>
 				</ul>
-				<!-- <div><pre>{{effect.options}}</pre></div> -->
+				<div><pre>{{effect.options}}</pre></div>
 			</form>
+			<!-- </pane> -->
 		</article>
 	</section>
-
-	
+	<!-- </tabs> -->
 	
 	
 	
@@ -68,11 +71,12 @@
 	</footer>
 	
   <script src="lib/angular.min.js"></script>
+	<script src="lib/angular-ui.min.js"></script>
   <script src="lib/angular-resource.min.js"></script>
   <script src="lib/angular-touchevents.js"></script>
   <script src="js/controllers.js"></script>
   <script src="js/services.js"></script>
-  <script src="http://192.168.0.106:8888/socket.io/socket.io.js"></script>
+  <script src="http://192.168.1.6:8888/socket.io/socket.io.js"></script><!-- For testing -->
 
 </body>
 </html>

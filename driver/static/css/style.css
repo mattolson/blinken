@@ -38,4 +38,5 @@ li.effect { list-style:none; }
 .effect label { color:#f0f0f0; display:inline; }
 
 
-#effect-selector {  }
+#effect-selector > li  {  float:left; list-style:none; }
+#effect-selector > li a { font-size:0.7em }

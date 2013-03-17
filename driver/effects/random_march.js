@@ -32,14 +32,13 @@ function RandomMarch(grid, options)
 util.inherits(RandomMarch, Effect);
 
 RandomMarch.prototype.step = function() {
+	return false;
 		copy_led_array();
 		
 	  var iCCW;
 	  this.color = this.grid.HSVtoRGB(Math.random(0,360), 255, 255);
 	
-	  LEDS[0].r = this.color[0];
-	  LEDS[0].g = this[1];
-	  LEDS[0].b = this[2];
+		this.grid.setPixelColor(0, this.color);
 
     iCCW = this.grid.adjacentCCW(i);
     LEDS[i].r = ledsX[iCCW][0];
@@ -47,6 +46,8 @@ RandomMarch.prototype.step = function() {
     LEDS[i].b = ledsX[iCCW][2];    
 
 };
+
+RandomMarch.options = Effect.options;
 
 // Export public interface
 exports.constructor = RandomMarch;

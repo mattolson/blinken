@@ -26,7 +26,7 @@ function Flicker(grid, options)
   Flicker.super_.call(this, NAME, grid, options);
   this.current_pixel = 0;
   this.wait = options['wait'] || 0;
-	this.hue = options['hue'] ||
+	this.hue = options['hue'] || 100;
 }
 
 // Set up inheritance from Effect
@@ -34,16 +34,15 @@ util.inherits(Flicker, Effect);
 
 
 Flicker.prototype.step = function() {
-	int random_bright = Math.random(0,255);
-  int random_delay = Math.random(10,100);
-  int random_bool = Math.random(0,random_bright);
-  int thisColor[3];
+	var random_bright = Math.random(0,255);
+  var random_delay = Math.random(10,100);
+  var random_bool = Math.random(0,random_bright);
 
   if (random_bool < 10) {
 
     this.color = this.grid.HSVtoRGB(this.hue, this.sat, random_bright);
 		
-		var xy = this.grid.xy(i);
+		var xy = this.grid.xy(this.current_pixel);
     this.grid.setPixelColor(xy.x, xy.y, this.color);
 
   }
@@ -54,6 +53,8 @@ Flicker.prototype.step = function() {
   // Keep going for now
   return true;
 };
+
+Flicker.options = Effect.options;
 
 // Export public interface
 exports.constructor = Flicker;

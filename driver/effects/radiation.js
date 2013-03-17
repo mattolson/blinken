@@ -27,8 +27,18 @@ function Radiation(grid, options)
   this.current_pixel = 0;
   this.period = options['period'] || 1;
 	this.hue = options['hue'] || 200;
-	this.increment = 0.2;
-	this.count = 0;
+	this.increment = options['increment'] || 0.2;
+	
+	// this.count = 0;
+ 	this.N3 = this.grid.num_pixels/3;
+	this.N6 = this.grid.num_pixels/6;  
+	this.N12 = this.grid.num_pixels/12;
+
+	this.tcount = tcount + this.increment;
+  if (this.tcount > 3.14) {this.tcount = 0.0;}
+  ibright = Math.sin(this.tcount)*255;
+
+
 }
 
 // Set up inheritance from Effect
@@ -36,28 +46,22 @@ util.inherits(Radiation, Effect);
 
 Radiation.prototype.step = function() {
 	  //var N2 = this.grid.num_pixels/2);
-		var N3 = this.grid.num_pixels/3;
-	  var N6 = this.grid.num_pixels/6;  
-	  var N12 = this.grid.num_pixels/12;
-	
-    this.tcount = tcount + this.increment;
-    if (tcount > 3.14) {tcount = 0.0;}
-    ibright = Math.sin(tcount)*255;
-
-    var j0 = this.grid.xy((i + this.grid.num_pixels - N12) % this.grid.num_pixels);
-    var j1 = this.grid.xy((j0+N3) % this.grid.num_pixels);
-    var j2 = this.grid.xy((j1+N3) % this.grid.num_pixels);    
-    this.color = this.grid.HSVtoRGB(this.hue, 255, ibright);  
+	  var j0 = this.grid.xy((this.current_pixel + this.grid.num_pixels - this.N12) % this.grid.num_pixels);
+	  var j1 = this.grid.xy((j0+this.N3) % this.grid.num_pixels);
+	  var j2 = this.grid.xy((j1+this.N3) % this.grid.num_pixels);    
+	  this.color = this.grid.HSVtoRGB(this.hue, 255, ibright);
 		
 		this.grid.setPixelColor(j0.x, j0.y, this.color);
 		this.grid.setPixelColor(j1.x, j1.y, this.color);
 		this.grid.setPixelColor(j2.x, j2.y, this.color);    
 	
 	  this.current_pixel++;
-		this.current_pixel = this.current_pixel % N6;
+		this.current_pixel = this.current_pixel % this.N6;
 		
 		return true;
 };
+
+Radiation.options = Effect.options;
 
 // Export public interface
 exports.constructor = Radiation;

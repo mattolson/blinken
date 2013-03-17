@@ -65,6 +65,8 @@ Sparkle.prototype.step = function() {
   return true;
 };
 
+Sparkle.options = Effect.options;
+
 // Export public interface
 exports.constructor = Sparkle;
 exports.name = NAME;
