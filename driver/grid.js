@@ -25,6 +25,9 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
 	this.bottom_indices = 0;
 	this.top_indices = this.num_pixels/2;
 	this.even_odd = this.num_pixels%2;
+	
+	//Framerate calculation;
+	this.timing = {};
 
   // Instantiate pixels. Loop through in logical order, and then
   // calculate the strand index.
@@ -39,7 +42,7 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
           y = (j * this.num_pixels_per_panel_y) + l;
 
           // Figure out where we are in the strand. See the wiring diagrams
-          // in the docs folder for details on the wiring layout. We start by
+          // in the docs folder for details on the wiring layouthis.timing. We start by
           // figuring out for the given position how many panels came before us.
           panel_index = (i*this.num_panels_y);
           panel_index += (i % 2 == 0) ? Math.floor(y / this.num_pixels_per_panel_y) : Math.floor((this.num_pixels_y - y - 1) / this.num_pixels_per_panel_y);
@@ -70,6 +73,34 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
 
   // Clear the display
   this.off();
+}
+
+Grid.prototype.calculateFramerate = function(){
+	
+	var interval = 2000;
+	
+	var this.timing.current = (new Date()).getTime();
+	
+  if (this.timing.started == 0) this.timing.started = this.timing.current;
+
+  if(this.timing.current - this.timing.lastRendered < interval) {
+		this.timing.refreshes++;
+		return true;
+	}
+
+  this.timing.lastRendered = this.timing.current;
+
+	this.timing.frame_rate = this.timing.current * 0.9 + this.timing.lastRendered * 0.1;
+	
+	// time * 0.9 + last_frame * 0.1 	
+	
+	// return this.timing.frame_rate
+	
+}
+
+Grid.prototype.getParentPanelIndex = function(data) {
+	if(data.xy) data.index = this.getStrandIndex(data.xy.x, data.xy.y);
+	
 }
 
 Grid.prototype.getStrandIndex = function(x, y) {
@@ -103,21 +134,25 @@ Grid.prototype.setPixelColor = function(x, y, rgb) {
 
 //Set the color of an entire row
 Grid.prototype.setRowColor = function(rownum, color){
-	var x;
-	for(x=0;x<this.num_pixels_x;x++){
-		var i = this.getStrandIndex(x, rownum);
-		this.setPixelColor(i, color);
+	
+	var total_per_row = this.num_pixels_x;
+	for(var x = 0 ; x < total_per_row; x++){ //loop through row.
+		// var i = this.getStrandIndex( // x, y=rownum ); //rownum is actually a y value.
+		this.setPixelColor( x, y=rownum, color );
 	}
+	
 }
 
 //Set the color of an entire column
 Grid.prototype.setColColor = function(colnum, color){
-	var y;
-	for(y=0;y<this.num_pixels_y;y++){
-		var i = this.getStrandIndex(colnum, y);
-		this.setPixelColor(i, color);
+	
+	for(var y=0;y<this.num_pixels_y;y++){
+		// var i = this.getStrandIndex(x=colnum, y);
+		this.setPixelColor(x=colnum, y, color, color);
 	}
+	
 }
+
 Grid.prototype.setColumnColor = function(colnum, color){ this.setColColor(colnum, color); }
 
 //Set Color of grid

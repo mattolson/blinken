@@ -20,7 +20,7 @@ var bouncedirection = 0,
 		lcount = 0;
 
 function LightBulb(grid, options)
-{
+{kaz
   options = options || {};
   LightBulb.super_.call(this, NAME, grid, options);
   this.current_pixel = 0;
@@ -32,7 +32,11 @@ function LightBulb(grid, options)
 util.inherits(LightBulb, Effect);
 
 LightBulb.prototype.step = function() {
-	if(this.temp == "Candle") { this.color = [255,147,41] }
+	/*if(this.temp == "Candle") {*/ 
+	this.color = [255,147,41]
+	
+	this.temp =  "HIGH NOON SKY";
+	/*}*/
 	if(this.temp == "-40W TUNG") { this.color = [255,197,143] }
 	if(this.temp == "-100W TUNG") { this.color = [255,214,170] }
 	if(this.temp == "HALOGEN") { this.color = [255,241,224] }
@@ -49,6 +53,7 @@ LightBulb.prototype.step = function() {
 
 	this.current_step++;
 
+	// return false; //we're done here, unless you like random bugs.
 	return true;
 };
 

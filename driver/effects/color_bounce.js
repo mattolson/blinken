@@ -7,9 +7,7 @@ var Effect = require('../effect');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
-var STEPS = 100;
-
-
+var STEPS;
 
 function ColorBounce(grid, options)
 {
@@ -27,6 +25,8 @@ function ColorBounce(grid, options)
 	this.isat = 0;
 	this.tcount = 0.0;
 	this.lcount = 0;
+	
+	STEPS = this.grid.num_pixels/2;
 }
 
 // Set up inheritance from Effect
@@ -53,14 +53,14 @@ ColorBounce.prototype.step = function() {
 	  if (i== this.idex) 
 	  	{ this.grid.setPixelColor(xy.x, xy.y, this.color); }
 	 	else 
-			{ this.grid.setPixelColor(xy.x, xy.y, this.bgColor; }
+			{ this.grid.setPixelColor(xy.x, xy.y, this.bgColor); }
 	}
 	
   // delay(idelay); //How do we delay?
 
   // Update state
   // this.current_pixel++;
-	// this.current_pixel = this.current_pixel % this.grid.num_pixels;
+	this.current_step = this.current_step % this.grid.num_pixels;
 
   // Keep going for now
   return true;

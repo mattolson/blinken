@@ -34,11 +34,9 @@ function Radiation(grid, options)
 	this.N6 = this.grid.num_pixels/6;  
 	this.N12 = this.grid.num_pixels/12;
 
-	this.tcount = tcount + this.increment;
+	this.tcount = this.tcount + this.increment;
   if (this.tcount > 3.14) {this.tcount = 0.0;}
-  ibright = Math.sin(this.tcount)*255;
-
-
+  this.ibright = Math.sin(this.tcount)*255;
 }
 
 // Set up inheritance from Effect
@@ -49,7 +47,7 @@ Radiation.prototype.step = function() {
 	  var j0 = this.grid.xy((this.current_pixel + this.grid.num_pixels - this.N12) % this.grid.num_pixels);
 	  var j1 = this.grid.xy((j0+this.N3) % this.grid.num_pixels);
 	  var j2 = this.grid.xy((j1+this.N3) % this.grid.num_pixels);    
-	  this.color = this.grid.HSVtoRGB(this.hue, 255, ibright);
+	  this.color = this.grid.HSVtoRGB(this.hue, 255, this.ibright);
 		
 		this.grid.setPixelColor(j0.x, j0.y, this.color);
 		this.grid.setPixelColor(j1.x, j1.y, this.color);

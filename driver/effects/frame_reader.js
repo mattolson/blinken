@@ -1,7 +1,5 @@
-//Ported from "FAST_SPI LED FX EXAMPLES"
-//Designed for ws2801s
-// teldredge ### www.funkboxing.com ### teldredge1979@gmail.com
-// Ported by Basil Caprese 2013
+//Creates a buffer stream from incomming pixel data.
+//Works as a getter/setter as well. 
 
 var path = require('path');
 var util = require('util');
@@ -38,12 +36,12 @@ function FrameReader(grid, options)
 util.inherits(FrameReader, Effect);
 
 FrameReader.prototype.step = function() {
-	
-		this.frames.push(this.frame)
 
+		this.frames.push(this.frame)
+		
 		for(i=0;i<this.grid.num_pixels;i++){
 			var xy = this.grid.xy(i);
-		  this.grid.setPixelColor(xy.x, xy.y, this.frames[0][i].color);
+		  // this.grid.setPixelColor(xy.x, xy.y, this.frames[0][i].color);
 			this.current_pixel++;
 		}
 		

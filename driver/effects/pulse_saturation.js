@@ -2,6 +2,7 @@
 //Designed for ws2801s
 // teldredge ### www.funkboxing.com ### teldredge1979@gmail.com
 // Ported by Basil Caprese 2013
+// MAKE THIS WORK!
 
 var path = require('path');
 var util = require('util');

@@ -20,23 +20,25 @@ function Runner(grid, options)
 {
   options = options || {};
   Runner.super_.call(this, NAME, grid, options);
-  this.color = options['color'] || [255,255,255];
-	STEPS = this.grid.num_pixels;
+  // this.color = options['color'] || [255,255,255];
+  this.color = [255,255,255];
+	this.period = 25;
+	this.current_step = 1;
+	// STEPS = this.grid.num_pixels;
+	this.easing_type = options['easing'] || 'easeIn';
+  this.easing = Easing(STEPS, this.easing_type, {
+    endToEnd: true
+  });
+	STEPS = this.grid.num_pixels_y;
 }
 
 // Set up inheritance from Effect
 util.inherits(Runner, Effect);
 
 Runner.prototype.step = function() {
+	this.grid.setGridColor([0,0,0]);
 	
-	for(i=0;i<this.grid.num_pixels;i++) {
-		// Set color of the grid
-		this.grid.setGridColor([0,0,0]);
-
-		var xy = this.grid.xy(this.current_step);
-		this.grid.setPixelColor(xy.x, xy.y, this.color);
-	}
- 
+	this.grid.setColColor(this.current_step, this.color);
 	
 	// Update step number
   this.current_step++;

@@ -20,7 +20,12 @@ function LedCtrl($scope, $http, socket, $timeout, Effects, Leds) {
 	// var effect = Effects.get();
 	ListEffectsJson = function(data) {
 	    $scope.effects = data;
-			console.log(data);
+			for(var i=0;i<$scope.effects.length;i++){
+				for(var k=0;k<$scope.effects[i].options.length;k++){
+					$scope.effects[i].options[k].current = $scope.effects[i].options[k].default;
+				}
+			}
+			console.log($scope.effects);
 	}
 	var url = "http://192.168.1.6:8888/effects";
 	$http.jsonp(url);
@@ -31,14 +36,14 @@ function LedCtrl($scope, $http, socket, $timeout, Effects, Leds) {
 	    $scope.leds = data;
 			console.log('Updating LED Data');
 	}
-	
-	var updateLeds = $timeout(function myFunction() {
-		    // do sth
-		var url = "http://192.168.1.6:8888/leds";
-		// console.log('timeout');
-		$http.jsonp(url);
-	     updateLeds = $timeout(myFunction, 2000);
-	 },1);
+	// 
+	// var updateLeds = $timeout(function myFunction() {
+	// 	    // do sth
+	// 	var url = "http://192.168.1.6:8888/leds";
+	// 	// console.log('timeout');
+	// 	$http.jsonp(url);
+	//      updateLeds = $timeout(myFunction, 2000);
+	//  },1);
 
 
   // fetch all effects from server at startup
@@ -49,10 +54,7 @@ function LedCtrl($scope, $http, socket, $timeout, Effects, Leds) {
   }
 
 	$scope.registerEffect = function(effect) {
-		var options = {};
-		options.name = effect.name;
-		options.options = effect.options;
-    socket.emit("effect:register", options);
+    socket.emit("effect:register", effect);
   }
 
   // submit a changed led via socket
@@ -81,24 +83,24 @@ function LedCtrl($scope, $http, socket, $timeout, Effects, Leds) {
 
   //--- mouse events -----
 
-  $scope.mouseMove = function(event) {
-    onLedMove(event.clientX, event.clientY);
-  }
-  
-  $scope.mouseDown = function(led, event) {
-    onLedDown(led, event.clientX, event.clientY);
-    event.preventDefault();
-  }
-
-  $scope.mouseUp = function(event) {
-    mouseDown = false;
-  }
-
-  $scope.mouseOut = function(event) {
-    if (typeof event !== "undefined" && event.relatedTarget.id == "body") {
-      mouseDown = false;
-    }
-  }
+  // $scope.mouseMove = function(event) {
+  //   onLedMove(event.clientX, event.clientY);
+  // }
+  // 
+  // $scope.mouseDown = function(led, event) {
+  //   onLedDown(led, event.clientX, event.clientY);
+  //   event.preventDefault();
+  // }
+  // 
+  // $scope.mouseUp = function(event) {
+  //   mouseDown = false;
+  // }
+  // 
+  // $scope.mouseOut = function(event) {
+  //   if (typeof event !== "undefined" && event.relatedTarget.id == "body") {
+  //     mouseDown = false;
+  //   }
+  // }
 
   //--- touch events on mobile -----
 

@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('app', ['teTouchevents','ngResource'])
+var app = angular.module('blinken', ['teTouchevents','ngResource'])
 
 	.factory('socket', function ($rootScope) {
     var socket = io.connect('192.168.1.6:8888');

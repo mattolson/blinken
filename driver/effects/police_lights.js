@@ -24,9 +24,12 @@ function PoliceLights(grid, options)
 {
   options = options || {};
   PoliceLights.super_.call(this, NAME, grid, options);
-  this.current_pixel = 0;
+  this.current_step = 0;
   this.wait = options['wait'] || 0;
 	this.color = options['color'] || [255,0,0];
+	this.period = 3000;
+	
+	this.stage = 'blue';
 }
 
 // Set up inheritance from Effect
@@ -34,19 +37,20 @@ util.inherits(PoliceLights, Effect);
 
 PoliceLights.prototype.step = function() {
 	//Setup Layout, Orientation and Mapping...
-  var idexR = idex;
-  var idexB = this.grid.antipodalIndex(idexR);  
 
   for(var i = 0; i < this.grid.num_pixels; i++ ) {
-		var xy = this.grid.xy(i);
-    if (i == idexR) {this.grid.setPixelColor(xy.x, xy.y, [255, 0, 0]);}
-    else if (i == idexB) {this.grid.setPixelColor(xy.x, xy.y, [0, 0, 255]);}    
-    else {this.grid.setPixelColor(xy.x, xy.y, [0, 0, 0]);}
-  }
-
+		if(this.stage == 'blue') {
+			if (i < this.grid.top_indices) { var xy = this.grid.xy(i); this.grid.setPixelColor(xy.x, xy.y, [0, 0, 255]); }
+		  else {var xy = this.grid.xy(i); var xy = this.grid.xy(i); this.grid.setPixelColor(xy.x, xy.y, [0, 0, 0]); }
+			this.stage = 'red';
+		} else /*red*/ {
+			if (i < this.grid.top_indices) {var xy = this.grid.xy(i); this.grid.setPixelColor(xy.x, xy.y, [255, 0, 0]);}
+		  else {var xy = this.grid.xy(i); var xy = this.grid.xy(i); this.grid.setPixelColor(xy.x, xy.y, [0, 0, 0]); }
+			this.stage = 'blue';
+		}
+	}
 //Delay here?
-
-  this.current_pixel++;
+  this.current_step++;
 
   // Keep going for now
   return true;

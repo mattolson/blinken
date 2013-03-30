@@ -34,34 +34,46 @@ function Sparkle(grid, options)
 {
   options = options || {};
   Sparkle.super_.call(this, NAME, grid, options);
-  this.current_pixel = 0;
+  this.current_step = 0;
 
-  this.color = options['color'] || [255,0,0];
-	this.density = options['density'] || 1;
-	this.wait = options['wait'] || 0;
+  this.color = options['color'] || [255,255,255];
+	// this.density = options['density'] || Math.floor(this.grid.num_pixels*0.1); //30% of the pixels.
+	this.period = options['period'] || 100; 
 	this.sustain = options['sustain'] || 0;
 	this.bg = options['bg'] || [0,0,0];
+	
+	this.mode = options['mode'] || 'random';
+	
 }
 
 // Set up inheritance from Effect
 util.inherits(Sparkle, Effect);
 
 Sparkle.prototype.step = function() {
+
 	// Set background to BG;
-	if(this.current_pixel == 0) { this.grid.setGridColor(this.bg); }
+	this.grid.setGridColor(this.bg);
 	
-  // Stop animation once we're out of bounds
-  if (this.current_pixel >= this.grid.num_pixels) {
-    return false;
-  }
+	if(this.mode == 'random') {
+		var r,g,b;
+		
+		r = Math.floor(Math.random()*255); g = Math.floor(Math.random()*255); b = Math.floor(Math.random()*255);
+		this.color = [r,g,b];
+		this.period = Math.floor(Math.random()*50);
+		this.density = Math.floor(this.grid.num_pixels*Math.random());
+		
+	}
 	
-	var xy = this.grid.xy( Math.random(0, this.grid.num_pixels) );
-	this.grid.setPixelColor(xy.x, xy.y, this.color);
+	// var xy;
+	for(var i=0;i < this.density;i++) {
+		var rand = Math.floor( Math.random()*this.grid.num_pixels );
+		var xy = this.grid.xy( rand );	
+		this.grid.setPixelColor(xy.x, xy.y, this.color);
+	}
 
   // Update state
-  this.current_pixel++;
+  this.current_step++;
 
-  // Keep going for now
   return true;
 };
 

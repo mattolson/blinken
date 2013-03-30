@@ -1,6 +1,6 @@
 // Setup grid
 var Grid = require('./grid');
-var grid = new Grid('/dev/spidev0.0', 7, 8, 3, 6);
+var grid = new Grid('/dev/spidev0.0', 6, 10, 3, 6);
 
 // Setup controller
 var Controller = require('./controller');
@@ -80,4 +80,5 @@ exports.registerSocketHandlers = function(socket) {
 exports.registerHttpHandlers = function(app) {
   app.get('/leds', ledState);
   app.get('/effects', listEffects);
+  app.get('/status', ledsStatus);
 }
