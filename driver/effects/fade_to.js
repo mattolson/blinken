@@ -9,28 +9,28 @@ var NAME = path.basename(__filename, '.js'); // Our unique name
 // options = {}, optional, valid keys:
 //   'period' = number of milliseconds between steps
 //   'color':  [r,g,b], the color to use, defaults to [255,255,255]
-function Static(grid, options)
+function FadeTo(grid, options)
 {
   options = options || {};
-  Static.super_.call(this, NAME, grid, options);
+  FadeTo.super_.call(this, NAME, grid, options);
   this.color = options['color'] || [255,255,255];
 	// console.log('Step '+this.current_step);
-	this.number_of_steps = 5;
+	this.number_of_steps = 100;
 	this.fade_all_pixels = true;
-	this.random_color
+	this.random_color = options['random_color'] || true;
 	this.black_rgb = [0,0,0];
 	this.target_grid = [];
 	this.color = (this.random_color) ? this.randomColor() : options['color'] || this.color;
 	this.current_step = 0;
-	this.period = 0;
+	this.period = 1;
 	// this.grid.setGridColor([255,255,255])
  	// buffers ... this.directions = 'p' || 'm' (plus or minus)
 }
 
 // Set up inheritance from Effect
-util.inherits(Static, Effect);
+util.inherits(FadeTo, Effect);
 
-Static.prototype.step = function() {
+FadeTo.prototype.step = function() {
 	
 	// console.log('Step '+this.current_step);
 	
@@ -78,12 +78,12 @@ Static.prototype.step = function() {
   return true;
 };
 
-Static.prototype.randomColor = function(){
+FadeTo.prototype.randomColor = function(){
 	return [ Math.floor( Math.random() * 255 ), Math.floor( Math.random() * 255 ), Math.floor( Math.random() * 255 ) ] ;
 }
 
 // Return js object containing all params and their types
-Static.options = function() {
+FadeTo.options = function() {
   return [
     {
       'name': 'color',
@@ -94,5 +94,5 @@ Static.options = function() {
 }
 
 // Export public interface
-exports.constructor = Static;
+exports.constructor = FadeTo;
 exports.name = NAME;
