@@ -2,8 +2,23 @@
 
 var LedsJson, ListEffectsJson;
 
+blink
+
+	.controller('Layers', function(){
+		$scope.layers = [];
+		$scope.layerOrder = []; //Index of layer in layers array ordered by index of this array. Get it?
+	})
+	
+	.controller('Library', function(){
+		$scope.assets;
+	})
+	
+	.controller('Preview', function(){
+		
+	});
+
 /* Controllers */	
-function LedCtrl($scope, $http, socket, $timeout, Effects, Leds) {
+function LedCtrl($scope, $http, socket, $timeout, Effects, Leds, Grid) {
 
   var mouseDown = false;
   var currentLed;
@@ -12,7 +27,7 @@ function LedCtrl($scope, $http, socket, $timeout, Effects, Leds) {
   var numPixelsX = 60;
   var numPixelsY = 51;
 
-  $scope.leds, $scope.effects, $scope.scale = 1;
+  $scope.leds, $scope.effects, $scope.layers, $scope.searchFilters, $scope.scale = 1;
 
 	var options;
 
@@ -37,14 +52,17 @@ function LedCtrl($scope, $http, socket, $timeout, Effects, Leds) {
 			console.log('Updating LED Data');
 	}
 	// 
-	// var updateLeds = $timeout(function myFunction() {
-	// 	    // do sth
-	// 	var url = "http://192.168.1.6:8888/leds";
-	// 	// console.log('timeout');
-	// 	$http.jsonp(url);
-	//      updateLeds = $timeout(myFunction, 2000);
-	//  },1);
-
+	var updateLeds = $timeout(function myFunction() {
+		    // do sth
+		var url = "http://192.168.1.6:8888/leds";
+		// console.log('timeout');
+		$http.jsonp(url);
+	     updateLeds = $timeout(myFunction, 2000);
+	 },1);
+	
+	$scope.toggleFilter = function(filter){
+		filter.on = filter.on ? false : true; //toggle
+	}
 
   // fetch all effects from server at startup
   // $scope.effects = Effects.get();
@@ -54,6 +72,7 @@ function LedCtrl($scope, $http, socket, $timeout, Effects, Leds) {
   }
 
 	$scope.registerEffect = function(effect) {
+		socket.emit("off", {});
     socket.emit("effect:register", effect);
   }
 
