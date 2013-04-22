@@ -247,7 +247,7 @@ Grid.prototype.horizontalIndex = function(i) {
   if (i == this.bottom_indices) { return this.bottom_indices; }
   if (i == this.top_indices && this.even_odd == 1) {return this.top_indices + 1;}
   if (i == this.top_indices && this.even_odd == 0) {return this.top_indices;}
-  return this.grid.num_pixels - i;  
+  return this.num_pixels - i;  
 }
 
 
@@ -263,7 +263,7 @@ Grid.prototype.antipodalIndex = function(i) {
 //-FIND ADJACENT INDEX CLOCKWISE
 Grid.prototype.adjacentCW = function(i) {
   var r;
-  if (i < this.grid.num_pixels - 1) {r = i + 1;}
+  if (i < this.num_pixels - 1) {r = i + 1;}
   else {r = 0;}
   return r;
 }
@@ -273,7 +273,7 @@ Grid.prototype.adjacentCW = function(i) {
 Grid.prototype.adjacentCCW = function(i) {
   var r;
   if (i > 0) {r = i - 1;}
-  else {r = this.grid.num_pixels - 1;}
+  else {r = this.num_pixels - 1;}
   return r;
 }
 
