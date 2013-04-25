@@ -25,7 +25,7 @@ function PulseLedsSaturation(grid, options)
 {
   options = options || {};
   PulseLedsSaturation.super_.call(this, NAME, grid, options);
-  this.current_pixel = 0;
+  this.current_step = 0;
   this.period = options['period'] || 1;
 	this.hue = 100;
 }
@@ -51,7 +51,7 @@ PulseLedsSaturation.prototype.step = function() {
 	  this.grid.setPixelColor(xy.x, xy.y, this.color);
 	    // delay(this.wait);
 
-		this.current_pixel++;
+		this.current_step++;
 	    // delay(this.wait);
 };
 
