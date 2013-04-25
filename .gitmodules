@@ -1,0 +1,3 @@
+[submodule "driver/static/lib/jquery-ui"]
+	path = driver/static/lib/jquery-ui
+	url = git://github.com/jquery/jquery-ui.git
