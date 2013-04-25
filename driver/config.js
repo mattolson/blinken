@@ -1,17 +1,15 @@
-//This theoretically sets the also theoretical mapping class to a different mapping mode.
-UNITS = true,
+var config = {};
+		
+		//Pixels per 'Panel'
+		config.pixels_per_panel_row = 3,
+		config.pixels_per_panel_col = 6;
+		
+		//Pixels per unit
+		config.pixels_per_panel = config.pixels_per_panel_row * config.pixels_per_unit_col;
+		
+		//Panels X / Y
+		config.panels_per_grid_row = 10; //x
+		config.panels_per_grid_col = 6; //y
 
-PIXELS_PER_UNIT_ROW = '3',
-PIXELS_PER_UNIT_COL = '6';
-PIXELS_PER_UNIT = PIXELS_PER_UNIT_ROW * PIXELS_PER_UNIT_COL;
 
-UNITS_PER_GRID_ROW = '10';
-UNITS_PER_GRID_ROW = '6';
-
-// These are the projected values;
-// UNITS_PER_GRID_ROW = '17';
-// UNITS_PER_GRID_COL = '10'
-
-//These are theoretical defitions to allow for this to be compatible with the open source, ie, unopinionated and scalable. 
-//Sole purpose? API between LEDs and User, based on Node.js, utilizing sockets and realtime interactivity.
-// MODE = 'yes';
+exports.config = config;
