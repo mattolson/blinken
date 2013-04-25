@@ -2,8 +2,6 @@
 // grid = the instantiated Grid object
 // options = {}, optional, valid keys:
 //   'period' = number of milliseconds between steps
-
-
 function Effect(name, grid, options) {
   options = options || {};
   this.name = name;
@@ -30,12 +28,8 @@ Effect.prototype.render = function() {
   // Remember the time
   this.rendered_at = current_time;
 
-	this.grid.calculateFramerate();
-
   // Call on subclass to render next step
   return this.step();
-
-
 };
 
 // Abstract method, to be overridden by subclasses
@@ -49,7 +43,7 @@ Effect.options = function() {
     {
       'name': 'period',
       'type': 'integer',
-      'default': 1
+      'default': 40
     }
   ];
 }
