@@ -80,5 +80,4 @@ exports.registerSocketHandlers = function(socket) {
 exports.registerHttpHandlers = function(app) {
   app.get('/leds', ledState);
   app.get('/effects', listEffects);
-  app.get('/status', ledsStatus);
 }

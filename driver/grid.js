@@ -79,7 +79,7 @@ Grid.prototype.calculateFramerate = function(){
 	
 	var interval = 2000;
 	
-	var this.timing.current = (new Date()).getTime();
+	this.timing.current = (new Date()).getTime();
 	
   if (this.timing.started == 0) this.timing.started = this.timing.current;
 
