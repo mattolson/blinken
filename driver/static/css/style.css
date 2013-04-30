@@ -1,0 +1,157 @@
+/*
+******** **** *** ** *
+*  RESET
+******** *** ** ** 
+*/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/*
+******** **** *** ** *
+*  LAYOUT
+******** *** ** ** 
+*/
+
+section, header {
+	position:relative;
+	z-index:11;
+}
+
+/*#secondary, #primary{float:left;}*/
+#secondary {width:25%;background:#111;position:fixed;top:0px;left:0px;bottom:0px;}
+#primary {width:75%;float:right;}
+.block {width:32%;margin-left:1%}
+
+/*
+******** **** *** ** *
+*  BLOCKS / LAYOUT / STYLE
+******** *** ** ** 
+*/
+
+/*These are everything*/
+.block { } /*Up the sleeve for now*/
+
+.block { float:left;background:rgba(0,0,0,0.5); margin-bottom:10px;}
+
+.block header { font-size: 10pt; color:#fff; padding:5px 10px; text-transform:uppercase; background:#000 }
+
+/*Settings Blocks*/
+.block.settings {}
+.block.settings {}
+
+/* list blocks */
+.block.list {}
+
+
+/*
+******** **** *** ** *
+*  FORMS / SETTINGS
+******** *** ** ** 
+*/
+
+
+
+/*
+******** **** *** ** *
+*  MENU
+******** *** ** ** 
+*/
+
+
+/*
+******** **** *** ** *
+*  GRID
+******** *** ** ** 
+*/	
+#leds { 
+	position:absolute;
+	top:0px;
+	left:0px;
+	right:0px;
+	bottom:0px;
+	z-index:1;
+}
+li.led {
+/*	margin:0px !important;padding:0px !important; */
+	float:left;
+	display:block;
+/*	width:25px;
+	height:25px;*/
+	line-height:0px;
+/*	background:#000;*/
+/*	border:1px solid #333;*/
+/*	border-width:0 0 1px 1px;*/
+	position:relative;
+}
+
+.led > div {
+/*	position:absolute;*/
+	height:50%;
+	margin:25%;
+/*	border:3px solid #000;*/
+/*	top:0px;*/
+/*	bottom:0px;*/
+/*	left:0px;*/
+/*	right:0px;*/
+}
+
+li.effect { list-style:none; }
+
+.effect label { color:#f0f0f0; display:inline; }
+
+
+#effect-selector > li  {  float:left; list-style:none; }
+#effect-selector > li a { font-size:0.7em }
+
+
+
+/*HACKY TEMP, SOON DEP*/
+.ui-slider .ui-slider-handle {
+	width: 0.5em !important;
+	height: 1.2em;
+}

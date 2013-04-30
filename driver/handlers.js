@@ -1,6 +1,6 @@
 // Setup grid
 var Grid = require('./grid');
-var grid = new Grid('/dev/spidev0.0', 3, 10, 3, 6);
+var grid = new Grid('/dev/spidev0.0', 6, 10, 3, 6);
 
 // Setup controller
 var Controller = require('./controller');
@@ -13,13 +13,13 @@ var effects = require('./effect_registry');
 // GET /leds
 // Output current leds as json
 function ledState(request, response) {
-  response.send(grid.toJson());
+  response.send('LedsJson('+JSON.stringify(grid.toJson())+');');
 }
 
 // GET /effects
 // List available effects
 function listEffects(request, response) {
-  response.send(effects.toJson());
+  response.send('ListEffectsJson('+JSON.stringify(effects.toJson())+');');
 }
 
 // Handle change events on the socket
@@ -80,4 +80,5 @@ exports.registerSocketHandlers = function(socket) {
 exports.registerHttpHandlers = function(app) {
   app.get('/leds', ledState);
   app.get('/effects', listEffects);
+  app.get('/status', ledsStatus);
 }

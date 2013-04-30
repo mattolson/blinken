@@ -21,6 +21,14 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
   // Setup list of listeners
   this.listeners = [];
 
+	//Setup Layout Indexes
+	this.bottom_indices = 0;
+	this.top_indices = this.num_pixels/2;
+	this.even_odd = this.num_pixels%2;
+	
+	//Framerate calculation;
+	this.timing = {};
+
   // Instantiate pixels. Loop through in logical order, and then
   // calculate the strand index.
   var i, j, k, l, x, y, panel_index, strand_index;
@@ -34,7 +42,7 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
           y = (j * this.num_pixels_per_panel_y) + l;
 
           // Figure out where we are in the strand. See the wiring diagrams
-          // in the docs folder for details on the wiring layout. We start by
+          // in the docs folder for details on the wiring layouthis.timing. We start by
           // figuring out for the given position how many panels came before us.
           panel_index = (i*this.num_panels_y);
           panel_index += (i % 2 == 0) ? Math.floor(y / this.num_pixels_per_panel_y) : Math.floor((this.num_pixels_y - y - 1) / this.num_pixels_per_panel_y);
@@ -60,11 +68,39 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
   this.device = new spi.Spi(device, {
     "mode": spi.MODE['MODE_0'],
     "chipSelect": spi.CS['none'],
-    "maxSpeed": 1000000
+    "maxSpeed": 500000
   }, function(d) { d.open(); });
 
   // Clear the display
   this.off();
+}
+
+Grid.prototype.calculateFramerate = function(){
+	
+	var interval = 2000;
+	
+	var this.timing.current = (new Date()).getTime();
+	
+  if (this.timing.started == 0) this.timing.started = this.timing.current;
+
+  if(this.timing.current - this.timing.lastRendered < interval) {
+		this.timing.refreshes++;
+		return true;
+	}
+
+  this.timing.lastRendered = this.timing.current;
+
+	this.timing.frame_rate = this.timing.current * 0.9 + this.timing.lastRendered * 0.1;
+	
+	// time * 0.9 + last_frame * 0.1 	
+	
+	// return this.timing.frame_rate
+	
+}
+
+Grid.prototype.getParentPanelIndex = function(data) {
+	if(data.xy) data.index = this.getStrandIndex(data.xy.x, data.xy.y);
+	
 }
 
 Grid.prototype.getStrandIndex = function(x, y) {
@@ -96,6 +132,30 @@ Grid.prototype.setPixelColor = function(x, y, rgb) {
   this.pixels[(index*3)+2] = rgb[2];
 };
 
+//Set the color of an entire row
+Grid.prototype.setRowColor = function(rownum, color){
+	
+	var total_per_row = this.num_pixels_x;
+	for(var x = 0 ; x < total_per_row; x++){ //loop through row.
+		// var i = this.getStrandIndex( // x, y=rownum ); //rownum is actually a y value.
+		this.setPixelColor( x, y=rownum, color );
+	}
+	
+}
+
+//Set the color of an entire column
+Grid.prototype.setColColor = function(colnum, color){
+	
+	for(var y=0;y<this.num_pixels_y;y++){
+		// var i = this.getStrandIndex(x=colnum, y);
+		this.setPixelColor(x=colnum, y, color, color);
+	}
+	
+}
+
+Grid.prototype.setColumnColor = function(colnum, color){ this.setColColor(colnum, color); }
+
+//Set Color of grid
 Grid.prototype.setGridColor = function(rgb) {
   for (var i = 0; i < this.num_pixels; i++) {
     this.pixels[i*3] = rgb[0];
@@ -104,6 +164,7 @@ Grid.prototype.setGridColor = function(rgb) {
   }
 };
 
+//Retrieve pixel color
 Grid.prototype.getPixelColor = function(x, y) {
   var index = this.getStrandIndex(x,y);
   if (index == null) {
@@ -158,6 +219,42 @@ Grid.prototype.addListener = function(listener) {
     this.listeners.push(listener);
   }
 };
+
+//-FIND INDEX OF HORIZONAL OPPOSITE LED
+Grid.prototype.horizontalIndex = function(i) {
+  //-ONLY WORKS WITH INDEX < TOPINDEX
+  if (i == this.bottom_indices) { return this.bottom_indices; }
+  if (i == this.top_indices && this.even_odd == 1) {return this.top_indices + 1;}
+  if (i == this.top_indices && this.even_odd == 0) {return this.top_indices;}
+  return this.num_pixels - i;  
+}
+
+
+//-FIND INDEX OF ANTIPODAL OPPOSITE LED
+Grid.prototype.antipodalIndex = function(i) {
+  //int N2 = int(this.grid.num_pixels/2);
+  var iN = i + this.top_indices;
+  if (i >= this.top_indices) {iN = ( i + this.top_indices ) % this.num_pixels; }
+  return iN;
+}
+
+
+//-FIND ADJACENT INDEX CLOCKWISE
+Grid.prototype.adjacentCW = function(i) {
+  var r;
+  if (i < this.num_pixels - 1) {r = i + 1;}
+  else {r = 0;}
+  return r;
+}
+
+
+//-FIND ADJACENT INDEX COUNTER-CLOCKWISE
+Grid.prototype.adjacentCCW = function(i) {
+  var r;
+  if (i > 0) {r = i - 1;}
+  else {r = this.num_pixels - 1;}
+  return r;
+}
 
 // Export constructor directly
 module.exports = Grid;

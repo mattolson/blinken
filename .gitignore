@@ -1,1 +1,3 @@
-driver/node_modules
+driver/node_modules/*
+.DS_Store
+driver/static/lib/jquery-ui
