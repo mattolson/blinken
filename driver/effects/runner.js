@@ -1,5 +1,6 @@
 var path = require('path');
 var util = require('util');
+var Easing = require('easing');
 var Effect = require('../effect');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
