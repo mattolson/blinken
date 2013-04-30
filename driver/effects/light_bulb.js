@@ -1,23 +1,17 @@
-// Ported from "FAST_SPI LED FX EXAMPLES"
-// by teldredge ### www.funkboxing.com ### teldredge1979@gmail.com
-// Ported to Node.js by Sean Mitchell 2013
+/*
+	Source.Generator.LightBulb
+	@author teldredge ### www.funkboxing.com ### teldredge1979@gmail.com
+	@author basil caprese [basilcaprese.com]
+	@description Creates colors that attempt to match/mimmick light sensor readings off of various lights.
+	@param options (object)
+		 		 options.temp (string) enum values provided in controller's response
+*/
 
 var path = require('path');
 var util = require('util');
 var Effect = require('../effect');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
-
-var STEPS = 100;
-
-var bouncedirection = 0, 
-		idex = 0, 
-		idex_offset = 0, 
-		ihue = 0, 
-		isat =0, 
-		isat = 0, 
-		tcount = 0.0, 
-		lcount = 0;
 
 function LightBulb(grid, options)
 {
