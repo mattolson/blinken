@@ -4,7 +4,7 @@ var Easing = require('easing');
 var Effect = require('../effect');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
-var STEPS; // = this.grid.num_pixels;
+var STEPS = 25; // = this.grid.num_pixels;
 
 var current = {};
 		current.x = 0,
