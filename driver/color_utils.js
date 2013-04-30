@@ -136,6 +136,6 @@ exports.wheel = function(position) {
   return [r,g,b];
 };
 
-exports.randomColor = function(){
+exports.random_color = function(){
 	return [ Math.floor( Math.random() * 255 ), Math.floor( Math.random() * 255 ), Math.floor( Math.random() * 255 ) ] ;
 }
