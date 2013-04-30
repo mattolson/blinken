@@ -6,7 +6,7 @@
 var path = require('path');
 var util = require('util');
 var Effect = require('../effect');
-var colorutils = require('../color_utils');
+var color_utils = require('../color_utils');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
