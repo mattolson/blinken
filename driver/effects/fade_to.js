@@ -1,6 +1,7 @@
 var path = require('path');
 var util = require('util');
 var Effect = require('../effect');
+var color_utils = require('../color_utils');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
@@ -20,7 +21,7 @@ function FadeTo(grid, options)
 	this.random_color = options['random_color'] || true;
 	this.black_rgb = [0,0,0];
 	this.target_grid = [];
-	this.color = (this.random_color) ? this.randomColor() : options['color'] || this.color;
+	this.color = (this.random_color) ? color_utils.random_color() : options['color'] || this.color;
 	this.current_step = 0;
 	this.period = 1;
 	// this.grid.setGridColor([255,255,255])
@@ -73,14 +74,10 @@ FadeTo.prototype.step = function() {
 
 	if (this.current_step >= this.number_of_steps) {
 		this.current_step = 0; 
-		if(this.random_color) this.color = this.randomColor();
+		if(this.random_color) this.color = color_utils.random_color();
 	}
   return true;
 };
-
-FadeTo.prototype.randomColor = function(){
-	return [ Math.floor( Math.random() * 255 ), Math.floor( Math.random() * 255 ), Math.floor( Math.random() * 255 ) ] ;
-}
 
 // Return js object containing all params and their types
 FadeTo.options = function() {
