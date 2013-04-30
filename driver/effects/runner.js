@@ -26,7 +26,7 @@ function Runner(grid, options)
 	this.period = 25;
 	this.current_step = 1;
 	// STEPS = this.grid.num_pixels;
-	this.easing_type = options['easing'] || 'easeIn';
+	this.easing_type = options['easing'] || 'linear';
   this.easing = Easing(STEPS, this.easing_type, {
     endToEnd: true
   });
