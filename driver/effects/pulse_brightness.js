@@ -6,6 +6,7 @@
 var path = require('path');
 var util = require('util');
 var Effect = require('../effect');
+var colorutils = require('../color_utils');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
@@ -27,7 +28,6 @@ function PulseLedsBrightness(grid, options)
   this.current_pixel = 0;
   this.period = options['period'] || 1;
 	this.hue = options['hue'] || 100;
-
 }
 
 // Set up inheritance from Effect
@@ -45,7 +45,8 @@ PulseLedsBrightness.prototype.step = function() {
 		    if (ibright <= 1) {bouncedirection = 0;}         
 		  }  
 
-		  this.color = this.grid.HSVtoRGB(this.hue, 255, ibright);
+		  // this.color = this.grid.HSVtoRGB(this.hue, 255, ibright); //saving JIC
+			this.color = color_utils.hsv_to_rgb(this.hue, 255, ibright);
 		
 		  var xy = this.grid.xy(i);
 		  this.grid.setPixelColor(xy.x, xy.y, this.color);
