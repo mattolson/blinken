@@ -20,7 +20,7 @@ var bouncedirection = 0,
 		lcount = 0;
 
 function LightBulb(grid, options)
-{kaz
+{
   options = options || {};
   LightBulb.super_.call(this, NAME, grid, options);
   this.current_pixel = 0;
