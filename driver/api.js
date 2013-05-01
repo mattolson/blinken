@@ -77,7 +77,7 @@ var layer_api = {
     var source = sources.find(name);
     if (source != null) {
       var layer = mixer.add_layer(new source(grid, request.body.source.options));
-      response.send(JSON.stringify(layer.toJson());
+      response.send(JSON.stringify(layer.toJson()));
     }
     else {
       response.send(errorResponse(400, "ERROR: unknown source '" + name + "'"));
