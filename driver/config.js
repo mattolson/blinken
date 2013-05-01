@@ -9,4 +9,4 @@ var Config = {};
   Config.num_panels_x = 10;
   Config.num_panels_y = 6;
 
-exports = Config;
+module.exports = Config;
