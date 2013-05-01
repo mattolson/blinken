@@ -28,12 +28,12 @@ var sources = require('./source_registry');
 //**************************************
 
 function errorResponse(code, description) {
-  return JSON.stringify ({
+  return {
     'error': {
       'code': code,
       'desc': description
     }
-  });
+  };
 }
 
 //**************************************
@@ -45,7 +45,7 @@ function errorResponse(code, description) {
 var source_api = {
   // GET /sources
   list: function(request, response) {
-    response.send('ListEffectsJson('+JSON.stringify(sources.toJson())+');');
+    response.jsonp(sources.toJson());
   },
 
   // GET /sources/:name
@@ -77,10 +77,10 @@ var layer_api = {
     var source = sources.find(name);
     if (source != null) {
       var layer = mixer.add_layer(new source(grid, request.body.source.options));
-      response.send(JSON.stringify(layer.toJson()));
+      response.jsonp(layer.toJson());
     }
     else {
-      response.send(errorResponse(400, "ERROR: unknown source '" + name + "'"));
+      response.jsonp(errorResponse(400, "ERROR: unknown source '" + name + "'"));
     }
   },
 
@@ -109,7 +109,7 @@ var layer_api = {
 var grid_api = {
   // GET /grid
   get: function(request, response) {
-    response.send('LedsJson('+JSON.stringify(grid.toJson())+');');
+    response.jsonp(grid.toJson());
   }
 };
 
