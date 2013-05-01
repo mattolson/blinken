@@ -35,8 +35,6 @@ exports.rgb_to_hsv = function(rgb) {
   return [h,s,v];
 };
 
-
-
 // Inverse of rgb_to_hsv
 exports.hsv_to_rgb = function(hsv) {
   var i, h, s, v, r, g, b, f, p, q, t;
@@ -96,7 +94,6 @@ exports.hsv_to_rgb = function(hsv) {
   return [r,g,b];
 };
 
-
 // Better hsv to rgb? 
 // exports.hsv_to_rgb = function(hsv) {
 // 	var r, g, b;
@@ -114,7 +111,7 @@ exports.hsv_to_rgb = function(hsv) {
 // 	case 4: r = t, g = p, b = v; break;
 // 	case 5: r = v, g = p, b = q; break;
 // 	}
-// 	return [Math.floor(r * 255), Math.floor(g * 255), Math.floor(b * 255)];
+// 	return [Math.floor(r * 255.0), Math.floor(g * 255.0), Math.floor(b * 255.0)];
 // }
 
 exports.wheel = function(position) {

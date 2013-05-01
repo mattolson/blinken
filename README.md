@@ -3,7 +3,7 @@
 We are working with strands of [Adafruit WS2801 LED pixels](https://www.adafruit.com/products/322), configured in a grid installed
 on ceiling tiles. For more information on basic wiring and led function, see [Adafruit's tutorial](http://learn.adafruit.com/12mm-led-pixels/).
 
-We're using a [NodeJS v0.8.21](https://github.com/joyent/node) server on a [Raspberry PI Model B](http://www.raspberrypi.org/) with a 
+We're using a [NodeJS v0.10.5](https://github.com/joyent/node) server on a [Raspberry PI Model B](http://www.raspberrypi.org/) with a 
 [breakout kit](http://adafruit.com/products/914) to drive the array.
 
 ### Requirements
@@ -15,13 +15,14 @@ to an SD card. See [this page](http://elinux.org/RPi_Easy_SD_Card_Setup) for mor
 * Download and compile node.js from source. Sadly, the binary distribution in the Raspbian repository did not work for us. Follow 
 [this guide](https://gist.github.com/3301813) but use the latest version of node. Compiling node on a 700Mhz ARM chip takes a long time, so grab a beer.
 * Wire up your lights [like so](http://learn.adafruit.com/light-painting-with-raspberry-pi/hardware).
+* Create an entry in your /etc/hosts for the IP address of the Pi named `leds.dev`.
 
 ### Installation
 
 * Clone this repository: `git clone git://github.com/mattolson/blinken.git`
 * Build/install node modules: `cd driver && npm install`
 * Start server: `sudo node index.js`
-* Open Chrome (or other browser capable with Web Sockets support) and visit http://raspberrypi.local:8888/
+* Open Chrome (or other browser capable with Web Sockets support) and visit http://leds.dev:8888/
 
 ### Thanks
 

@@ -1,6 +1,11 @@
 // Setup grid
+var Config = require('./config');
 var Grid = require('./grid');
-var grid = new Grid('/dev/spidev0.0', 6, 10, 3, 6);
+var grid = new Grid('/dev/spidev0.0', 
+                    Config.num_panels_x, 
+                    Config.num_panels_y, 
+                    Config.num_pixels_per_panel_x, 
+                    Config.num_pixels_per_panel_y);
 
 // Setup controller
 var Controller = require('./controller');
@@ -22,7 +27,7 @@ function listEffects(request, response) {
   response.send('ListEffectsJson('+JSON.stringify(effects.toJson())+');');
 }
 
-// Handle change events on the socket
+// Change individual pixel
 function changeLed(socket, x, y, rgb) {
   // Change the pixel color
   grid.setPixelColor(x, y, rgb);
@@ -32,13 +37,9 @@ function changeLed(socket, x, y, rgb) {
   socket.broadcast.emit("changed:led", { x: x, y: y, rgb: rgb }); 
 }
 
-// Register socket handlers
+// Register socket handlers. Called from server.js once sockets
+// are up and running.
 exports.registerSocketHandlers = function(socket) {
-  // Add grid listener
-  //grid.addListener(function() {
-  //  socket.emit("update", grid.toJson());
-  //});
-
   socket.on("change:led", function(data) {
     // Validate input values
     var x = parseInt(data.x);
@@ -76,7 +77,8 @@ exports.registerSocketHandlers = function(socket) {
   });
 }
 
-// Register http handlers
+// Register http handlers. Called from server.js once http
+// server is up and running.
 exports.registerHttpHandlers = function(app) {
   app.get('/leds', ledState);
   app.get('/effects', listEffects);

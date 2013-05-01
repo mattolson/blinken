@@ -1,15 +1,12 @@
-var config = {};
+var Config = {};
 		
-		//Pixels per 'Panel'
-		config.pixels_per_panel_row = 3,
-		config.pixels_per_panel_col = 6;
+  // Pixels per 'Panel'
+  Config.num_pixels_per_panel_x = 3,
+  Config.num_pixels_per_panel_y = 6;
+  Config.num_pixels_per_panel = Config.num_pixels_per_panel_x * Config.num_pixels_per_unit_y;
 		
-		//Pixels per unit
-		config.pixels_per_panel = config.pixels_per_panel_row * config.pixels_per_unit_col;
-		
-		//Panels X / Y
-		config.panels_per_grid_row = 10; //x
-		config.panels_per_grid_col = 6; //y
+  // Panels per grid
+  Config.num_panels_x = 10;
+  Config.num_panels_y = 6;
 
-
-exports.config = config;
+exports = Config;
