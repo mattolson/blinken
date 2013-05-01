@@ -1,6 +1,6 @@
 var path = require('path');
 var util = require('util');
-var Effect = require('../effect');
+var Source = require('../source');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
@@ -46,8 +46,8 @@ function Sparkle(grid, options)
 	
 }
 
-// Set up inheritance from Effect
-util.inherits(Sparkle, Effect);
+// Set up inheritance from Source
+util.inherits(Sparkle, Source);
 
 Sparkle.prototype.step = function() {
 
@@ -77,7 +77,7 @@ Sparkle.prototype.step = function() {
   return true;
 };
 
-Sparkle.options = Effect.options;
+Sparkle.options = Source.options;
 
 // Export public interface
 exports.constructor = Sparkle;

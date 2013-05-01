@@ -1,7 +1,7 @@
 var path = require('path');
 var util = require('util');
 var Easing = require('easing');
-var Effect = require('../effect');
+var Source = require('../source');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 var STEPS = 25; // = this.grid.num_pixels;
@@ -12,7 +12,7 @@ var current = {};
 		current.rows = 0,
 		current.cols = 0;
 
-// This effect simply sets the entire grid to a single color
+// This source simply sets the entire grid to a single color
 //
 // options = {}, optional, valid keys:
 //   'period' = number of milliseconds between steps
@@ -33,8 +33,8 @@ function Runner(grid, options)
 	STEPS = this.grid.num_pixels_y;
 }
 
-// Set up inheritance from Effect
-util.inherits(Runner, Effect);
+// Set up inheritance from Source
+util.inherits(Runner, Source);
 
 Runner.prototype.step = function() {
 	this.grid.setGridColor([0,0,0]);
@@ -62,7 +62,7 @@ Runner.options = function() {
       'type': 'integer',
       'default': 1
     }
-  ].concat(Effect.options());
+  ].concat(Source.options());
 }
 
 // Export public interface

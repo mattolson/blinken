@@ -1,8 +1,8 @@
-// name = a unique short name for this effect (used for registration)
+// name = a unique short name for this source (used for registration)
 // grid = the instantiated Grid object
 // options = {}, optional, valid keys:
 //   'period' = number of milliseconds between steps
-function Effect(name, grid, options) {
+function Source(name, grid, options) {
   options = options || {};
   this.name = name;
   this.grid = grid;
@@ -11,7 +11,7 @@ function Effect(name, grid, options) {
   this.rendered_at = 0; // when was the last time we rendered a step?
 }
 
-Effect.prototype.render = function() {
+Source.prototype.render = function() {
   var current_time = (new Date()).getTime();
 
   // Update start time
@@ -33,12 +33,14 @@ Effect.prototype.render = function() {
 };
 
 // Abstract method, to be overridden by subclasses
-Effect.prototype.step = function() {
+Source.prototype.step = function() {
   return true;
 };
 
-// Return js object containing all params and their types
-Effect.options = function() {
+// Return js object containing all params and their types. This is a
+// default that should be overridden by subclasses if they have
+// additional options.
+Source.options = function() {
   return [
     {
       'name': 'period',
@@ -49,4 +51,4 @@ Effect.options = function() {
 }
 
 // Export constructor directly
-module.exports = Effect;
+module.exports = Source;

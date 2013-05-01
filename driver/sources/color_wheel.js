@@ -1,11 +1,11 @@
 var path = require('path');
 var util = require('util');
-var Effect = require('../effect');
+var Source = require('../source');
 var color_utils = require('../color_utils');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
-// This effect loops through the color wheel continuously, producing
+// This source loops through the color wheel continuously, producing
 // a rainbow effect cycling through each pixel.
 //
 // options = {}, optional, valid keys:
@@ -17,8 +17,8 @@ function ColorWheel(grid, options)
   this.current_color = 0;
 }
 
-// Set up inheritance from Effect
-util.inherits(ColorWheel, Effect);
+// Set up inheritance from Source
+util.inherits(ColorWheel, Source);
 
 ColorWheel.prototype.step = function() {
   for (var i = 0; i < this.grid.num_pixels; i++) {
@@ -34,8 +34,8 @@ ColorWheel.prototype.step = function() {
   return true;
 };
 
-// Copy superclass definition
-ColorWheel.options = Effect.options;
+// Since we don't have any additional options, copy superclass definition
+ColorWheel.options = Source.options;
 
 // Export public interface
 exports.constructor = ColorWheel;

@@ -9,7 +9,7 @@
 
 var path = require('path');
 var util = require('util');
-var Effect = require('../effect');
+var Source = require('../source');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
@@ -22,8 +22,8 @@ function LightBulb(grid, options)
 	this.color = [];
 }
 
-// Set up inheritance from Effect
-util.inherits(LightBulb, Effect);
+// Set up inheritance from Source
+util.inherits(LightBulb, Source);
 
 LightBulb.prototype.step = function() {
 	/*if(this.temp == "Candle") {*/ 
@@ -71,7 +71,7 @@ LightBulb.options = function() {
 				"CLEAR BLUE SKY",
 			]
     }
-  ].concat(Effect.options());
+  ].concat(Source.options());
 }
 
 // Export public interface

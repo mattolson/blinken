@@ -1,10 +1,10 @@
 var path = require('path');
 var util = require('util');
-var Effect = require('../effect');
+var Source = require('../source');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
-// This effect simply sets the entire grid to a single color
+// This source simply sets the entire grid to a single color
 //
 // options = {}, optional, valid keys:
 //   'period' = number of milliseconds between steps
@@ -16,8 +16,8 @@ function Static(grid, options)
   this.color = options['color'] || [255,255,255];
 }
 
-// Set up inheritance from Effect
-util.inherits(Static, Effect);
+// Set up inheritance from Source
+util.inherits(Static, Source);
 
 Static.prototype.step = function() {
   // Set color of the grid
@@ -35,7 +35,7 @@ Static.options = function() {
       'type': 'color',
       'default': [255,255,255]
     }
-  ].concat(Effect.options());
+  ].concat(Source.options());
 }
 
 // Export public interface

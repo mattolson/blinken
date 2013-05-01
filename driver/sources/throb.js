@@ -1,12 +1,12 @@
 var path = require('path');
 var util = require('util');
 var Easing = require('easing');
-var Effect = require('../effect');
+var Source = require('../source');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 var STEPS = 25; // Number of steps between start_color and end_color
 
-// This effect uses an easing library to produce a throb effect, alternating
+// This source uses an easing library to produce a throb effect, alternating
 // between two given colors.
 //
 // options = {}, optional, valid keys:
@@ -27,8 +27,8 @@ function Throb(grid, options)
   });
 }
 
-// Set up inheritance from Effect
-util.inherits(Throb, Effect);
+// Set up inheritance from Source
+util.inherits(Throb, Source);
 
 Throb.prototype.calculate_single = function(start_value, end_value) {
   return start_value + (end_value-start_value) * this.easing[this.current_step];
@@ -72,7 +72,7 @@ Throb.options = function() {
       'type': 'string',
       'default': 'linear'
     }
-  ].concat(Effect.options());
+  ].concat(Source.options());
 }
 
 // Export public interface

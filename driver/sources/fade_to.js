@@ -1,11 +1,11 @@
 var path = require('path');
 var util = require('util');
-var Effect = require('../effect');
+var Source = require('../source');
 var color_utils = require('../color_utils');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
-// This effect simply sets the entire grid to a single color
+// This source simply sets the entire grid to a single color
 //
 // options = {}, optional, valid keys:
 //   'period' = number of milliseconds between steps
@@ -28,8 +28,8 @@ function FadeTo(grid, options)
  	// buffers ... this.directions = 'p' || 'm' (plus or minus)
 }
 
-// Set up inheritance from Effect
-util.inherits(FadeTo, Effect);
+// Set up inheritance from Source
+util.inherits(FadeTo, Source);
 
 FadeTo.prototype.step = function() {
 	
@@ -87,7 +87,7 @@ FadeTo.options = function() {
       'type': 'color',
       'default': [255,255,255]
     }
-  ].concat(Effect.options());
+  ].concat(Source.options());
 }
 
 // Export public interface

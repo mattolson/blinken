@@ -5,7 +5,7 @@
 
 var path = require('path');
 var util = require('util');
-var Effect = require('../effect');
+var Source = require('../source');
 var color_utils = require('../color_utils');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
@@ -30,8 +30,8 @@ function PulseLedsBrightness(grid, options)
 	this.hue = options['hue'] || 100;
 }
 
-// Set up inheritance from Effect
-util.inherits(PulseLedsBrightness, Effect);
+// Set up inheritance from Source
+util.inherits(PulseLedsBrightness, Source);
 
 PulseLedsBrightness.prototype.step = function() {
 		for (var i = 0; i < this.grid.num_pixels; i++) {
@@ -58,7 +58,7 @@ PulseLedsBrightness.prototype.step = function() {
 		return true;
 };
 
-PulseLedsBrightness.options = Effect.options;
+PulseLedsBrightness.options = Source.options;
 
 // Export public interface
 exports.constructor = PulseLedsBrightness;

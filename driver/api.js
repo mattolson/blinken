@@ -13,13 +13,28 @@ var grid = new Grid('/dev/spidev0.0',
                     Config.num_pixels_per_panel_x, 
                     Config.num_pixels_per_panel_y);
 
-// Setup controller
-var Controller = require('./controller');
-var controller = new Controller(grid);
-controller.run();
+// Setup mixer and set rendering loop in motion
+var Mixer = require('./mixer');
+var mixer = new Mixer(grid);
+mixer.run();
 
-// Get effect registry (this loads effects as well)
-var effects = require('./effect_registry');
+// Get source registry (this loads sources themselves as well)
+var sources = require('./source_registry');
+
+//**************************************
+//
+//              Errors
+//
+//**************************************
+
+function errorResponse(code, description) {
+  return JSON.stringify ({
+    'error': {
+      'code': code,
+      'desc': description
+    }
+  });
+}
 
 //**************************************
 //
@@ -30,7 +45,7 @@ var effects = require('./effect_registry');
 var source_api = {
   // GET /sources
   list: function(request, response) {
-    response.send('ListEffectsJson('+JSON.stringify(effects.toJson())+');');
+    response.send('ListEffectsJson('+JSON.stringify(sources.toJson())+');');
   },
 
   // GET /sources/:name
@@ -49,6 +64,24 @@ var layer_api = {
   // GET /layers
   list: function(request, response) {
     console.log("layers.list");
+  },
+
+  // POST /layers
+  // expects request body to contain the following:
+  // source[name]
+  // source[options][...]
+  create: function(request, response) {
+    var name = request.body.source.name;
+
+    // Find and instantiate source by name
+    var source = sources.find(name);
+    if (source != null) {
+      var layer = mixer.add_layer(new source(grid, request.body.source.options));
+      response.send(JSON.stringify(layer.toJson());
+    }
+    else {
+      response.send(errorResponse(400, "ERROR: unknown source '" + name + "'"));
+    }
   },
 
   // GET /layers/:id
@@ -109,25 +142,9 @@ exports.registerSocketHandlers = function(socket) {
   });
 
   socket.on("off", function(data) {
-    controller.deregister_all();
+    mixer.clear_layers();
     grid.off();
     socket.emit("update", grid.toJson());
-  });
-
-  socket.on("effect:register", function(data) {
-    // Extract effect name
-    var effect_name = data['name'];
-    delete data['name'];
-
-    // Find and instantiate effect by name
-    var effect = effects.find(effect_name);
-    if (effect != null) {
-      controller.register_effect(new effect(grid, data));
-      console.log("INFO: registered effect '" + effect_name + "'");
-    }
-    else {
-      console.log("ERROR: unknown effect '" + effect_name + "'");
-    }
   });
 }
 
@@ -136,10 +153,11 @@ exports.registerSocketHandlers = function(socket) {
 exports.registerHttpHandlers = function(app) {
   // Sources
   app.get('/sources', source_api.list);
-  app.get('/source/:id', source_api.get);
+  app.get('/sources/:id', source_api.get);
 
   // Layers
   app.get('/layers', layer_api.list);
+  app.post('/layers', layer_api.create);
   app.get('/layers/:id', layer_api.get);
   app.put('/layers/:id', layer_api.update);
   app.delete('/layers/:id', layer_api.destroy);

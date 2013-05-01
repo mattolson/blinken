@@ -1,10 +1,10 @@
 var path = require('path');
 var util = require('util');
-var Effect = require('../effect');
+var Source = require('../source');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
-// This effect simply loops through each pixel in sequence and changes its color.
+// This source simply loops through each pixel in sequence and changes its color.
 //
 // options = {}, optional, valid keys:
 //   'period' = number of milliseconds between steps
@@ -17,8 +17,8 @@ function ColorWipe(grid, options)
   this.current_pixel = 0;
 }
 
-// Set up inheritance from Effect
-util.inherits(ColorWipe, Effect);
+// Set up inheritance from Source
+util.inherits(ColorWipe, Source);
 
 ColorWipe.prototype.step = function() {
   // Stop animation once we're out of bounds
@@ -45,7 +45,7 @@ ColorWipe.options = function() {
       'type': 'color',
       'default': [255,0,0]
     }
-  ].concat(Effect.options());
+  ].concat(Source.options());
 }
 
 // Export public interface
