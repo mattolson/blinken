@@ -1,7 +1,7 @@
 var express = require('express');
 var socket = require('socket.io');
 var http = require('http');
-var handlers = require("./handlers");
+var api = require("./api");
 
 var app, io;
 
@@ -22,11 +22,11 @@ function start() {
   app.use(express.static('static'));
 
   // Register http handlers
-  handlers.registerHttpHandlers(app);
+  api.registerHttpHandlers(app);
 
   // Register socket handlers
   io.on("connection", function(socket) {
-    handlers.registerSocketHandlers(socket);
+    api.registerSocketHandlers(socket);
   });
 
   // Export for later
