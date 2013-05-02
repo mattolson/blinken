@@ -7,7 +7,7 @@ function Layer(source, id) {
 
 // For now, rendering a layer simply means rendering the source
 Layer.prototype.render = function() {
-  this.source.render();
+  return this.source.render();
 };
 
 Layer.prototype.toJson = function() {
