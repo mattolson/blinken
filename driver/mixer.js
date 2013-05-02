@@ -30,7 +30,13 @@ Mixer.prototype.add_layer = function(source) {
 Mixer.prototype.remove_layer = function(layer_id) {
   var index = this.layer_zindex(layer_id);
   if (index != null) {
+    // Remove it
     this.layers.splice(index, 1);
+
+    // If this was the last layer, turn off lights
+    if (this.layers.length == 0) {
+      this.grid.off();
+    }
   }
 };
 

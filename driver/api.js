@@ -97,7 +97,7 @@ var layer_api = {
   // DELETE /layers/:id
   destroy: function(request, response) {
     mixer.remove_layer(request.params.id);
-    res.set('Status', '204');
+    response.set('Status', '204');
   }
 };
 
