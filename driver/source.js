@@ -48,11 +48,11 @@ Source.prototype.options = function() {
       'default': 40
     }
   ];
-}
+};
 
 Source.prototype.toJson = function() {
   return {
-    'name': name,
+    'name': this.name,
     'options': this.options()
   };
 };

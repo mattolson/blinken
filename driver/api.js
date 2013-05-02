@@ -54,7 +54,7 @@ var source_api = {
     if (source != null) {
       response.jsonp(source.toJson());
     } else {
-      response.jsonp(errorResponse(400, "ERROR: unknown source '" + name + "'"));
+      response.jsonp(errorResponse(400, "ERROR: unknown source '" + request.params.name + "'"));
     }
   }
 };
@@ -77,11 +77,12 @@ var layer_api = {
   // source[options][...]
   create: function(request, response) {
     var name = request.body.source.name;
+    var options = request.body.source.options;
 
     // Find and instantiate source by name
     var source = sources.find(name);
     if (source != null) {
-      var layer = mixer.add_layer(new source(grid, request.body.source.options));
+      var layer = mixer.add_layer(new source(grid, options));
       response.jsonp(layer.toJson());
     } else {
       response.jsonp(errorResponse(400, "ERROR: unknown source '" + name + "'"));
@@ -90,11 +91,11 @@ var layer_api = {
 
   // GET /layers/:id
   get: function(request, response) {
-    var layer = mixer.find_layer(request.id);
+    var layer = mixer.find_layer(request.params.id);
     if (layer != null) {
       response.jsonp(layer.toJson());
     } else {
-      response.jsonp(errorResponse(400, "ERROR: unknown layer id '" + request.id + "'"));
+      response.jsonp(errorResponse(400, "ERROR: unknown layer id '" + request.params.id + "'"));
     }
   },
 
@@ -105,7 +106,7 @@ var layer_api = {
 
   // DELETE /layers/:id
   destroy: function(request, response) {
-    mixer.remove_layer(request.id);
+    mixer.remove_layer(request.params.id);
   }
 };
 
