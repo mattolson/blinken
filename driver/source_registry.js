@@ -5,8 +5,9 @@ function SourceRegistry() {
 
   // Loop through sources directory and add them to the registry
   var registry = this;
-  require("fs").readdirSync("./sources").forEach(function(file) {
-    var source = require("./sources/" + file);
+  var sources_dir = path.resolve(__dirname, 'sources');
+  require("fs").readdirSync(sources_dir).forEach(function(file) {
+    var source = require(sources_dir + "/" + file);
     registry.sources[source.name] = source.constructor;
   });
 }
