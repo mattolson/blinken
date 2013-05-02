@@ -9,7 +9,7 @@ var NAME = path.basename(__filename, '.js'); // Our unique name
 // a rainbow effect cycling through each pixel.
 //
 // options = {}, optional, valid keys:
-//   'period' = number of milliseconds between steps
+//   period = number of milliseconds between steps
 function ColorWheel(grid, options)
 {
   options = options || {};
@@ -34,8 +34,8 @@ ColorWheel.prototype.step = function() {
   return true;
 };
 
-// Since we don't have any additional options, copy superclass definition
-ColorWheel.options = Source.options;
+// Since we don't have any additional options, copy default
+ColorWheel.options_spec = Source.options_spec;
 
 // Export public interface
 exports.constructor = ColorWheel;

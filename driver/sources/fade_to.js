@@ -8,20 +8,25 @@ var NAME = path.basename(__filename, '.js'); // Our unique name
 // This source simply sets the entire grid to a single color
 //
 // options = {}, optional, valid keys:
-//   'period' = number of milliseconds between steps
-//   'color':  [r,g,b], the color to use, defaults to [255,255,255]
+//   period = number of milliseconds between steps
+//   color:  [r,g,b], the color to use, defaults to [255,255,255]
+//   random_color: boolean, whether to choose a random color   
 function FadeTo(grid, options)
 {
   options = options || {};
   FadeTo.super_.call(this, NAME, grid, options);
-  this.color = options['color'] || [255,255,255];
+
+  this.options.color = options.color || [255,255,255];
+	this.options.random_color = options.random_color || true;
+  if (this.options.random_color) {
+	  this.options.color = color_utils.random_color();
+  }
+
 	// console.log('Step '+this.current_step);
 	this.number_of_steps = 100;
 	this.fade_all_pixels = true;
-	this.random_color = options['random_color'] || true;
 	this.black_rgb = [0,0,0];
 	this.target_grid = [];
-	this.color = (this.random_color) ? color_utils.random_color() : options['color'] || this.color;
 	this.current_step = 0;
 	this.period = 1;
 	// this.grid.setGridColor([255,255,255])
@@ -42,7 +47,7 @@ FadeTo.prototype.step = function() {
 		var xy = this.grid.xy(i); //Duh
 		var current = this.grid.getPixelColor(xy.x, xy.y) ;
 		// console.log(current);
-		var target = this.color; //Where we are going.
+		var target = this.options.color; //Where we are going.
 		var diffs = [], 
 				diff_total = [], 
 				step_size = [], 
@@ -53,7 +58,7 @@ FadeTo.prototype.step = function() {
 		
 		for(var m=0;m<current.length;m++){
 			var diff;
-			//This might seem illogical, but it the p or m system allows for step based algortihm flexibility.\
+			//This might seem illogical, but it the p or m system allows for step based algortihm flexibility.
 			directions.push( current[m] < target[m] ? 'p' : 'm' );
 			diffs.push( diff = (directions[m] == 'p') ? target[m] - current[m] : current[m] - target[m] );	 //Plus or minus, avoiding too much from the Math function (already optimized from using negatives which requires special flags in certain cases)
 			// diffs[m] = Math.round( this.fade_all_pixels !== true && is_black) ? 0 : diffs[m]; //If it's black and we want to keep them that way, set to zero, otherwise calculate present difference.
@@ -74,20 +79,25 @@ FadeTo.prototype.step = function() {
 
 	if (this.current_step >= this.number_of_steps) {
 		this.current_step = 0; 
-		if(this.random_color) this.color = color_utils.random_color();
+		if(this.options.random_color) this.options.color = color_utils.random_color();
 	}
   return true;
 };
 
 // Return js object containing all params and their types
-FadeTo.options = function() {
+FadeTo.options_spec = function() {
   return [
     {
       'name': 'color',
       'type': 'color',
       'default': [255,255,255]
+    },
+    {
+      'name': 'random_color',
+      'type': 'boolean',
+      'default': true
     }
-  ].concat(Source.options());
+  ].concat(Source.options_spec());
 }
 
 // Export public interface

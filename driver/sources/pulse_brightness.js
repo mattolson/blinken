@@ -10,55 +10,52 @@ var color_utils = require('../color_utils');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
-var STEPS = 100;
-
-var bouncedirection = 0, 
-		idex = 0, 
-		idex_offset = 0, 
-		ihue = 0, 
-		ibright =0, 
-		isat = 0, 
-		tcount = 0.0, 
-		lcount = 0;
-
+// options = {}, optional, valid keys:
+//   period = number of milliseconds between steps
+//   hue: integer, the hue to maintain
 function PulseLedsBrightness(grid, options)
 {
   options = options || {};
   PulseLedsBrightness.super_.call(this, NAME, grid, options);
-  this.current_pixel = 0;
-  this.period = options['period'] || 1;
-	this.hue = options['hue'] || 100;
+	this.options.hue = options.hue || 100;
+  this.brightness = 0;
+  this.bounce_direction = 0;
 }
 
 // Set up inheritance from Source
 util.inherits(PulseLedsBrightness, Source);
 
 PulseLedsBrightness.prototype.step = function() {
-		for (var i = 0; i < this.grid.num_pixels; i++) {
-	 	 if (bouncedirection == 0) {
-		    ibright++;
-		    if (ibright >= 255) {bouncedirection = 1;}
-		  }
-	
-		  if (bouncedirection == 1) {
-		    ibright = ibright - 1;
-		    if (ibright <= 1) {bouncedirection = 0;}         
-		  }  
+  for (var i = 0; i < this.grid.num_pixels; i++) {
+    if (this.bounce_direction == 0) {
+      this.brightness++;
+      if (this.brightness >= 255) {this.bounce_direction = 1;}
+    }
 
-		  // this.color = this.grid.HSVtoRGB(this.hue, 255, ibright); //saving JIC
-			this.color = color_utils.hsv_to_rgb(this.hue, 255, ibright);
-		
-		  var xy = this.grid.xy(i);
-		  this.grid.setPixelColor(xy.x, xy.y, this.color);
-		}
+    if (this.bounce_direction == 1) {
+      this.brightness--;
+      if (this.brightness <= 1) {this.bounce_direction = 0;}         
+    }  
 
-		// this.current_pixel++;
-		// this.current_pixel = this.current_pixel % this.grid.num_pixels;
-		
-		return true;
+    var color = color_utils.hsv_to_rgb(this.options.hue, 255, this.brightness);
+
+    var xy = this.grid.xy(i);
+    this.grid.setPixelColor(xy.x, xy.y, color);
+  }
+
+  return true;
 };
 
-PulseLedsBrightness.options = Source.options;
+// Return js object containing all params and their types
+PulseLedsBrightness.options_spec = function() {
+  return [
+    {
+      'name': 'hue',
+      'type': 'integer',
+      'default': 100
+    }
+  ].concat(Source.options_spec());
+}
 
 // Export public interface
 exports.constructor = PulseLedsBrightness;

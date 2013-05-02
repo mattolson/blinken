@@ -17,50 +17,42 @@ function LightBulb(grid, options)
 {
   options = options || {};
   LightBulb.super_.call(this, NAME, grid, options);
-  this.current_pixel = 0;
-  this.temp = options['temp'] || "Direct Sun";
-	this.color = [];
+
+  this.options.temp = options.temp || "CLEAR BLUE SKY";
 }
 
 // Set up inheritance from Source
 util.inherits(LightBulb, Source);
 
+LightBulb.prototype.getColor = function(temp) {
+	if (temp == "CANDLE") { return [255,147,41] }
+	if (temp == "-40W TUNG") { return [255,197,143] }
+	if (temp == "-100W TUNG") { return [255,214,170] }
+	if (temp == "HALOGEN") { return [255,241,224] }
+	if (temp == "CARBON ARC") { return [255,250,244] }
+	if (temp == "HIGH NOON SKY") { return [255,255,251] }
+	if (temp == "DIRECT SUN") { return [255,255,255] }
+	if (temp == "OVERCAST SKY") { return [201,226,255] }
+	if (temp == "CLEAR BLUE SKY") { return [64,156,255] }
+};
+
 LightBulb.prototype.step = function() {
-	/*if(this.temp == "Candle") {*/ 
-	this.color = [255,147,41]
-	
-	this.temp =  "HIGH NOON SKY";
-	/*}*/
-	if(this.temp == "-40W TUNG") { this.color = [255,197,143] }
-	if(this.temp == "-100W TUNG") { this.color = [255,214,170] }
-	if(this.temp == "HALOGEN") { this.color = [255,241,224] }
-	if(this.temp == "CARBON ARC") { this.color = [255,250,244] }
-	if(this.temp == "HIGH NOON SKY") { this.color = [255,255,251] }
-	if(this.temp == "DIRECT SUN") { this.color = [255,255,255] }
-	if(this.temp == "OVERCAST SKY") { this.color = [201,226,255] }
-	if(this.temp == "CLEAR BLUE SKY") { this.color = [64,156,255] }
-	
-	for(var i = 0; i < this.grid.num_pixels; i++ ) {
-		var xy = this.grid.xy(i);
-		this.grid.setPixelColor(xy.x, xy.y, this.color);
-  }
+  // Update grid
+  this.grid.setGridColor(this.getColor(this.options.temp));
 
-	this.current_step++;
-
-	// return false; //we're done here, unless you like random bugs.
-	return true;
+  // We're done here
+	return false;
 };
 
 // Return js object containing all params and their types
-LightBulb.options = function() {
+LightBulb.options_spec = function() {
   return [
     {
       'name': 'temp',
       'type': 'select',
-      'default': ["CLEAR BLUE SKY"],
-			//Options as in <select><option></option></select>
-			'options' : [
-				"Candle",
+      'default': "CLEAR BLUE SKY",
+			'choices': [
+				"CANDLE",
 				"-40W TUNG",
 				"-100W TUNG",
 				"HALOGEN",
@@ -68,10 +60,10 @@ LightBulb.options = function() {
 				"HIGH NOON SKY",
 				"DIRECT SUN",
 				"OVERCAST SKY",
-				"CLEAR BLUE SKY",
+				"CLEAR BLUE SKY"
 			]
     }
-  ].concat(Source.options());
+  ].concat(Source.options_spec());
 }
 
 // Export public interface

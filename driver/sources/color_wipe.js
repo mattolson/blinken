@@ -7,13 +7,13 @@ var NAME = path.basename(__filename, '.js'); // Our unique name
 // This source simply loops through each pixel in sequence and changes its color.
 //
 // options = {}, optional, valid keys:
-//   'period' = number of milliseconds between steps
-//   'color':  [r,g,b], the color to use, defaults to [255,0,0]
+//   period = number of milliseconds between steps
+//   color:  [r,g,b], the color to use, defaults to [255,0,0]
 function ColorWipe(grid, options)
 {
   options = options || {};
   ColorWipe.super_.call(this, NAME, grid, options);
-  this.color = options['color'] || [255,0,0];
+  this.options.color = options.color || [255,0,0];
   this.current_pixel = 0;
 }
 
@@ -28,7 +28,7 @@ ColorWipe.prototype.step = function() {
 
   // Set color of next pixel in the sequence
   var xy = this.grid.xy(this.current_pixel);
-  this.grid.setPixelColor(xy.x, xy.y, this.color);
+  this.grid.setPixelColor(xy.x, xy.y, this.options.color);
 
   // Update state
   this.current_pixel++;
@@ -38,14 +38,14 @@ ColorWipe.prototype.step = function() {
 };
 
 // Return js object containing all params and their types
-ColorWipe.options = function() {
+ColorWipe.options_spec = function() {
   return [
     {
       'name': 'color',
       'type': 'color',
       'default': [255,0,0]
     }
-  ].concat(Source.options());
+  ].concat(Source.options_spec());
 }
 
 // Export public interface

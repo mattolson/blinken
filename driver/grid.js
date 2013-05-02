@@ -144,15 +144,7 @@ Grid.prototype.toJson = function() {
   var json = new Array(this.num_pixels);
   for (var y = 0; y < this.num_pixels_y; y++) {
     for (var x = 0; x < this.num_pixels_x; x++) {
-      var index = (y * this.num_pixels_x) + x;
-      var color = this.getPixelColor(x,y);
-      if (color != null) {
-        json[index] = {
-          'x': x,
-          'y': y,
-          'rgb': color
-        };
-      }
+      json.push(this.getPixelColor(x,y));
     }
   }
   return json;

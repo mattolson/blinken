@@ -23,7 +23,7 @@ SourceRegistry.prototype.toJson = function() {
   for (var name in this.sources) {
     json.push({
       'name': name,
-      'options': this.sources[name].options()
+      'options': this.sources[name].options_spec()
     });
   }
   return json;

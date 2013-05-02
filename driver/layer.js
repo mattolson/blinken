@@ -10,10 +10,17 @@ Layer.prototype.render = function() {
   return this.source.render();
 };
 
+// Update based on PUT request
+Layer.prototype.update = function(data) {
+  if ('source' in data && 'options' in data.source) { 
+    this.source.update_options(data.source.options);
+  }
+};
+
 Layer.prototype.toJson = function() {
   return {
     'id': this.id,
-    'source': this.source.name
+    'source': this.source.toJson()
   };
 };
 

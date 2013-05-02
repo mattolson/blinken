@@ -3,6 +3,7 @@
 //                Setup
 //
 //**************************************
+var util = require('util');
 
 // Setup grid
 var Grid = require('./grid');
@@ -64,35 +65,48 @@ var layer_api = {
     var name = request.body.source.name;
     var options = request.body.source.options;
 
-    // Find and instantiate source by name
+    // Lookup source
     var source = sources.find(name);
-    if (source != null) {
-      var layer = mixer.add_layer(new source(grid, options));
-      response.jsonp(layer.toJson());
-    } else {
-      response.jsonp(errorResponse(400, "ERROR: unknown source '" + name + "'"));
+    if (source == null) {
+      response.status(400).jsonp(errorResponse(400, util.format("ERROR: source not found: '%s'", name)));
+      return;
     }
+
+    // Add layer and return its json representation
+    var layer = mixer.add_layer(new source(grid, options));
+    response.status(201).jsonp(layer.toJson());
   },
 
   // GET /layers/:id
   get: function(request, response) {
+    // Look up layer
     var layer = mixer.find_layer(request.params.id);
-    if (layer != null) {
-      response.jsonp(layer.toJson());
-    } else {
-      response.jsonp(errorResponse(400, "ERROR: unknown layer id '" + request.params.id + "'"));
+    if (layer == null) {
+      response.status(404).jsonp(errorResponse(404, util.format("ERROR: layer not found: '%d'", request.params.id)));
+      return;
     }
+
+    // Return json representation
+    response.jsonp(layer.toJson());
   },
 
   // PUT /layers/:id
   update: function(request, response) {
-    console.log("layers.update");
+    // Look up layer
+    var layer = mixer.find_layer(request.params.id);
+    if (layer == null) {
+      response.status(404).jsonp(errorResponse(404, util.format("ERROR: layer not found: '%d'", request.params.id)));
+      return;
+    }
+
+    // Update layer
+    layer.update(request.body);
   },
 
   // DELETE /layers/:id
   destroy: function(request, response) {
     mixer.remove_layer(request.params.id);
-    response.set('Status', '204');
+    response.send(204);
   }
 };
 

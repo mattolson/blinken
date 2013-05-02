@@ -36,39 +36,33 @@ function Sparkle(grid, options)
   Sparkle.super_.call(this, NAME, grid, options);
   this.current_step = 0;
 
-  this.color = options['color'] || [255,255,255];
-	// this.density = options['density'] || Math.floor(this.grid.num_pixels*0.1); //30% of the pixels.
-	this.period = options['period'] || 100; 
-	this.sustain = options['sustain'] || 0;
-	this.bg = options['bg'] || [0,0,0];
-	
-	this.mode = options['mode'] || 'random';
-	
+  this.options.color = options.color || [255,255,255];
+	// this.options.density = options['density'] || Math.floor(this.grid.num_pixels*0.1); //30% of the pixels.
+	this.options.sustain = options.sustain || 0;
+	this.options.bg = options.bg || [0,0,0];
+	this.options.mode = options.mode || 'random';
 }
 
 // Set up inheritance from Source
 util.inherits(Sparkle, Source);
 
 Sparkle.prototype.step = function() {
-
 	// Set background to BG;
-	this.grid.setGridColor(this.bg);
+	this.grid.setGridColor(this.options.bg);
 	
-	if(this.mode == 'random') {
+	if(this.options.mode == 'random') {
 		var r,g,b;
 		
 		r = Math.floor(Math.random()*255); g = Math.floor(Math.random()*255); b = Math.floor(Math.random()*255);
-		this.color = [r,g,b];
-		this.period = Math.floor(Math.random()*50);
-		this.density = Math.floor(this.grid.num_pixels*Math.random());
-		
+		this.options.color = [r,g,b];
+		this.options.period = Math.floor(Math.random()*50);
+		this.options.density = Math.floor(this.grid.num_pixels*Math.random());
 	}
 	
-	// var xy;
-	for(var i=0;i < this.density;i++) {
+	for(var i=0;i < this.options.density;i++) {
 		var rand = Math.floor( Math.random()*this.grid.num_pixels );
 		var xy = this.grid.xy( rand );	
-		this.grid.setPixelColor(xy.x, xy.y, this.color);
+		this.grid.setPixelColor(xy.x, xy.y, this.options.color);
 	}
 
   // Update state
@@ -77,7 +71,32 @@ Sparkle.prototype.step = function() {
   return true;
 };
 
-Sparkle.options = Source.options;
+// Return js object containing all params and their types
+Sparkle.options_spec = function() {
+  return [
+    {
+      'name': 'color',
+      'type': 'color',
+      'default': [255,255,255]
+    },
+    {
+      'name': 'sustain',
+      'type': 'integer',
+      'default': 0
+    },
+    {
+      'name': 'bg',
+      'type': 'color',
+      'default': [0,0,0]
+    },
+    {
+      'name': 'mode',
+      'type': 'select',
+      'default': 'random',
+      'choices': ['random']
+    }
+  ].concat(Source.options_spec());
+}
 
 // Export public interface
 exports.constructor = Sparkle;

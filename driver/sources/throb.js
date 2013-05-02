@@ -4,25 +4,27 @@ var Easing = require('easing');
 var Source = require('../source');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
-var STEPS = 25; // Number of steps between start_color and end_color
 
 // This source uses an easing library to produce a throb effect, alternating
 // between two given colors.
 //
 // options = {}, optional, valid keys:
-//   'period' = number of milliseconds between steps
-//   'start_color':  [r,g,b], the color to start with, defaults to [0,0,0]
-//   'end_color':  [r,g,b], the color to end up with after period*STEPS milliseconds, defaults to [255,255,255]
-//   'easing': string for type of easing to perform, defaults to 'linear'
+//   period = number of milliseconds between steps
+//   start_color:  [r,g,b], the color to start with, defaults to [0,0,0]
+//   end_color:  [r,g,b], the color to end up with after period*easing_steps milliseconds, defaults to [255,255,255]
+//   easing_type: string for type of easing to perform, defaults to 'linear'
+//   easing_steps: string for type of easing to perform, defaults to 'linear'
 function Throb(grid, options)
 {
   options = options || {};
   Throb.super_.call(this, NAME, grid, options);
+  this.options.start_color = options.start_color || [0,0,0];
+  this.options.end_color = options.end_color || [255,255,255];
+  this.options.easing_type = options.easing_type || 'linear';
+  this.options.easing_steps = options.easing_steps || 25;
+
   this.current_step = 0;
-  this.start_color = options['start_color'] || [0,0,0];
-  this.end_color = options['end_color'] || [255,255,255];
-  this.easing_type = options['easing'] || 'linear';
-  this.easing = Easing(STEPS, this.easing_type, {
+  this.easing = Easing(this.options.easing_steps, this.easing_type, {
     endToEnd: true
   });
 }
@@ -35,9 +37,9 @@ Throb.prototype.calculate_single = function(start_value, end_value) {
 };
 
 Throb.prototype.calculate_rgb = function() {
-  var r = this.calculate_single(this.start_color[0], this.end_color[0]);
-  var g = this.calculate_single(this.start_color[1], this.end_color[1]);
-  var b = this.calculate_single(this.start_color[2], this.end_color[2]);
+  var r = this.calculate_single(this.options.start_color[0], this.options.end_color[0]);
+  var g = this.calculate_single(this.options.start_color[1], this.options.end_color[1]);
+  var b = this.calculate_single(this.options.start_color[2], this.options.end_color[2]);
   return [r,g,b];
 };
 
@@ -55,7 +57,7 @@ Throb.prototype.step = function() {
 };
 
 // Return js object containing all params and their types
-Throb.options = function() {
+Throb.options_spec = function() {
   return [
     {
       'name': 'start_color',
@@ -68,11 +70,26 @@ Throb.options = function() {
       'default': [255,255,255]
     },
     {
-      'name': 'easing',
-      'type': 'string',
-      'default': 'linear'
+      'name': 'easing_type',
+      'type': 'select',
+      'default': 'linear',
+      'choices': [
+        'linear',
+        'quadratic',
+        'cubic',
+        'quartic',
+        'quintic',
+        'sinusoidal',
+        'circular',
+        'exponential'
+      ]
+    },
+    {
+      'name': 'easing_steps',
+      'type': 'integer',
+      'default': 25
     }
-  ].concat(Source.options());
+  ].concat(Source.options_spec());
 }
 
 // Export public interface
