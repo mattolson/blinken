@@ -1,4 +1,8 @@
 var Config = {};
+  // Server settings
+  Config.server_port = 8888;
+  Config.server_user = 'pi';
+  Config.server_group = 'pi';
 		
   // Pixels per 'Panel'
   Config.num_pixels_per_panel_x = 3,

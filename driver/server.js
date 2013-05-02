@@ -2,6 +2,7 @@ var express = require('express');
 var socket = require('socket.io');
 var http = require('http');
 var api = require("./api");
+var Config = require("./config");
 
 var app, io;
 
@@ -15,8 +16,12 @@ function start() {
   io.set('log level', 1);  
 
   // Start http server
-  server.listen(8888);
-  console.log("Listening on port 8888...");
+  server.listen(Config.server_port);
+  console.log("Listening on port " + Config.server_port + "...");
+
+  // Downgrade permissions
+  process.setgid(Config.server_user);
+  process.setuid(Config.server_port);
 
   // Configure to serve static files out of '/static' directory
   app.use(express.static('static'));
