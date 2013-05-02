@@ -44,7 +44,7 @@ Mixer.prototype.remove_layer = function(layer_id) {
 Mixer.prototype.find_layer = function(layer_id) {
   for (var i = 0; i < this.layers.length; i++) {
     if (this.layers[i].id == layer_id) {
-      return layer;
+      return this.layers[i];
     }
   }
   return null;
