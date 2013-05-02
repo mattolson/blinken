@@ -46,16 +46,6 @@ var source_api = {
   // GET /sources
   list: function(request, response) {
     response.jsonp(sources.toJson());
-  },
-
-  // GET /sources/:name
-  get: function(request, response) {
-    var source = sources.find(request.params.name);
-    if (source != null) {
-      response.jsonp(source.toJson());
-    } else {
-      response.jsonp(errorResponse(400, "ERROR: unknown source '" + request.params.name + "'"));
-    }
   }
 };
 
@@ -163,7 +153,6 @@ exports.registerSocketHandlers = function(socket) {
 exports.registerHttpHandlers = function(app) {
   // Sources
   app.get('/sources', source_api.list);
-  app.get('/sources/:id', source_api.get);
 
   // Layers
   app.get('/layers', layer_api.list);

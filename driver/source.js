@@ -40,7 +40,7 @@ Source.prototype.step = function() {
 // Return js object containing all params and their types. This is a
 // default that should be overridden by subclasses if they have
 // additional options.
-Source.prototype.options = function() {
+Source.options = function() {
   return [
     {
       'name': 'period',
@@ -48,13 +48,6 @@ Source.prototype.options = function() {
       'default': 40
     }
   ];
-};
-
-Source.prototype.toJson = function() {
-  return {
-    'name': this.name,
-    'options': this.options()
-  };
 };
 
 // Export constructor directly

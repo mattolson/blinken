@@ -7,7 +7,6 @@ purposes (i.e. use a different physical layout), you'll need to change the Grid 
 ### Sources
 
 * GET /sources returns list of known sources
-* GET /source/:name returns info for a particular source (:name is one of our uniquely defined names)
 
 ### Layers
 

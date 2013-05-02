@@ -18,7 +18,10 @@ SourceRegistry.prototype.find = function(name) {
 SourceRegistry.prototype.toJson = function() {
   var json = [];
   for (var name in this.sources) {
-    json.push(this.sources[name].toJson());
+    json.push({
+      'name': name,
+      'options': this.sources[name].options()
+    });
   }
   return json;
 };
