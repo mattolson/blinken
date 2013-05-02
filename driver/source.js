@@ -94,7 +94,7 @@ Source.prototype.update_options = function(new_options) {
 Source.prototype.toJson = function() {
   return {
     'name': this.name,
-    'options': this.options_spec()
+    'options': this.options
   };
 };
 
