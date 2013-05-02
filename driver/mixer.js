@@ -108,5 +108,13 @@ Mixer.prototype.render = function() {
   this.rendering = false;
 };
 
+Mixer.prototype.toJson = function() {
+  var json = [];
+  for (var i = 0; i < this.layers.length; i++) {
+    json.push(this.layers[i].toJson());
+  }
+  return json;
+};
+
 // Export constructor directly
 module.exports = Mixer;

@@ -58,7 +58,7 @@ var source_api = {
 var layer_api = {
   // GET /layers
   list: function(request, response) {
-    console.log("layers.list");
+    response.jsonp(mixer.toJson());
   },
 
   // POST /layers
