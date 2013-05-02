@@ -50,7 +50,12 @@ var source_api = {
 
   // GET /sources/:name
   get: function(request, response) {
-    console.log("sources.get");
+    var source = sources.find(request.params.name);
+    if (source != null) {
+      response.jsonp(source.toJson());
+    } else {
+      response.jsonp(errorResponse(400, "ERROR: unknown source '" + name + "'"));
+    }
   }
 };
 
@@ -78,15 +83,19 @@ var layer_api = {
     if (source != null) {
       var layer = mixer.add_layer(new source(grid, request.body.source.options));
       response.jsonp(layer.toJson());
-    }
-    else {
+    } else {
       response.jsonp(errorResponse(400, "ERROR: unknown source '" + name + "'"));
     }
   },
 
   // GET /layers/:id
   get: function(request, response) {
-    console.log("layers.get");
+    var layer = mixer.find_layer(request.id);
+    if (layer != null) {
+      response.jsonp(layer.toJson());
+    } else {
+      response.jsonp(errorResponse(400, "ERROR: unknown layer id '" + request.id + "'"));
+    }
   },
 
   // PUT /layers/:id
@@ -96,7 +105,7 @@ var layer_api = {
 
   // DELETE /layers/:id
   destroy: function(request, response) {
-    console.log("layers.destroy");
+    mixer.remove_layer(request.id);
   }
 };
 
