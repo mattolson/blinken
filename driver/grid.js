@@ -1,17 +1,18 @@
 // The grid object maps the 2D logical space to the 1D physical space
 // and handles device operations
+var Config = require('./config');
 var spi = require('spi');
 
-function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pixels_per_panel_y) {
+function Grid() {
   // Store dimensions for later
-  this.num_panels_x = num_panels_x;
-  this.num_panels_y = num_panels_y;
-  this.num_pixels_per_panel_x = num_pixels_per_panel_x;
-  this.num_pixels_per_panel_y = num_pixels_per_panel_y;
+  this.num_panels_x = Config.grid.num_panels_x;
+  this.num_panels_y = Config.grid.num_panels_y;
+  this.num_pixels_per_panel_x = Config.grid.num_pixels_per_panel_x;
+  this.num_pixels_per_panel_y = Config.grid.num_pixels_per_panel_y;
 
   // Figure out overall dimensions
-  this.num_pixels_x = num_panels_x * num_pixels_per_panel_x;
-  this.num_pixels_y = num_panels_y * num_pixels_per_panel_y;
+  this.num_pixels_x = this.num_panels_x * this.num_pixels_per_panel_x;
+  this.num_pixels_y = this.num_panels_y * this.num_pixels_per_panel_y;
   this.num_pixels = this.num_pixels_x * this.num_pixels_y;
 
   // Setup data structures for pixels
@@ -57,10 +58,10 @@ function Grid(device, num_panels_x, num_panels_y, num_pixels_per_panel_x, num_pi
   }
 
   // Instantiate SPI device
-  this.device = new spi.Spi(device, {
-    "mode": spi.MODE['MODE_0'],
-    "chipSelect": spi.CS['none'],
-    "maxSpeed": 1000000
+  this.device = new spi.Spi(Config.device.name, {
+    "mode": spi.MODE[Config.device.spi_mode],
+    "chipSelect": spi.CS[Config.device.spi_chip_select],
+    "maxSpeed": Config.device.max_speed
   }, function(d) { d.open(); });
 
   // Clear the display

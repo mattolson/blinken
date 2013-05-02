@@ -5,13 +5,8 @@
 //**************************************
 
 // Setup grid
-var Config = require('./config');
 var Grid = require('./grid');
-var grid = new Grid('/dev/spidev0.0', 
-                    Config.num_panels_x, 
-                    Config.num_panels_y, 
-                    Config.num_pixels_per_panel_x, 
-                    Config.num_pixels_per_panel_y);
+var grid = new Grid();
 
 // Setup mixer and set rendering loop in motion
 var Mixer = require('./mixer');

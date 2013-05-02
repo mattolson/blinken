@@ -16,12 +16,12 @@ function start() {
   io.set('log level', 1);  
 
   // Start http server
-  server.listen(Config.server_port);
-  console.log("Listening on port " + Config.server_port + "...");
+  server.listen(Config.server.port);
+  console.log("Listening on port " + Config.server.port + "...");
 
   // Downgrade permissions
-  process.setgid(Config.server_group);
-  process.setuid(Config.server_user);
+  process.setgid(Config.server.group);
+  process.setuid(Config.server.user);
 
   // Configure to serve static files out of '/static' directory
   app.use(express.static('static'));

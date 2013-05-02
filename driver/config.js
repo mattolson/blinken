@@ -1,16 +1,23 @@
 var Config = {};
+
   // Server settings
-  Config.server_port = 8888;
-  Config.server_user = 'pi';
-  Config.server_group = 'pi';
+  Config.server = {};
+  Config.server.port = 8888;
+  Config.server.user = 'pi';
+  Config.server.group = 'pi';
 		
-  // Pixels per 'Panel'
-  Config.num_pixels_per_panel_x = 3,
-  Config.num_pixels_per_panel_y = 6;
-  Config.num_pixels_per_panel = Config.num_pixels_per_panel_x * Config.num_pixels_per_unit_y;
-		
-  // Panels per grid
-  Config.num_panels_x = 10;
-  Config.num_panels_y = 6;
+  // Device settings
+  Config.device = {};
+  Config.device.name = '/dev/spidev0.0'; 
+  Config.device.spi_mode = 'MODE_0';
+  Config.device.spi_chip_select = 'none';
+  Config.device.max_speed = 1000000;
+
+  // Grid settings
+  Config.grid = {};
+  Config.grid.num_pixels_per_panel_x = 3,
+  Config.grid.num_pixels_per_panel_y = 6;
+  Config.grid.num_panels_x = 10;
+  Config.grid.num_panels_y = 6;
 
 module.exports = Config;
