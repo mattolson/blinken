@@ -1,3 +1,5 @@
+var path = require('path');
+
 // Keep track of all sources available in the system, for easy
 // lookup and instantiation.
 function SourceRegistry() {
