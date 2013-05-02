@@ -20,8 +20,8 @@ function start() {
   console.log("Listening on port " + Config.server_port + "...");
 
   // Downgrade permissions
-  process.setuid(Config.server_user);
   process.setgid(Config.server_group);
+  process.setuid(Config.server_user);
 
   // Configure to serve static files out of '/static' directory
   app.use(express.static('static'));
