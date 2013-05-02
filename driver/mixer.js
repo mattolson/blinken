@@ -17,8 +17,8 @@ function Mixer(grid) {
 // Add layer to the mix
 Mixer.prototype.add_layer = function(source) {
   // Assign a globally sequential id for later operations
-  var layer_id = next_layer_id;
-  next_layer_id++;
+  var layer_id = this.next_layer_id;
+  this.next_layer_id++;
 
   // Create a new layer and add it to the list
   var layer = new Layer(source, layer_id);
