@@ -21,6 +21,9 @@ function start() {
   // Configure to serve static files out of '/static' directory
   app.use(express.static('static'));
 
+  // Automatically parse request body
+  app.use(express.bodyParser());
+
   // Register http handlers
   api.registerHttpHandlers(app);
 
