@@ -96,7 +96,7 @@ Mixer.prototype.render = function() {
   }
 
   // Blast updates to strip
-  if (changed) {
+  if (grid_changed) {
     this.grid.sync();
   }
 
