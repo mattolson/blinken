@@ -24,7 +24,7 @@ function start() {
   process.setuid(Config.server.user);
 
   // Configure to serve static files out of '/static' directory
-  app.use(express.static('static'));
+  app.use(express.static(__dirname + '/static'));
 
   // Automatically parse request body
   app.use(express.bodyParser());
