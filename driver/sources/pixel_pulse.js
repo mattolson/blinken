@@ -18,13 +18,13 @@ function PixelPulse(grid, options)
   this.height = this.grid.num_pixels_y;
 
   // Keep track of location of pixels and their colors.
-  // Initialize a 2D array of nulls. Pixel colors will
-  // be inserted through options.colors
+  // Initialize a 2D array of bg colors. Pixel colors will
+  // be inserted through options.colors.
   this.pixels = [];
   for (var x = 0; x < this.width; x++) {
     this.pixels[x] = [];
     for (var y = 0; y < this.height; y++) {
-      this.pixels[x].push(null);
+      this.pixels[x].push(this.options.bg);
     }
   }
 }
