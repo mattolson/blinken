@@ -45,7 +45,7 @@ Throb.prototype.step = function() {
 
   // Update step number
   this.current_step++;
-  this.current_step = this.current_step % STEPS;
+  this.current_step = this.current_step % this.options.easing_steps;
 
   // Keep going forever
   return true;
