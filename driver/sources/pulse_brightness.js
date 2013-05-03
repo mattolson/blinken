@@ -17,7 +17,6 @@ function PulseLedsBrightness(grid, options)
 {
   options = options || {};
   PulseLedsBrightness.super_.call(this, NAME, grid, options);
-	this.options.hue = options.hue || 100;
   this.brightness = 0;
   this.bounce_direction = 0;
 }

@@ -18,10 +18,6 @@ function Throb(grid, options)
 {
   options = options || {};
   Throb.super_.call(this, NAME, grid, options);
-  this.options.start_color = options.start_color || [0,0,0];
-  this.options.end_color = options.end_color || [255,255,255];
-  this.options.easing_type = options.easing_type || 'linear';
-  this.options.easing_steps = options.easing_steps || 25;
 
   this.current_step = 0;
   this.easing = Easing(this.options.easing_steps, this.easing_type, {

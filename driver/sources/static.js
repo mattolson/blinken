@@ -13,7 +13,6 @@ function Static(grid, options)
 {
   options = options || {};
   Static.super_.call(this, NAME, grid, options);
-  this.options.color = options['color'] || [255,255,255];
 }
 
 // Set up inheritance from Source

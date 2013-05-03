@@ -14,6 +14,7 @@ function ColorWheel(grid, options)
 {
   options = options || {};
   ColorWheel.super_.call(this, NAME, grid, options);
+
   this.current_color = 0;
 }
 

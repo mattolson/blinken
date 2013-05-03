@@ -17,8 +17,6 @@ function LightBulb(grid, options)
 {
   options = options || {};
   LightBulb.super_.call(this, NAME, grid, options);
-
-  this.options.temp = options.temp || "CLEAR BLUE SKY";
 }
 
 // Set up inheritance from Source

@@ -13,7 +13,6 @@ function ColorWipe(grid, options)
 {
   options = options || {};
   ColorWipe.super_.call(this, NAME, grid, options);
-  this.options.color = options.color || [255,0,0];
   this.current_pixel = 0;
 }
 

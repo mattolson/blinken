@@ -35,12 +35,6 @@ function Sparkle(grid, options)
   options = options || {};
   Sparkle.super_.call(this, NAME, grid, options);
   this.current_step = 0;
-
-  this.options.color = options.color || [255,255,255];
-	// this.options.density = options['density'] || Math.floor(this.grid.num_pixels*0.1); //30% of the pixels.
-	this.options.sustain = options.sustain || 0;
-	this.options.bg = options.bg || [0,0,0];
-	this.options.mode = options.mode || 'random';
 }
 
 // Set up inheritance from Source

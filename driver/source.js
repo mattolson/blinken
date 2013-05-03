@@ -11,7 +11,7 @@ function Source(name, grid, options) {
   this.rendered_at = 0; // when was the last time we rendered a step?
 
   this.options = {};
-  this.options.period = options.period || 40; // default to 40 ms between steps
+  this.validate_options(options, true);
 }
 
 Source.prototype.render = function() {
@@ -40,9 +40,12 @@ Source.prototype.step = function() {
   return true;
 };
 
-// Validate and update options
-Source.prototype.update_options = function(new_options) {
+// Validate options
+Source.prototype.validate_options = function(new_options, use_defaults) {
+  var validated = {};
   var spec = this.options_spec();
+
+  // Loop through spec
   for (var i = 0; i < spec.length; i++) {
     var option_name = spec[i].name;
     var option_type = spec[i].type;
@@ -84,9 +87,29 @@ Source.prototype.update_options = function(new_options) {
 
       // Apply new value to self
       if (value != null) {
-        this.options[option_name] = value;
+        validated[option_name] = value;
       }
     }
+  }
+
+  // Provide defaults if desired
+  if (use_defaults) {
+    for (var i = 0; i < spec.length; i++) {
+      var option_name = spec[i].name;
+      if (!(option_name in validated)) {
+        validated[option_name] = spec[i]['default'];
+      }
+    }
+  }
+
+  return validated;
+};
+
+// Validate and update given options
+Source.prototype.update_options = function(new_options) {
+  var validated = this.validate_options(new_options, false);
+  for (option in new_options) {
+    this.options[option] = new_options[option];
   }
 };
 

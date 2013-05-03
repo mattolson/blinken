@@ -16,8 +16,6 @@ function FadeTo(grid, options)
   options = options || {};
   FadeTo.super_.call(this, NAME, grid, options);
 
-  this.options.color = options.color || [255,255,255];
-  this.options.random_color = options.random_color || true;
   if (this.options.random_color) {
     this.options.color = color_utils.random_color();
   }

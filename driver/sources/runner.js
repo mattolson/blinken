@@ -11,7 +11,6 @@ function Runner(grid, options)
 {
   options = options || {};
   Runner.super_.call(this, NAME, grid, options);
-  this.options.color = options.color || [255,255,255];
 
 	this.current_column = 0;
 }
