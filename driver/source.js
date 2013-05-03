@@ -1,4 +1,5 @@
 var util = require('util');
+var validation = require('./validation');
 
 // name = a unique short name for this source (used for registration)
 // grid = the instantiated Grid object
@@ -59,31 +60,16 @@ Source.prototype.validate_options = function(new_options, use_defaults) {
       // Coerce to appropriate type
       switch (option_type) {
         case 'integer':
-          value = Number(raw_value);
-          if (isNaN(value)) {
-            value = null;
-          }
+          value = validation.to_number(raw_value);
           break;
         case 'string':
-          value = String(raw_value);
+          value = validation.to_string(raw_value);
           break;
-        case 'array':
-          if (Array.isArray(raw_value)) {
-            value = raw_value;
-          }
+        case 'color_array':
+          value = validation.to_color_array(raw_value);
           break;
         case 'color':
-          if (Array.isArray(raw_value)) {
-            // Coerce each component to a number
-            value = raw_value.map(function(e) {
-              return Number(e);
-            });
-
-            // Make sure conversion worked for every component
-            if (!value.every(function(e) { return !isNaN(e); })) {
-              value = null;
-            }
-          }
+          value = validation.to_color(raw_value);
           break;
         case 'boolean':
           break;

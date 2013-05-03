@@ -72,7 +72,7 @@ PixelPulse.options_spec = function() {
   return [
     {
       'name': 'colors',
-      'type': 'array',
+      'type': 'color_array',
       'default': default_colors
     },
     {
