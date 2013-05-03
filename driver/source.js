@@ -68,12 +68,12 @@ Source.prototype.validate_options = function(new_options, use_defaults) {
         case 'color':
           if (Array.isArray(raw_value)) {
             // Coerce each component to a number
-            value = raw_value.map(function() {
-              return Number(this);
+            value = raw_value.map(function(e) {
+              return Number(e);
             });
 
             // Make sure conversion worked for every component
-            if (!value.every(function(e,i,a) { return !isNaN(e); })) {
+            if (!value.every(function(e) { return !isNaN(e); })) {
               value = null;
             }
           }
