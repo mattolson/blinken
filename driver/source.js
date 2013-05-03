@@ -54,6 +54,11 @@ Source.prototype.deactivate = function() {
   this.active = false;
 };
 
+// Reactivate source
+Source.prototype.activate = function() {
+  this.active = true;
+};
+
 // Validate options
 Source.prototype.validate_options = function(new_options, use_defaults) {
   var validated = {};
@@ -112,16 +117,21 @@ Source.prototype.validate_options = function(new_options, use_defaults) {
 
 // Validate and update given options
 Source.prototype.update_options = function(new_options) {
+  // Merge validated options
   var validated = this.validate_options(new_options, false);
   for (option in new_options) {
     this.options[option] = new_options[option];
   }
+
+  // Activate source again
+  this.activate();
 };
 
 // Output current state as json
 Source.prototype.toJson = function() {
   return {
     'name': this.name,
+    'active': this.active,
     'options': this.options
   };
 };
