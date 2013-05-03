@@ -24,7 +24,7 @@ function PixelPulse(grid, options)
   for (var x = 0; x < this.width; x++) {
     this.pixels[x] = [];
     for (var y = 0; y < this.height; y++) {
-      this.pixels[x][y] = null;
+      this.pixels[x].push(null);
     }
   }
 }

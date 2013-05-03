@@ -1,3 +1,5 @@
+var util = require('util');
+
 // name = a unique short name for this source (used for registration)
 // grid = the instantiated Grid object
 // options = {}, optional, valid keys:
@@ -91,6 +93,7 @@ Source.prototype.validate_options = function(new_options, use_defaults) {
 
       // Apply new value to self
       if (value != null) {
+        console.log(util.format("parsed value '%s' for option '%s'", value, option_name);
         validated[option_name] = value;
       }
     }
