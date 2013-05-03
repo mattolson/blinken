@@ -20,7 +20,7 @@ function Throb(grid, options)
   Throb.super_.call(this, NAME, grid, options);
 
   this.current_step = 0;
-  this.easing = Easing(this.options.easing_steps, this.easing_type, {
+  this.easing = Easing(this.options.easing_steps, this.options.easing_type, {
     endToEnd: true
   });
 }
@@ -41,8 +41,7 @@ Throb.prototype.calculate_rgb = function() {
 
 Throb.prototype.step = function() {
   // Set entire grid to the new color
-  var color = this.calculate_rgb();
-  this.grid.setGridColor(color);
+  this.grid.setGridColor(this.calculate_rgb());
 
   // Update step number
   this.current_step++;
