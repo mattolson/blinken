@@ -41,9 +41,9 @@ PixelPulse.prototype.step = function() {
   // Check for options color data. We use this to dynamically insert elements
   // into the array.
   for (var x = 0; x < this.width; x++) {
-    if ('color' in this.options && this.options.color[x] != null) {
-      this.pushPixel(x, this.options.color[x]);
-      this.options.color[x] = null;
+    if (this.options.colors[x] != null) {
+      this.pushPixel(x, this.options.colors[x]);
+      this.options.colors[x] = null;
     }
     else {
       this.pushPixel(this.options.bg);
