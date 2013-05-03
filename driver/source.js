@@ -10,8 +10,7 @@ function Source(name, grid, options) {
   this.started_at = 0; // when did this effect first begin?
   this.rendered_at = 0; // when was the last time we rendered a step?
 
-  this.options = {};
-  this.validate_options(options, true);
+  this.options = this.validate_options(options, true);
 }
 
 Source.prototype.render = function() {
