@@ -85,18 +85,14 @@ Mixer.prototype.stop = function() {
 };
 
 Mixer.prototype.render = function() {
-  // Global lock to make sure this doesn't get called again until we're done
+  // Lock to make sure this doesn't get called again until we're done
   this.rendering = true;
 
-  // The grid will have changed if there is at least one layer in our list
-  var changed = this.layers.length > 0;
-
   // Loop through layers and have them render themselves
+  var grid_changed = false;
   for (var i = 0; i < this.layers.length; i++) {
-    if (!this.layers[i].render()) {
-      // Source has requested removal
-      this.layers.splice(i, 1);
-    }
+    var layer_changed = this.layers[i].render();
+    grid_changed = grid_changed || layer_changed;
   }
 
   // Blast updates to strip

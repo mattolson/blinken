@@ -38,7 +38,10 @@ LightBulb.prototype.step = function() {
   // Update grid
   this.grid.setGridColor(this.getColor(this.options.temp));
 
-  // We're done here
+  // We're done
+  this.deactivate();
+
+  // We changed the grid
 	return false;
 };
 

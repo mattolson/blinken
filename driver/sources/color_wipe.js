@@ -22,6 +22,7 @@ util.inherits(ColorWipe, Source);
 ColorWipe.prototype.step = function() {
   // Stop animation once we're out of bounds
   if (this.current_pixel >= this.grid.num_pixels) {
+    this.deactivate();
     return false;
   }
 
@@ -32,7 +33,7 @@ ColorWipe.prototype.step = function() {
   // Update state
   this.current_pixel++;
 
-  // Keep going for now
+  // We changed the grid
   return true;
 };
 

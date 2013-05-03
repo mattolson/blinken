@@ -47,7 +47,7 @@ Throb.prototype.step = function() {
   this.current_step++;
   this.current_step = this.current_step % this.options.easing_steps;
 
-  // Keep going forever
+  // We changed the grid
   return true;
 };
 

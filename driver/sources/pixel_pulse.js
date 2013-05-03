@@ -57,7 +57,7 @@ PixelPulse.prototype.step = function() {
     }
   }
 
-  // Keep going
+  // We changed the grid
   return true;
 };
 

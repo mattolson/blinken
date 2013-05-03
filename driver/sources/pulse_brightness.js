@@ -48,6 +48,7 @@ PulseLedsBrightness.prototype.step = function() {
     this.grid.setPixelColor(xy.x, xy.y, color);
   }
 
+  // We changed the grid
   return true;
 };
 

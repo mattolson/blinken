@@ -12,11 +12,17 @@ function Source(name, grid, opts) {
   this.grid = grid;
   this.started_at = 0; // when did this effect first begin?
   this.rendered_at = 0; // when was the last time we rendered a step?
+  this.active = true; // source can opt-out of future rendering cycles
 
   this.options = this.validate_options(opts, true);
 }
 
 Source.prototype.render = function() {
+  // Check if still active
+  if (!this.active) {
+    return false;
+  }
+
   var current_time = (new Date()).getTime();
 
   // Update start time
@@ -27,7 +33,7 @@ Source.prototype.render = function() {
   // Check how much time has elapsed since last time. If it's not time
   // yet, return right away.
   if (current_time - this.rendered_at < this.options.period) {
-    return true;
+    return false;
   }
 
   // Remember the time
@@ -37,9 +43,15 @@ Source.prototype.render = function() {
   return this.step();
 };
 
-// Abstract method, to be overridden by subclasses
+// Abstract method, to be overridden by subclasses. Return true
+// if you changed the grid.
 Source.prototype.step = function() {
-  return true;
+  return false;
+};
+
+// Source can opt-out of future render cycles by calling this method.
+Source.prototype.deactivate = function() {
+  this.active = false;
 };
 
 // Validate options

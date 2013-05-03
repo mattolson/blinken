@@ -29,7 +29,7 @@ Runner.prototype.step = function() {
   // Set color
 	this.grid.setColColor(this.current_column, this.options.color);
 
-  // Keep going
+  // We changed the grid
   return true;
 };
 

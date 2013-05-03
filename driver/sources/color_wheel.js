@@ -31,7 +31,7 @@ ColorWheel.prototype.step = function() {
   this.current_color++;
   this.current_color = this.current_color % 256;
 
-  // Keep going forever
+  // We changed the grid
   return true;
 };
 

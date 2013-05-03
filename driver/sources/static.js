@@ -22,8 +22,11 @@ Static.prototype.step = function() {
   // Set color of the grid
   this.grid.setGridColor(this.options.color);
 
-  // We're done!
-  return false;
+  // We're done
+  this.deactivate();
+
+  // We changed the grid
+  return true;
 };
 
 // Return js object containing all params and their types

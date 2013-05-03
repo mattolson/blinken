@@ -62,6 +62,7 @@ Sparkle.prototype.step = function() {
   // Update state
   this.current_step++;
 
+  // We changed the grid
   return true;
 };
 

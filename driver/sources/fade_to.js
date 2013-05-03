@@ -79,6 +79,8 @@ FadeTo.prototype.step = function() {
     this.current_step = 0; 
     if(this.options.random_color) this.options.color = color_utils.random_color();
   }
+
+  // We changed the grid
   return true;
 };
 
