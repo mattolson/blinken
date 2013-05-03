@@ -2,15 +2,15 @@
 // grid = the instantiated Grid object
 // options = {}, optional, valid keys:
 //   period = number of milliseconds between steps
-function Source(name, grid, options) {
-  options = options || {};
+function Source(name, grid, opts) {
+  opts = opts || {};
 
   this.name = name;
   this.grid = grid;
   this.started_at = 0; // when did this effect first begin?
   this.rendered_at = 0; // when was the last time we rendered a step?
 
-  this.options = this.validate_options(options, true);
+  this.options = this.validate_options(opts, true);
 }
 
 Source.prototype.render = function() {
@@ -73,7 +73,7 @@ Source.prototype.validate_options = function(new_options, use_defaults) {
             });
 
             // Make sure conversion worked for every component
-            if (!value.every(function() { !isNaN(this) })) {
+            if (!value.every(function(e,i,a) { return !isNaN(e); })) {
               value = null;
             }
           }
