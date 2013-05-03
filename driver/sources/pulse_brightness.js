@@ -28,15 +28,21 @@ PulseLedsBrightness.prototype.step = function() {
   for (var i = 0; i < this.grid.num_pixels; i++) {
     if (this.bounce_direction == 0) {
       this.brightness++;
-      if (this.brightness >= 255) {this.bounce_direction = 1;}
+      if (this.brightness >= 255) {
+        this.brightness = 255;
+        this.bounce_direction = 1;
+      }
     }
 
     if (this.bounce_direction == 1) {
       this.brightness--;
-      if (this.brightness <= 1) {this.bounce_direction = 0;}         
+      if (this.brightness <= 0) {
+        this.brightness = 0;
+        this.bounce_direction = 0;
+      }         
     }  
 
-    var color = color_utils.hsv_to_rgb(this.options.hue, 255, this.brightness);
+    var color = color_utils.hsv_to_rgb([this.options.hue, 255, this.brightness]);
 
     var xy = this.grid.xy(i);
     this.grid.setPixelColor(xy.x, xy.y, color);
