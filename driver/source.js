@@ -65,6 +65,11 @@ Source.prototype.validate_options = function(new_options, use_defaults) {
         case 'string':
           value = String(raw_value);
           break;
+        case 'array':
+          if (Array.isArray(raw_value)) {
+            value = raw_value;
+          }
+          break;
         case 'color':
           if (Array.isArray(raw_value)) {
             // Coerce each component to a number
