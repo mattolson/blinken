@@ -46,7 +46,7 @@ PixelPulse.prototype.step = function() {
       this.options.colors[x] = null;
     }
     else {
-      this.pushPixel(this.options.bg);
+      this.pushPixel(x, this.options.bg);
     }
   }
 
