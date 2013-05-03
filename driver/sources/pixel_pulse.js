@@ -42,7 +42,7 @@ PixelPulse.prototype.step = function() {
   // into the array.
   for (var x = 0; x < this.width; x++) {
     if ('color' in this.options && this.options.color[x] != null) {
-      this.pushPixel(this.options.color[x]);
+      this.pushPixel(x, this.options.color[x]);
       this.options.color[x] = null;
     }
     else {
