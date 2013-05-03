@@ -101,6 +101,7 @@ var layer_api = {
 
     // Update layer
     layer.update(request.body);
+    response.send(204);
   },
 
   // DELETE /layers/:id
