@@ -43,7 +43,7 @@ Source.prototype.step = function() {
 // Validate options
 Source.prototype.validate_options = function(new_options, use_defaults) {
   var validated = {};
-  var spec = this.options_spec();
+  var spec = this.constructor.options_spec();
 
   // Loop through spec
   for (var i = 0; i < spec.length; i++) {
