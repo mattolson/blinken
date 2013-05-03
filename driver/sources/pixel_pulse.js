@@ -1,7 +1,7 @@
 var path = require('path');
 var util = require('util');
 var Source = require('../source');
-var Config = require('./config');
+var Config = require('../config');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
