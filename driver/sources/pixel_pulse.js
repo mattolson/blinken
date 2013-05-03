@@ -14,34 +14,47 @@ function PixelPulse(grid, options)
   PixelPulse.super_.call(this, NAME, grid, options);
 
   // For convenience
-  this.column_length = this.grid.num_pixels_per_panel_y;
+  this.width = this.grid.num_pixels_x;
+  this.height = this.grid.num_pixels_y;
 
-  // Keep track of location of pixels and their colors 
-  this.columns = [];
-  for(var i = 0; i < this.column_length; i++) {
-    this.columns.push({
-      'y': 0,
-      'color': this.options.colors[i]
-    });
+  // Keep track of location of pixels and their colors.
+  // Initialize a 2D array of nulls. Pixel colors will
+  // be inserted through options.colors
+  this.pixels = [];
+  for (var x = 0; x < this.width; x++) {
+    this.pixels[x] = [];
+    for (var y = 0; y < this.height; y++) {
+      this.pixels[x][y] = null;
+    }
   }
 }
 
 // Set up inheritance from Source
 util.inherits(PixelPulse, Source);
 
+PixelPulse.prototype.pushPixel = function(x, color) {
+  this.pixels[x].unshift(color);
+  this.pixels[x].pop();
+};
+
 PixelPulse.prototype.step = function() {
-  for (var x = 0; x < this.columns.length; x++) {
-    var y = this.columns[x].y;
+  // Check for options color data. We use this to dynamically insert elements
+  // into the array.
+  for (var x = 0; x < this.width; x++) {
+    if ('color' in this.options && this.options.color[x] != null) {
+      this.pushPixel(this.options.color[x]);
+      this.options.color[x] = null;
+    }
+    else {
+      this.pushPixel(this.options.bg);
+    }
+  }
 
-    // Clear previous pixel to bg color
-    var previous_y = (y == 0 ? this.column_length : y-1);
-    this.grid.setPixelColor(x, previous_y, this.options.bg);
-
-    // Render current pixels
-    this.grid.setPixelColor(x, y, this.columns[x].color);
-
-    // Advance y
-    this.columns[x].y = (y + 1) % this.column_length;
+  // Update grid
+  for (var x = 0; x < this.width; x++) {
+    for (var y = 0; y < this.height; y++) {
+      this.grid.setPixelColor(x, y, this.pixels[x][y]);
+    }
   }
 
   // Keep going
@@ -50,8 +63,9 @@ PixelPulse.prototype.step = function() {
 
 // Return js object containing all params and their types
 PixelPulse.options_spec = function() {
-  var default_colors = new Array(Config.grid.num_pixels_per_panel_x);
-  for (var i = 0; i < Config.grid.num_pixels_per_panel_x; i++) {
+  var grid_width = Config.grid.num_pixels_per_panel_x * Config.grid.num_panels_x;
+  var default_colors = []
+  for (var i = 0; i < grid_width; i++) {
     default_colors.push([0,0,0]);
   }
 
