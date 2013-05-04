@@ -1,6 +1,5 @@
 var http = require('http');
 
-
 function Attendance(mixer, sources) {
   this.mixer = mixer;
   this.source_registry = sources;
@@ -54,8 +53,8 @@ Attendance.prototype.add_layer = function() {
   }
 
   // Choose a new source for a temporary layer
-  var source = this.choose_source();
-  console.log("chose source " + source.name);
+  var source = this.choose_source.bind(this)();
+  console.log("choosing source " + source.name);
 
   // Add a new layer
   var layer = this.mixer.add_layer('Ding! Ding! Ding!', source);
