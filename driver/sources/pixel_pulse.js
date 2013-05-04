@@ -2,7 +2,6 @@ var path = require('path');
 var util = require('util');
 var Source = require('../source');
 var Config = require('../config');
-var color_utils = require('../color_utils');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
@@ -17,14 +16,6 @@ function PixelPulse(grid, options)
   // For convenience
   this.width = this.grid.num_pixels_x;
   this.height = this.grid.num_pixels_y;
-
-  // Convert colors to rgb
-  for (var x = 0; x < this.width; x++) {
-    var hsv = this.options.colors[x];
-    if (hsv != null) {
-      this.options.colors[x] = color_utils.hsv_to_rgb(hsv);
-    }
-  }
 
   // Keep track of location of pixels and their colors.
   // Initialize a 2D array of bg colors. Pixel colors will
