@@ -35,44 +35,40 @@ Attendance.prototype.update = function() {
         self.attendance = num;
       }
 
-      if (previous_attendance == this.attendance) {
+      if (previous_attendance == self.attendance) {
         console.log("attendance hasn't changed, skipping this cycle");
       } else {
-        self.add_layer.bind(self)();
+        // Record active state of layers, and deactivate them all
+        var active = [];
+        for (var i = 0; i < self.mixer.layers.length; i++) {
+          active.push(self.mixer.layers[i].source.active);
+          self.mixer.layers[i].source.deactivate();
+        }
+
+        // Choose a new source for a temporary layer
+        var source = self.choose_source.bind(self)();
+        console.log("choosing source " + source.name);
+
+        // Add a new layer
+        var layer = self.mixer.add_layer('Ding! Ding! Ding!', source);
+        console.log("adding layer");
+
+        // Let some time elapse and then revert
+        setTimeout(function() {
+          // Remove our temporary layer
+          console.log("removing our layer");
+          self.mixer.remove_layer(layer.id);
+
+          // Restore active bit for other layers
+          for (var i = 0; i < self.mixer.layers.length; i++) {
+            if (active[i]) {
+              self.mixer.layers[i].source.activate();
+            }
+          }
+        }, 5000);
       }
     });
   });
-};
-
-Attendance.prototype.add_layer = function() {
-  // Record active state of layers, and deactivate them all
-  var active = [];
-  for (var i = 0; i < this.mixer.layers.length; i++) {
-    active.push(this.mixer.layers[i].source.active);
-    this.mixer.layers[i].source.deactivate();
-  }
-
-  // Choose a new source for a temporary layer
-  var source = this.choose_source.bind(this)();
-  console.log("choosing source " + source.name);
-
-  // Add a new layer
-  var layer = this.mixer.add_layer('Ding! Ding! Ding!', source);
-  console.log("adding layer");
-
-  // Let some time elapse and then revert
-  setTimeout(function() {
-    // Remove our temporary layer
-    console.log("removing our layer");
-    this.mixer.remove_layer(layer.id);
-
-    // Restore active bit for other layers
-    for (var i = 0; i < this.mixer.layers.length; i++) {
-      if (active[i]) {
-        this.mixer.layers[i].source.activate();
-      }
-    }
-  }, 5000);
 };
 
 // Put the logic for choosing a source based on attendance number here
