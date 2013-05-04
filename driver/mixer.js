@@ -15,13 +15,13 @@ function Mixer(grid) {
 }
 
 // Add layer to the mix
-Mixer.prototype.add_layer = function(source) {
+Mixer.prototype.add_layer = function(name, source) {
   // Assign a globally sequential id for later operations
   var layer_id = this.next_layer_id;
   this.next_layer_id++;
 
   // Create a new layer and add it to the list
-  var layer = new Layer(source, layer_id);
+  var layer = new Layer(layer_id, name, source);
   this.layers.push(layer);
   return layer;
 };

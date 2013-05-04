@@ -62,18 +62,19 @@ var layer_api = {
   // source[name]
   // source[options][...]
   create: function(request, response) {
-    var name = request.body.source.name;
-    var options = request.body.source.options;
+    var layer_name = request.body.name;
+    var source_name = request.body.source.name;
+    var source_options = request.body.source.options;
 
     // Lookup source
-    var source = sources.find(name);
+    var source = sources.find(source_name);
     if (source == null) {
-      response.status(400).jsonp(errorResponse(400, util.format("ERROR: source not found: '%s'", name)));
+      response.status(400).jsonp(errorResponse(400, util.format("ERROR: source not found: '%s'", source_name)));
       return;
     }
 
     // Add layer and return its json representation
-    var layer = mixer.add_layer(new source(grid, options));
+    var layer = mixer.add_layer(layer_name, new source(grid, source_options));
     response.status(201).jsonp(layer.toJson());
   },
 
