@@ -5,7 +5,7 @@ function Attendance(mixer, sources) {
   this.source_registry = sources;
   this.attendance = 0;
   this.attendance_layer_timeout = 5000;
-  this.attendance_check_interval = 10000;
+  this.attendance_check_interval = 20000;
 }
 
 Attendance.prototype.run = function() {
