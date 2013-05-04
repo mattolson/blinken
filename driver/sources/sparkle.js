@@ -91,6 +91,11 @@ Sparkle.options_spec = function() {
       'default': 0
     },
     {
+      'name': 'density',
+      'type': 'integer',
+      'default': 10
+    },
+    {
       'name': 'bg',
       'type': 'color',
       'default': [0,0,0]
