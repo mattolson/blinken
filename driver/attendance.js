@@ -1,5 +1,6 @@
 var http = require('http');
 
+
 function Attendance(mixer, grid, sources) {
   this.mixer = mixer;
   this.grid = grid;
@@ -35,15 +36,17 @@ Attendance.prototype.update = function() {
       if (!isNaN(num)) {
         self.attendance = num;
       }
+
+      if (previous_attendance == this.attendance) {
+        console.log("attendance hasn't changed, skipping this cycle");
+      } else {
+        self.add_layer();
+      }
     });
   });
+};
 
-  // Don't do anything if nothing changed
-  if (previous_attendance == this.attendance) {
-    console.log("attendance hasn't changed, skipping this cycle");
-    return;
-  }
-
+Attendance.prototype.add_layer = function() {
   // Record active state of layers, and deactivate them all
   var active = [];
   for (var i = 0; i < this.mixer.layers.length; i++) {
