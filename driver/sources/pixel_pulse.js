@@ -22,7 +22,7 @@ function PixelPulse(grid, options)
   for (var x = 0; x < this.width; x++) {
     var hsv = this.options.colors[x];
     if (hsv != null) {
-      this.options.colors[x] = color_utils.hsv_to_rgb([hsv[0], hsv[1], hsv[2]]);
+      this.options.colors[x] = color_utils.hsv_to_rgb(hsv);
     }
   }
 
