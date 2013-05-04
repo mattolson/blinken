@@ -133,7 +133,7 @@ var grid_api = {
 
 // TODO: HACK FOR DEMO, REMOVE ME
 var ATTENDANCE = 0;
-function attendance(request, response) {
+function get_attendance(request, response) {
   response.send(''+(ATTENDANCE++));
 }
 
@@ -189,5 +189,5 @@ exports.registerHttpHandlers = function(app) {
   app.get('/grid', grid_api.get);
 
   // TODO: HACK FOR DEMO, REMOVE ME
-  app.get('/attendance', attendance);
+  app.get('/attendance', get_attendance);
 };
