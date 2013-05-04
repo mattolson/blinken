@@ -103,7 +103,7 @@ Sparkle.options_spec = function() {
     {
       'name': 'mode',
       'type': 'select',
-      'default': 'density',
+      'default': 'random_color',
       'choices': ['density', 'random_color', 'crazy']
     }
   ].concat(Source.options_spec());
