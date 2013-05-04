@@ -19,7 +19,7 @@ Attendance.prototype.update = function() {
   var previous_attendance = this.attendance;
 
   // Get latest attendance numbers
-  //var url = 'http://ideafablabs.com/current-attendance.php';
+  //var url = 'http://ideafablabs.com/api/attendance';
   var url = 'http://192.168.1.6:8888/attendance';
   http.get(url, function(response) {
     var output = '';
@@ -28,9 +28,11 @@ Attendance.prototype.update = function() {
     });
 
     response.on('end', function() {
+      console.log("queried for attendance, got " + output);
       var num = Number(output);
       if (!isNaN(num)) {
         this.attendance = num;
+        console.log("setting attendance figure");
       }
     });
   });
@@ -49,13 +51,16 @@ Attendance.prototype.update = function() {
 
   // Choose a new source for a temporary layer
   var source = this.choose_source(previous_attendance, this.attendance);
+  console.log("chose source " + source.name);
 
   // Add a new layer
   var layer = this.mixer.add_layer('Ding! Ding! Ding!', source);
+  console.log("adding layer");
 
   // Let some time elapse and then revert
   setTimeout(function() {
     // Remove our temporary layer
+    console.log("removing our layer");
     this.mixer.remove_layer(layer.id);
 
     // Restore active bit for other layers
