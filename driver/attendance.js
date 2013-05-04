@@ -46,7 +46,7 @@ Attendance.prototype.update = function() {
         }
 
         // Choose a new source for a temporary layer
-        var source = self.choose_source.bind(self)();
+        var source = self.choose_source(self);
         console.log("choosing source " + source.name);
 
         // Add a new layer
@@ -73,7 +73,7 @@ Attendance.prototype.update = function() {
 
 // Put the logic for choosing a source based on attendance number here
 // given previous and current attendance numbers
-Attendance.prototype.choose_source = function() {
+Attendance.prototype.choose_source = function(self) {
   // The list of good choices for this demo
   var choices = ['color_wheel', 'color_wipe', 'pulse_brightness', 'runner', 'sparkle', 'throb'];
   
@@ -81,7 +81,7 @@ Attendance.prototype.choose_source = function() {
   var choice = choices[Math.floor(Math.random(choices.length-1))];
 
   // Instantiate and return new source
-  return new this.source_registry.find(choice);
+  return new self.source_registry.find(choice);
 };
 
 // Expose constructor directly
