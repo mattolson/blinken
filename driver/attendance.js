@@ -27,8 +27,8 @@ Attendance.prototype.update = function() {
       output += chunk;
     });
 
-    res.on('end', function() {
-      var num = Number(response.body);
+    response.on('end', function() {
+      var num = Number(output);
       if (!isNaN(num)) {
         this.attendance = num;
       }
