@@ -17,6 +17,11 @@ mixer.run();
 // Get source registry (this loads sources themselves as well)
 var sources = require('./source_registry');
 
+// TODO: HACK FOR OPENING DEMO, REMOVE ME
+// I need access to grid and mixer for the following demo.
+var attendance = new Attendance(grid, mixer, sources);
+attendance.run();
+
 //**************************************
 //
 //              Errors
@@ -125,6 +130,12 @@ var grid_api = {
   }
 };
 
+// TODO: HACK FOR DEMO, REMOVE ME
+var ATTENDANCE = 0;
+function attendance(request, response) {
+  response.send(''+(ATTENDANCE++));
+}
+
 //***************************************************************
 //
 //                Register handlers
@@ -158,7 +169,7 @@ exports.registerSocketHandlers = function(socket) {
     grid.off();
     socket.emit("update", grid.toJson());
   });
-}
+};
 
 // Register http handlers. Called from server.js once http
 // server is up and running.
@@ -175,4 +186,7 @@ exports.registerHttpHandlers = function(app) {
 
   // Grid
   app.get('/grid', grid_api.get);
-}
+
+  // TODO: HACK FOR DEMO, REMOVE ME
+  app.get('/attendance', attendance);
+};
