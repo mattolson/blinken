@@ -40,6 +40,7 @@ Attendance.prototype.update = function() {
 
   // Don't do anything if nothing changed
   if (previous_attendance == this.attendance) {
+    console.log("attendance hasn't changed, skipping this cycle");
     return;
   }
 
