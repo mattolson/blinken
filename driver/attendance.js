@@ -20,7 +20,7 @@ Attendance.prototype.update = function() {
   var previous_attendance = this.attendance;
 
   // Get latest attendance numbers
-  var url = 'http://ideafablabs.com/api/attendance';
+  var url = 'http://ideafablabs.com/api/attendance/';
   //var url = 'http://192.168.1.6:8888/attendance';
   http.get(url, function(response) {
     var output = '';
