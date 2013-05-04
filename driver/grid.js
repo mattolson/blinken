@@ -141,7 +141,7 @@ Grid.prototype.getPixelColor = function(x, y) {
 
 // Output color values for entire grid as json
 Grid.prototype.toJson = function() {
-  var json = new Array(this.num_pixels);
+  var json = [];
   for (var y = 0; y < this.num_pixels_y; y++) {
     for (var x = 0; x < this.num_pixels_x; x++) {
       json.push(this.getPixelColor(x,y));
