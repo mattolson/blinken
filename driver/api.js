@@ -20,7 +20,7 @@ var sources = require('./source_registry');
 // TODO: HACK FOR OPENING DEMO, REMOVE ME
 // I need access to grid and mixer for the following demo.
 var Attendance = require('./attendance');
-var attendance = new Attendance(mixer, grid, sources);
+var attendance = new Attendance(mixer, sources);
 attendance.run();
 
 //**************************************

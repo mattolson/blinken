@@ -1,9 +1,8 @@
 var http = require('http');
 
 
-function Attendance(mixer, grid, sources) {
+function Attendance(mixer, sources) {
   this.mixer = mixer;
-  this.grid = grid;
   this.source_registry = sources;
   this.attendance = 0;
 }
@@ -12,7 +11,7 @@ Attendance.prototype.run = function() {
   var self = this;
   setInterval(function() {
     self.update();
-  }, 30000);
+  }, 10000);
 };
 
 Attendance.prototype.update = function() {
@@ -40,7 +39,7 @@ Attendance.prototype.update = function() {
       if (previous_attendance == this.attendance) {
         console.log("attendance hasn't changed, skipping this cycle");
       } else {
-        self.add_layer();
+        self.add_layer.bind(self)();
       }
     });
   });
