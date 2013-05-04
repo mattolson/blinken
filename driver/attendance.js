@@ -22,10 +22,17 @@ Attendance.prototype.update = function() {
   //var url = 'http://ideafablabs.com/current-attendance.php';
   var url = 'http://192.168.1.6:8888/attendance';
   http.get(url, function(response) {
-    var num = Number(response);
-    if (!isNaN(num)) {
-      this.attendance = num;
-    }
+    var output = '';
+    response.on('data', function(chunk) {
+      output += chunk;
+    });
+
+    res.on('end', function() {
+      var num = Number(response.body);
+      if (!isNaN(num)) {
+        this.attendance = num;
+      }
+    });
   });
 
   // Don't do anything if nothing changed
