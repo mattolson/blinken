@@ -74,12 +74,20 @@ Attendance.prototype.choose_source = function() {
   // The list of good choices for this demo
   var choices = ['color_wheel', 'color_wipe', 'pulse_brightness', 'runner', 'sparkle', 'throb'];
   
-  // Random choice for now
-  var choice = choices[Math.floor(Math.random(choices.length-1))];
-
-  // Setup options
+  var choice = null;
   var options = {};
 
+  if (this.attendance < 90) {
+    // Use sparkle with varying density
+    choice = 'sparkle';
+    options['density'] = this.attendance;
+    options['color'] = [255,0,0];
+  } else {
+    // Random choice for now
+    choice = choices[Math.floor(Math.random(choices.length-1))];
+  }
+
+  // Instantiate source and return it
   var source = this.source_registry.find(choice);
   return new source(this.mixer.grid, options);
 };
