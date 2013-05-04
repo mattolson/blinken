@@ -46,17 +46,14 @@ Attendance.prototype.update = function() {
         }
 
         // Choose a new source for a temporary layer
-        var source = self.choose_source(self);
-        console.log("choosing source " + source.name);
+        var source = self.choose_source.apply(self);
 
         // Add a new layer
         var layer = self.mixer.add_layer('Ding! Ding! Ding!', source);
-        console.log("adding layer");
 
         // Let some time elapse and then revert
         setTimeout(function() {
           // Remove our temporary layer
-          console.log("removing our layer");
           self.mixer.remove_layer(layer.id);
 
           // Restore active bit for other layers
@@ -73,15 +70,18 @@ Attendance.prototype.update = function() {
 
 // Put the logic for choosing a source based on attendance number here
 // given previous and current attendance numbers
-Attendance.prototype.choose_source = function(self) {
+Attendance.prototype.choose_source = function() {
   // The list of good choices for this demo
   var choices = ['color_wheel', 'color_wipe', 'pulse_brightness', 'runner', 'sparkle', 'throb'];
   
   // Random choice for now
   var choice = choices[Math.floor(Math.random(choices.length-1))];
 
-  // Instantiate and return new source
-  return new self.source_registry.find(choice);
+  // Setup options
+  var options = {};
+
+  var source = this.source_registry.find(choice);
+  return new source(this.mixer.grid, options);
 };
 
 // Expose constructor directly
