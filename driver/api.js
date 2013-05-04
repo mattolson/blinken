@@ -132,7 +132,7 @@ var grid_api = {
 };
 
 // TODO: HACK FOR DEMO, REMOVE ME
-var ATTENDANCE = 0;
+var ATTENDANCE = 1;
 function get_attendance(request, response) {
   response.send(''+(ATTENDANCE++));
 }

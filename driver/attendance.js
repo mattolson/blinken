@@ -15,6 +15,8 @@ Attendance.prototype.run = function() {
 };
 
 Attendance.prototype.update = function() {
+  var self = this;
+
   // Record previous attendance
   var previous_attendance = this.attendance;
 
@@ -31,8 +33,7 @@ Attendance.prototype.update = function() {
       console.log("queried for attendance, got " + output);
       var num = Number(output);
       if (!isNaN(num)) {
-        this.attendance = num;
-        console.log("setting attendance figure");
+        self.attendance = num;
       }
     });
   });
