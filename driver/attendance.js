@@ -4,13 +4,15 @@ function Attendance(mixer, sources) {
   this.mixer = mixer;
   this.source_registry = sources;
   this.attendance = 0;
+  this.attendance_layer_timeout = 5000;
+  this.attendance_check_interval = 10000;
 }
 
 Attendance.prototype.run = function() {
   var self = this;
   setInterval(function() {
     self.update();
-  }, 10000);
+  }, this.attendance_check_interval);
 };
 
 Attendance.prototype.update = function() {
@@ -62,7 +64,7 @@ Attendance.prototype.update = function() {
               self.mixer.layers[i].source.activate();
             }
           }
-        }, 5000);
+        }, self.attendance_layer_timeout);
       }
     });
   });
@@ -72,7 +74,7 @@ Attendance.prototype.update = function() {
 // given previous and current attendance numbers
 Attendance.prototype.choose_source = function() {
   // The list of good choices for this demo
-  var choices = ['color_wheel', 'color_wipe', 'pulse_brightness', 'runner', 'sparkle', 'throb'];
+  var choices = ['fade_to', 'color_wheel', 'color_wipe', 'pulse_brightness', 'runner', 'sparkle', 'throb'];
   
   var choice = null;
   var options = {};
@@ -82,9 +84,12 @@ Attendance.prototype.choose_source = function() {
     choice = 'sparkle';
     options['density'] = this.attendance;
     options['color'] = [255,0,0];
+    options['mode'] = 'random_color';
   } else {
+    choice = 'fade_to';
+    this.attendance_layer_timeout = 30000;
     // Random choice for now
-    choice = choices[Math.floor(Math.random(choices.length-1))];
+    //choice = choices[Math.floor(Math.random(choices.length-1))];
   }
 
   // Instantiate source and return it
