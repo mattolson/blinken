@@ -5,7 +5,8 @@ function Attendance(mixer, sources) {
   this.source_registry = sources;
   this.attendance = 0;
   this.attendance_layer_timeout = 5000;
-  this.attendance_check_interval = 20000;
+  this.attendance_check_interval = 60000;
+  this.special_effect_triggered = false;
 }
 
 Attendance.prototype.run = function() {
@@ -22,8 +23,8 @@ Attendance.prototype.update = function() {
   var previous_attendance = this.attendance;
 
   // Get latest attendance numbers
-  //var url = 'http://ideafablabs.com/api/attendance/';
-  var url = 'http://192.168.1.6:8888/attendance';
+  var url = 'http://ideafablabs.com/api/attendance/';
+  //var url = 'http://192.168.1.6:8888/attendance';
   http.get(url, function(response) {
     var output = '';
     response.on('data', function(chunk) {
@@ -85,11 +86,12 @@ Attendance.prototype.choose_source = function() {
     options['density'] = this.attendance;
     options['color'] = [255,0,0];
     options['mode'] = 'random_color';
-  } else {
+  } else if (!this.special_effect_triggered) {
+    this.special_effect_triggered = true;
     choice = 'fade_to';
     this.attendance_layer_timeout = 30000;
-    // Random choice for now
-    //choice = choices[Math.floor(Math.random(choices.length-1))];
+  } else {
+    choice = choices[Math.floor(Math.random(choices.length-1))];
   }
 
   // Instantiate source and return it
