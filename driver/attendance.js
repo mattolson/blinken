@@ -81,15 +81,15 @@ Attendance.prototype.choose_source = function(previous, current) {
   var choice = null;
   if (current - previous >= 2) {
     // If attendance number jumped by a significant amount, run sparkle
-    name = 'sparkle';
+    choice = 'sparkle';
   }
   else {
     // Choose at random
-    name = choices[Math.floor(Math.random(choices.length-1))];
+    choice = choices[Math.floor(Math.random(choices.length-1))];
   }
 
   // Instantiate and return new source
-  return new this.source_registry.find(name);
+  return new this.source_registry.find(choice);
 };
 
 // Expose constructor directly
