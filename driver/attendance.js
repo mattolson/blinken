@@ -1,3 +1,5 @@
+var http = require('http');
+
 function Attendance(mixer, grid, sources) {
   this.mixer = mixer;
   this.grid = grid;
