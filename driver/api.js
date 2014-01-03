@@ -128,6 +128,18 @@ var grid_api = {
   // GET /grid
   get: function(request, response) {
     response.jsonp(grid.toJson());
+  },
+  
+  // added by mf
+  // GET /grid/:x/:y 
+  getxy: function(request, response) {
+    var x = request.params.x;
+    var y = request.params.y;
+    var color = grid.getPixelColor(x, y);
+    if(!color) {
+	color = [33,x,y];
+    }
+    response.jsonp(color.toJson());
   }
 };
 
@@ -187,6 +199,7 @@ exports.registerHttpHandlers = function(app) {
 
   // Grid
   app.get('/grid', grid_api.get);
+  app.get('/grid/:x/:y', grid_api.getxy);
 
   // TODO: HACK FOR DEMO, REMOVE ME
   app.get('/attendance', get_attendance);
