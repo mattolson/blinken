@@ -4,7 +4,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "spi": "git://github.com/RussTheAerialist/node-spi.git",
     "express": ">= 3.1.0",
     "socket.io": "*",
     "easing": "*"

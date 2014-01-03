@@ -1,7 +1,8 @@
 // The grid object maps the 2D logical space to the 1D physical space
 // and handles device operations
 var Config = require('./config');
-var spi = require('spi');
+//var spi = require('spi');
+var spi = 0;
 
 function Grid() {
   // Store dimensions for later
@@ -58,12 +59,13 @@ function Grid() {
   }
 
   // Instantiate SPI device
-  this.device = new spi.Spi(Config.device.name, {
-    "mode": spi.MODE[Config.device.spi_mode],
-    "chipSelect": spi.CS[Config.device.spi_chip_select],
-    "maxSpeed": Config.device.max_speed
-  }, function(d) { d.open(); });
-
+  if (spi) {
+	  this.device = new spi.Spi(Config.device.name, {
+		"mode": spi.MODE[Config.device.spi_mode],
+		"chipSelect": spi.CS[Config.device.spi_chip_select],
+		"maxSpeed": Config.device.max_speed
+	  }, function(d) { d.open(); });
+	}
   // Clear the display
   this.off();
 }
@@ -133,7 +135,7 @@ Grid.prototype.getPixelColor = function(x, y) {
   }
 
   return [
-    this.pixels[index], 
+    this.pixels[(index*3)], // bugfix by mf
     this.pixels[(index*3)+1], 
     this.pixels[(index*3)+2]
   ]; 
@@ -164,7 +166,9 @@ Grid.prototype.off = function() {
 // Write to device
 Grid.prototype.sync = function() {
   // Blast out updates
-  this.device.write(this.pixels);
+  if (this.device) {
+	this.device.write(this.pixels);
+  }
 
   // Notify listeners
   for (var i = 0; i < this.listeners.length; i++) {

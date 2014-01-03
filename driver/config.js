@@ -8,10 +8,10 @@ var Config = {};
 		
   // Device settings
   Config.device = {};
-  Config.device.name = '/dev/spidev0.0'; 
-  Config.device.spi_mode = 'MODE_0';
-  Config.device.spi_chip_select = 'none';
-  Config.device.max_speed = 1000000;
+  //Config.device.name = '/dev/spidev0.0'; 
+  //Config.device.spi_mode = 'MODE_0';
+  //Config.device.spi_chip_select = 'none';
+  //Config.device.max_speed = 1000000;
 
   // Grid settings
   Config.grid = {};
