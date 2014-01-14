@@ -44,7 +44,7 @@ class Read_PatchFile {
 )
 
 	public getUni($u){
-		return $this->universes($u);
+		return $this->universes[$u];
 	}
 
 	public getPixel($x, $y){
