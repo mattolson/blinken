@@ -13,10 +13,11 @@ $total_points = COLUMNS * ROWS;
 
 
 class Universe {
-	public 	$id,
-			$ip = array(),
-			$controller,
-			$channels;
+	public 	$c,
+			$ch,
+			$net,
+			$subnet,
+			$ip = array();
 }
 
 class Pixel {
@@ -28,6 +29,7 @@ class Read_PatchFile {
 	private $patchfile,
 			$universes,
 			$map = array(),
+			$meta,
 			$filename = "";
 
 	public $errors =0;
@@ -37,13 +39,15 @@ class Read_PatchFile {
 		$this->prepare();
 		$this->run();
 		// print '<pre>';
-		// print_r($this->map);
+		// print_r($this->universes);
+		// die();
 	}
 
 	public function get_patchdata(){
 		$res = (object) null;
 		$res->universes = $this->universes;
 		$res->map = $this->map;
+		$res->meta = $this->meta;
 		return $res;
 	}
 
@@ -113,18 +117,15 @@ class Read_PatchFile {
 		$key = rtrim($dd[0]);
 		$value = rtrim($dd[1]);
 
-		// print "<pre>";
-		// print_r($l);
-		// print_r($key);
-		// print("\r\n");
-		// print_r($value);
-
-		//print_r($l);
-
 		switch($l[1]){
 
 			case "Num": //Patch_Num_Unis=16
-
+				$this->meta = (object) null;
+				$this->meta->total_unis = $value;
+				$this->meta->source = "Glediator";
+				$this->meta->patch_version = "0.1";
+				$this->meta->patch_generator = "Blinken";
+				$this->meta->author = "Sandwich";
 				break;
 
 			case "Uni": //Patch_Uni_ID_11_IP3=1
@@ -136,7 +137,14 @@ class Read_PatchFile {
 					case "IP2": $this->universes[$id]->ip[1] = $value; break;
 					case "IP3": $this->universes[$id]->ip[2] = $value; break;
 					case "IP4": $this->universes[$id]->ip[3] = $value; break;
-					case "Nr": 	$this->universes[$id]->id = $value; break;
+					case "Ch" : if("Num" == $l[4]) $this->universes[$id]->ch = $value;
+					case "Nr": 	
+						$v = $l[4];
+						
+						if($v == "Uni") $this->universes[$id]->c = $value; 
+						elseif($v == "Net") $this->universes[$id]->net = $value;
+						elseif($v == "Sub") $this->universes[$id]->subnet = $value;
+						break;
 				}
 			break;
 
@@ -166,7 +174,8 @@ class Read_PatchFile {
 
 class Output_PatchFile {
 
-	public $map,
+	public $meta,
+		   $map,
 		   $universes;
 
 	public $html;
@@ -178,16 +187,23 @@ class Output_PatchFile {
 		$patchdata = $glediator->get_patchdata();
 
 		//Assign vars.
+		$this->meta = $patchdata->meta;
 		$this->map = $patchdata->map;
 		$this->universes = $patchdata->universes;
 	} 
 
 	function display(){
 		$this->json_open();
+		$this->output_meta();
 		$this->output_universes();
 		$this->output_map();
 		$this->json_close();
 		echo $this->html;
+	}
+
+	private function output_meta(){
+		$this->html .= "\t".'"meta" : '."\r\n";
+		$this->html .= "\t"."\t".'{ "total_unis" : '.$this->meta->total_unis.', "pixels_per_uni" : 90,  "source" : "'.$this->meta->source.'", "patch_generator" : "'.$this->meta->patch_generator.'", "patch_version" : "'.$this->meta->patch_version.'", "author" : "'.$this->meta->author.'" },'."\r\n";; 
 	}
 
 	private function output_universes(){
@@ -197,9 +213,8 @@ class Output_PatchFile {
 		if(!empty($this->universes)) {
 			foreach($this->universes as $u) {
 				$ip = rtrim(trim(ip($u->ip)));
-				$id = $u->id;
-				$channels = 512;
-				$this->html .= "\t"."\t".'{ "id" : '.$id.', "ip" : "'.$ip.'"}';
+				$c = $u->c;
+				$this->html .= "\t"."\t".'{ "c" : '.$u->c.',  "ch" : '.$u->ch.', "net" : '.$u->net.', "subnet" : '.$u->subnet.', "ip" : "'.$ip.'"}';
 				$current++;
 				$this->html .= ($current == $total) ? "\r\n" : ','."\r\n";
 			}
