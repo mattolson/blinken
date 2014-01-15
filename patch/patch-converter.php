@@ -16,7 +16,7 @@ class Universe {
 	public 	$id,
 			$ip = array(),
 			$controller,
-			$channels
+			$channels;
 
 	function IP(){
 		return implode('.', $ip);
@@ -40,28 +40,33 @@ class Read_PatchFile {
 		$this->filename = $filename;
 		$this->prepare();
 		$this->run();
+		// print '<pre>';
+		// print_r($this->patchfile);
 	}
-)
 
-	public getUni($u){
+	public function get_patchdata(){
+		$res = (object) null;
+		$res->universes = $this->universes;
+		$res->map = $this->map;
+		return $res;
+	}
+
+	public function getUni($u){
 		return $this->universes[$u];
 	}
 
-	public getPixel($x, $y){
+	public function getPixel($x, $y){
 		return $this->map[$x][$y];
 	}
 
 	private function run(){
-		foreach($this->patchfile as $line) {
+
+		// echo $this->patchfile[0];
+
+		foreach($this->patchfile as $key => $line) {
+			// print($line);
 			$this->examine($line);
 		}
-		//Go line by line.
-			//Split up each line into an array.
-			//Detect which type of line it is.
-			//apply data to correct structure
-			//repeat ^^
-
-		//display_data
 	}
 
 	private function prepare(){
@@ -71,15 +76,23 @@ class Read_PatchFile {
 	}
 
 	//Patch
-	function load_patchfile(){
-		$this->patchfile = file($this->filename, FILE_IGNORE_NEW_LINES);
+	private function load_patchfile(){
+		// $this->patchfile = file($this->filename, FILE_IGNORE_NEW_LINES);
 		//Remove first two lines;
+		$handle = fopen($this->filename, "r");
+		if ($handle) {
+		    while (($line = fgets($handle)) !== false) {
+		        $this->patchfile[] = $line;
+		    }
+		} else {
+		    echo "ERROR ERROR! SKY IS FALLING.";
+		}	
 		array_shift( $this->patchfile ); 
 		array_shift( $this->patchfile );
 	}
 
 	//Setup
-	function create_pixels(){
+	private function create_pixels(){
 		for($x = 0; $x < COLUMNS; $x++) {
 			for($y = 0; $y < ROWS; $y ++) {
 				$map[$x][$y] = new Pixel();
@@ -87,28 +100,30 @@ class Read_PatchFile {
 		}
 	}
 
-	function create_universes(){
+	private function create_universes(){
 		for($u = 0; $u < COLUMNS; $u++) {
 			$map[$u] = new Universe();
 		}
 	}
 
-	function break_apart($line){
+	private function break_apart($line){
 		return explode('_', $line);
 	}
 
-	function return_patchdata(){
-		$res = (object) null;
-		$res->universes = $this->universes;
-		$res->map = $this->map;
-		return $res;
-	}
+	private function examine($_l){
+		$l = explode("_", $_l);
 
+		$dd = explode('=', $l[count($l)-1]);
+		$key = $dd[0];
+		$value = $dd[1];
 
-	function examine($l){
+		print "<pre>";
+		print_r($l);
+		print_r($key);
+		print("\r\n");
+		print_r($value);
 
-		$key = explode('=', $l[count($l)-1])[0];
-		$value = explode('=', $l[count($l)-1])[1];
+		//print_r($l);
 
 		switch($l[1]){
 
@@ -155,8 +170,8 @@ class Read_PatchFile {
 
 class Output_PatchFile {
 
-	public $this->map,
-		   $this->universes;
+	public $map,
+		   $universes;
 
 	public $html;
 
@@ -174,7 +189,7 @@ class Output_PatchFile {
 
 	function display(){
 		$this->json_open();
-		$this->output_universe();
+		$this->output_universes();
 		$this->output_map();
 		$this->json_close();
 		echo $this->html;
@@ -182,13 +197,17 @@ class Output_PatchFile {
 
 	private function output_universes(){
 		$this->html .= "\t"."universes : ["."\r\n";
-		foreach($this->universes as $u) {
-			$ip = $u->IP();
-			$id = $u->id();
-			$channels = 512;
-			$this->html .= "\t"."\t".'{ id : '.$id.', ip : "'.$ip.'"}';
-			$current++;
-			if($current == $total) ? $this->html .= "\r\n" : $this->html .= ','."\r\n";
+		if(!empty($this->universes)) {
+			foreach($this->universes as $u) {
+				$ip = $u->IP();
+				$id = $u->id();
+				$channels = 512;
+				$this->html .= "\t"."\t".'{ id : '.$id.', ip : "'.$ip.'"}';
+				$current++;
+				$this->html .= ($current == $total) ? "\r\n" : ','."\r\n";
+			}
+		} else {
+			$this->html .= '"NO DATA"';
 		}
 		$this->html .= "\t"."],"."\r\n";
 	}
@@ -197,22 +216,25 @@ class Output_PatchFile {
 		$this->html .= "\t"."map : ["."\r\n";
 		$total = count($this->map);
 		$current = 0;
-		foreach($this->map as $p) {
-			$u = $p->u;
-			$r = $p->r;
-			$g = $p->g;
-			$b = $p->b;
-			$this->html .= "\t"."\t".'{ u : '.$u.', r : '.$r.', g : '.$g.', b : '.$b.' }';
-			$current++;
-			if($current == $total) ? $this->html .= "\r\n" : $this->html .= ','."\r\n";
-			
+		if(!empty($this->map)) {
+			foreach($this->map as $p) {
+				$u = $p->u;
+				$r = $p->r;
+				$g = $p->g;
+				$b = $p->b;
+				$this->html .= "\t"."\t".'{ u : '.$u.', r : '.$r.', g : '.$g.', b : '.$b.' }';
+				$current++;
+				$this->html .= ($current == $total) ? "\r\n" : ','."\r\n";
+				
+			}
+		} else {
+			$this->html .= '"NO DATA"';
 		}
 		$this->html .= "\t"."]"."\r\n";
 	}
 
 	private function json_open(){  $this->html .= '[{'."\r\n"; }
-	private function json_close(){  $this->html .= ']}'."\r\n"; }
-
+	private function json_close(){  $this->html .= '}]'; }
 }
 
 //Read and Process the Patchfile (OBSCURE BS)
