@@ -1,17 +1,14 @@
 <?php 
 
+// Could this have been done with less code using RegEx? YEP!
+
+
+//Config.
 DEFINE('COLUMNS', 60);
 DEFINE('ROWS', 24);
 DEFINE('UNIVERSES', 16);
 
-$file = '';
-
-$rows = 0;
-$columns = 0;
-
-$total_points = COLUMNS * ROWS;
-
-
+// Singleton Objects
 class Universe {
 	public 	$c,
 			$ch,
@@ -24,6 +21,8 @@ class Pixel {
 	public 	$u, $r, $g, $b;
 }
 
+
+//Read the patchfile (Glediator)
 class Read_PatchFile {
 
 	private $patchfile,
@@ -172,6 +171,8 @@ class Read_PatchFile {
 	}
 }
 
+
+//Format a JSON response using Glediator patch data
 class Output_PatchFile {
 
 	public $meta,
