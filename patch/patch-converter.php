@@ -17,10 +17,6 @@ class Universe {
 			$ip = array(),
 			$controller,
 			$channels;
-
-	function IP(){
-		return implode('.', $ip);
-	}
 }
 
 class Pixel {
@@ -41,7 +37,7 @@ class Read_PatchFile {
 		$this->prepare();
 		$this->run();
 		// print '<pre>';
-		// print_r($this->patchfile);
+		// print_r($this->map);
 	}
 
 	public function get_patchdata(){
@@ -114,14 +110,14 @@ class Read_PatchFile {
 		$l = explode("_", $_l);
 
 		$dd = explode('=', $l[count($l)-1]);
-		$key = $dd[0];
-		$value = $dd[1];
+		$key = rtrim($dd[0]);
+		$value = rtrim($dd[1]);
 
-		print "<pre>";
-		print_r($l);
-		print_r($key);
-		print("\r\n");
-		print_r($value);
+		// print "<pre>";
+		// print_r($l);
+		// print_r($key);
+		// print("\r\n");
+		// print_r($value);
 
 		//print_r($l);
 
@@ -136,11 +132,11 @@ class Read_PatchFile {
 				$id = $l[3];
 
 				switch($key) {
-					case "IP1": $universe[$id]->ip[0] = $value; break;
-					case "IP2": $universe[$id]->ip[1] = $value; break;
-					case "IP3": $universe[$id]->ip[2] = $value; break;
-					case "IP4": $universe[$id]->ip[3] = $value; break;
-					case "Nr": 	$universe[$id]->controller = $value; break;
+					case "IP1": $this->universes[$id]->ip[0] = $value; break;
+					case "IP2": $this->universes[$id]->ip[1] = $value; break;
+					case "IP3": $this->universes[$id]->ip[2] = $value; break;
+					case "IP4": $this->universes[$id]->ip[3] = $value; break;
+					case "Nr": 	$this->universes[$id]->id = $value; break;
 				}
 			break;
 
@@ -151,11 +147,11 @@ class Read_PatchFile {
 
 				switch($l[6]){
 					case 'Uni':
-						if($key == 'ID') $map[$x][$y]->u = $value;
+						if($key == 'ID') $this->map[$x][$y]->u = $value;
 					break;
 					case 'Ch':
 						$key = strtolower($key);
-						$map[$x][$y]->$key = $value;
+						$this->map[$x][$y]->$key = $value;
 					break;
 				}
 				
@@ -180,7 +176,6 @@ class Output_PatchFile {
 	function __construct($filename, $glediator){
 		$this->glediator = $glediator;
 		$patchdata = $glediator->get_patchdata();
-		$this->json_open();
 
 		//Assign vars.
 		$this->map = $patchdata->map;
@@ -196,13 +191,15 @@ class Output_PatchFile {
 	}
 
 	private function output_universes(){
-		$this->html .= "\t"."universes : ["."\r\n";
+		$this->html .= "\t".'"universes" : ['."\r\n";
+		$current = 0;
+		$total = count($this->universes);
 		if(!empty($this->universes)) {
 			foreach($this->universes as $u) {
-				$ip = $u->IP();
-				$id = $u->id();
+				$ip = rtrim(trim(ip($u->ip)));
+				$id = $u->id;
 				$channels = 512;
-				$this->html .= "\t"."\t".'{ id : '.$id.', ip : "'.$ip.'"}';
+				$this->html .= "\t"."\t".'{ "id" : '.$id.', "ip" : "'.$ip.'"}';
 				$current++;
 				$this->html .= ($current == $total) ? "\r\n" : ','."\r\n";
 			}
@@ -213,19 +210,29 @@ class Output_PatchFile {
 	}
 
 	private function output_map(){
-		$this->html .= "\t"."map : ["."\r\n";
-		$total = count($this->map);
-		$current = 0;
+		$this->html .= "\t".'"map" : ['."\r\n";
+		
 		if(!empty($this->map)) {
-			foreach($this->map as $p) {
-				$u = $p->u;
-				$r = $p->r;
-				$g = $p->g;
-				$b = $p->b;
-				$this->html .= "\t"."\t".'{ u : '.$u.', r : '.$r.', g : '.$g.', b : '.$b.' }';
-				$current++;
-				$this->html .= ($current == $total) ? "\r\n" : ','."\r\n";
-				
+			$rowIndex = 0;
+			$rowTotal = count($this->map);
+			foreach($this->map as $row) { //row = X
+				$this->html .= "["."\r\n";
+				$colIndex = 0;			 //Reset Column Index
+				$colTotal = count($row); //Count total Columns in Row
+				foreach($row as $col) { //col = Y
+					$u = $col->u;
+					$r = $col->r;
+					$g = $col->g;
+					$b = $col->b;
+					$this->html .= "\t"."\t".'{ "u" : '.$u.', "r" : '.$r.', "g" : '.$g.', "b" : '.$b.' }';
+					$colIndex++;
+					$this->html .= ($colIndex == $colTotal) ? "\r\n" : ','."\r\n";
+				}		
+
+				$this->html .= "]"."\r\n";
+				$rowIndex++;
+				$this->html .= ($rowIndex == $rowTotal) ? "\r\n" : ','."\r\n";
+
 			}
 		} else {
 			$this->html .= '"NO DATA"';
@@ -233,8 +240,14 @@ class Output_PatchFile {
 		$this->html .= "\t"."]"."\r\n";
 	}
 
-	private function json_open(){  $this->html .= '[{'."\r\n"; }
-	private function json_close(){  $this->html .= '}]'; }
+	private function json_open(){  $this->html .= '[{ "result" : {'."\r\n"; }
+	private function json_close(){  $this->html .= '}}]'; }
+}
+
+
+// Utilities
+function ip($ip){
+	return implode('.', $ip);
 }
 
 //Read and Process the Patchfile (OBSCURE BS)
@@ -242,6 +255,9 @@ $glediator = new Read_PatchFile('patch.glediator');
 
 //Output & Save (Not implemented) new Patchfile (JSON)
 $blinken = new Output_PatchFile('patch.blinken', $glediator);
+
+//Set header type as JSON.
+header('Content-Type: application/json');
 
 //SHOW IT ON THE SCREEN FOR COPY/PASTE
 $blinken->display();
