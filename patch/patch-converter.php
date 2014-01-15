@@ -240,8 +240,8 @@ class Output_PatchFile {
 		$this->html .= "\t"."]"."\r\n";
 	}
 
-	private function json_open(){  $this->html .= '[{ "result" : {'."\r\n"; }
-	private function json_close(){  $this->html .= '}}]'; }
+	private function json_open(){  $this->html .= '[{'."\r\n"; }
+	private function json_close(){  $this->html .= '}]'; }
 }
 
 
