@@ -144,6 +144,8 @@ class Read_PatchFile {
 						elseif($v == "Net") $this->universes[$id]->net = $value;
 						elseif($v == "Sub") $this->universes[$id]->subnet = $value;
 						break;
+					default:
+						$this->errors++;
 				}
 			break;
 
@@ -160,6 +162,8 @@ class Read_PatchFile {
 						$key = strtolower($key);
 						$this->map[$x][$y]->$key = $value;
 					break;
+					default:
+						$this->errors++;
 				}
 				
 			break;
@@ -229,25 +233,25 @@ class Output_PatchFile {
 		$this->html .= "\t".'"map" : ['."\r\n";
 		
 		if(!empty($this->map)) {
-			$rowIndex = 0;
-			$rowTotal = count($this->map);
-			foreach($this->map as $row) { //row = X
+			$colIndex = 0;
+			$colTotal = count($this->map);
+			foreach($this->map as $col) { //row = X
 				$this->html .= "["."\r\n";
-				$colIndex = 0;			 //Reset Column Index
-				$colTotal = count($row); //Count total Columns in Row
-				foreach($row as $col) { //col = Y
-					$u = $col->u;
-					$r = $col->r;
-					$g = $col->g;
-					$b = $col->b;
+				$rowIndex = 0;			 //Reset Column Index
+				$Total = count($col); //Count total Columns in Row
+				foreach($col as $row) {j //col = Y
+					$u = $row->u;
+					$r = $row->r;
+					$g = $row->g;
+					$b = $row->b;
 					$this->html .= "\t"."\t".'{ "u" : '.$u.', "r" : '.$r.', "g" : '.$g.', "b" : '.$b.' }';
-					$colIndex++;
-					$this->html .= ($colIndex == $colTotal) ? "\r\n" : ','."\r\n";
+					$rowIndex++;
+					$this->html .= ($rowIndex == $rowTotal) ? "\r\n" : ','."\r\n";
 				}		
 
 				$this->html .= "]"."\r\n";
-				$rowIndex++;
-				$this->html .= ($rowIndex == $rowTotal) ? "\r\n" : ','."\r\n";
+				$colIndex++;
+				$this->html .= ($colIndex == $colTotal) ? "\r\n" : ','."\r\n";
 
 			}
 		} else {
