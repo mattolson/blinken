@@ -152,34 +152,45 @@ exports.registerSocketHandlers = function() {
 
   io.on('connection', function (socket) {
 
+    function refresh_clients(){
+      socket.emit('refresh layers', api.layer.list() );
+      socket.broadcast.emit('refresh layers', api.layer.list() );
+    }
+
     console.log('User connected.');
 
     socket.on('disconnect', function(){
       console.log('User disconnected');
     });
 
-    io.emit("Successfully connected to LED Ceiling via websocket, Welcome!");
+    socket.emit("message", "Welcome!");
 
     // Sources
     socket.on('list sources', function(){ var result = api.source.list(); socket.emit('refresh sources', result) });
     // socket.on('add remote source', websocket.source.addRemoteSource);
 
     // Layer
-    socket.on('list layers', function(){ var result = api.layer.list(); socket.emit('refresh layers', result) });
+    socket.on('list layers', function(){ 
+      var result = api.layer.list(); 
+      socket.emit('refresh layers', result) 
+    });
     socket.on('create layer', function(layer_name, source_name, source_options){ 
       var result = api.layer.create(layer_name, source_name, source_options); 
-      return (!result.error) ? socket.emit('layer created', result) : socket.emit('error', result.error );
-      socket.broadcast.emit('mixer update', { details : 'layer '+result.id+' created' });
+      (!result.error) ? socket.emit('layer created', result) : socket.emit('error', result.error );
+      if(result.error) console.log('Error: '+result.error);
+      refresh_clients();
     });
     socket.on('update layer', function(layer_id, layer_options) { 
       var result = api.layer.update(layer_id, layer_options); 
-      return (!result.error) ? socket.emit('layer updated', result ) : socket.emit('error', result.error );
-      socket.broadcast.emit('mixer update', { details : 'layer '+result.id+' updated' });
+      (!result.error) ? socket.emit('layer updated', result ) : socket.emit('error', result.error );
+      if(result.error) console.log('Error: '+result.error);
+      refresh_clients();
     });
     socket.on('destroy layer', function(layer_id) { 
       var result = api.layer.destroy(layer_id);
-      return (!result.error) ? socket.emit('layer destroyed', result ) : socket.emit('error', result.error );
-      socket.broadcast.emit('mixer update', { details : 'layer '+result.id+'destroyed' });
+      (!result.error) ? socket.emit('layer destroyed', result ) : socket.emit('error', result.error );
+      if(result.error) console.log('Error: '+result.error);
+      refresh_clients();
     });
     socket.on('get layer', function(layer_name) { 
       var result = api.layer.get(layer_name); 
