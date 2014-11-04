@@ -73,7 +73,7 @@ Source.prototype.validate_options = function(new_options, use_defaults) {
     if (option_name in new_options) {
       var value = null;
       var raw_value = new_options[option_name];
-
+      
       // Coerce to appropriate type
       switch (option_type) {
         case 'integer':
