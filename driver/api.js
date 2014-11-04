@@ -163,7 +163,7 @@ exports.registerSocketHandlers = function() {
       console.log('User disconnected');
     });
 
-    socket.emit("message", "Welcome!");
+    // socket.emit("message", "Welcome!");
 
     // Sources
     socket.on('list sources', function(){ var result = api.source.list(); socket.emit('refresh sources', result) });
