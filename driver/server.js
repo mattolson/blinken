@@ -11,8 +11,8 @@ var bodyParser = require('body-parser');
 
 function start() {
   // Start http server
-  server.listen(Config.server.port, function ()  {
-    console.log('Listening');
+  server.listen(Config.server.port, 'localhost', function ()  {
+    console.log('Listening on localhost:'+Config.server.port);
   });
 
   // Configure to serve static files out of '/static' directory
