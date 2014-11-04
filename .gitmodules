@@ -1,0 +1,3 @@
+[submodule "driver/static"]
+	path = driver/static
+	url = https://github.com/dskvr/Blinken-Layer-Manager.git
