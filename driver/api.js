@@ -43,12 +43,10 @@ function errorResponse(code, description) {
 //
 //**************************************
 
-api.source =  {
-  // GET /sources
-  list: function() {
-    return sources.toJson();
-  }
-};
+api.source =  new Object();
+api.source.list =  function() {
+  return sources.toJson();
+}
 
 //**************************************
 //
@@ -116,7 +114,7 @@ api.layer.destroy = function(layer_id) {
 api.grid = new Object();
   
 // GET /grid
-api.grid.get = function(request, response) {
+api.grid.get = function() {
   return grid.toJson();
 };
   
@@ -130,6 +128,17 @@ api.grid.getxy = function(x, y) {
 api.grid.set = function(color_grid, mode, strict){
   grid.set(color_grid, mode, strict);
 }
+
+api.grid.dimensions = function() {
+  return {
+    width : grid.number_pixels_x,
+    height : grid.number_pixels_y
+  }
+};
+
+api.grid.map = function() {
+  return grid.pixel_map;
+};
 
 //***************************************************************
 //
@@ -181,7 +190,10 @@ exports.registerSocketHandlers = function() {
     //Grid
     socket.on('set grid', function(color_grid, mode, strict){ return api.grid.set(color_grid, mode, strict); } );
     socket.on('get grid', function(){ return api.grid.get(); } );
+    socket.on('get grid meta', function(){ return api.grid.getMeta(); } );
     socket.on('get xy', function(x, y){ return api.grid.getxy(x, y); });
+    socket.on('get grid map', function(){ return api.grid.map(); } );
+    socket.on('get grid dimensions', function(){ return api.grid.dimensions(); } );
 
     socket.on("update led", function(data) {
       // Validate input values
@@ -217,96 +229,68 @@ exports.registerSocketHandlers = function() {
 // server is up and running.
 exports.registerHttpHandlers = function(app) {
 
-//**************************************
-//
-//              REST Handler
-//
-//**************************************
-
-var restful = { grid : {}, layer : {}, source : {} }
-
-restful.layer.list = function(request, response){  
-  var result = api.layer.list();
-  request.jsonp(result);
-}
-
-restful.layer.create = function(request, response){  
-
-  var layer_name = request.body.name;
-  var source_name = request.body.source.name;
-  var source_options = request.body.source.options;
-
-  var result = api.layer.create(layer_name, source_name, source_options);
-
-  if(!result.error)  response.status(201).jsonp(result);
-  else response.status(400).jsonp(errorResponse(400, result.error));
-
-};
-
-restful.layer.update = function(request, response){
-  
-  var layer_id = request.params.id;
-  var layer_options = request.body;
-
-  var result = api.layer.update(layer_id, layer_options);
-
-  if(!result.error) response.send(204);
-  else response.status(404).jsonp(errorResponse(404, result.error));
-
-};
-
-
-restful.layer.get = function(request, response){
-
-  var result = api.layer.get(request.params.id);
-  if(!result.error) response.status(201).jsonp(result);
-  else jsonp(errorResponse(404, result.error));
-
-};
-
-restful.layer.destroy = function(request, response){
-
-  var layer_id = request.params.id;
-  api.layer.destroy(layer_id);
-  response.send(204);
-
-};
-
-restful.grid.get = function(request, response){
-
-  var result = api.grid.get();
-  response.jsonp(result);
-
-}
-
-restful.grid.getxy = function(request, response){
-
-  var x = request.params.x;
-  var y = request.params.y;
-  var result = api.grid.getxy(x, y);
-  response.jsonp(result);
-
-}
-
-restful.source.list = function(request, response){
-  var result = api.source.list();
-  response.jsonp(result);
-}
-module.exports = restful;
-
   // Sources
-  app.get('/sources', api.source.list);
+  app.get('/sources', function(request, response){
+    var result = api.source.list();
+    response.jsonp(result);
+  });
 
   // Layers
-  app.get('/mixer/layers', api.layer.list);
-  app.post('/mixer/layers', api.layer.create);
-  app.get('/mixer/layers/:id', api.layer.get);
-  app.put('/mixer/layers/:id', api.layer.update);
-  app.delete('/mixer/layers/:id', api.layer.destroy);
+  app.get('/mixer/layers', function(request, response){  
+    var result = api.layer.list();
+    request.jsonp(result);
+  });
+  app.post('/mixer/layers', function(request, response){  
+
+    var layer_name = request.body.name;
+    var source_name = request.body.source.name;
+    var source_options = request.body.source.options;
+
+    var result = api.layer.create(layer_name, source_name, source_options);
+
+    if(!result.error)  response.status(201).jsonp(result);
+    else response.status(400).jsonp(errorResponse(400, result.error));
+
+  });
+  app.get('/mixer/layers/:id', function(request, response){
+    var result = api.layer.get(request.params.id);
+    if(!result.error) response.status(201).jsonp(result);
+    else jsonp(errorResponse(404, result.error));
+  });
+  app.put('/mixer/layers/:id', function(request, response){
+    
+    var layer_id = request.params.id;
+    var layer_options = request.body;
+
+    var result = api.layer.update(layer_id, layer_options);
+
+    if(!result.error) response.send(204);
+    else response.status(404).jsonp(errorResponse(404, result.error));
+
+  });
+  app.delete('/mixer/layers/:id', function(request, response){
+
+    var layer_id = request.params.id;
+    api.layer.destroy(layer_id);
+    response.send(204);
+
+  });
 
   // Grid
-  app.get('/output', api.grid.get);
-  app.get('/output/:x/:y', api.grid.getxy);
+  app.get('/output', function(request, response){
+
+    var result = api.grid.get();
+    response.jsonp(result);
+
+  });
+  app.get('/output/:x/:y', function(request, response){
+
+    var x = request.params.x;
+    var y = request.params.y;
+    var result = api.grid.getxy(x, y);
+    response.jsonp(result);
+
+  });
 
   // TODO: HACK FOR DEMO, REMOVE ME
   // app.get('/attendance', get_attendance);
