@@ -1,45 +1,33 @@
 var express = require('express');
-var socket = require('socket.io');
-var http = require('http');
+
+var app = express(),
+    http = require('http'),
+    server = http.createServer(app);
+    io = require('socket.io').listen(server);
+
 var api = require("./api");
 var Config = require("./config");
-
-var app, io;
+var bodyParser = require('body-parser');
 
 function start() {
-  // Create servers
-  app = express();
-  server = http.createServer(app);
-
-  // Instantitate web socket
-  io = socket.listen(server);
-  io.set('log level', 1);  
-
   // Start http server
-  server.listen(Config.server.port);
-  console.log("Listening on port " + Config.server.port + "...");
-
-  // Downgrade permissions
- //  if (process.setgid) {
-	// process.setgid(Config.server.group);
- //  }
- //  if (process.setuid) {
-	// process.setuid(Config.server.user);
- //  }
+  server.listen(Config.server.port, function ()  {
+    console.log('Listening');
+  });
 
   // Configure to serve static files out of '/static' directory
   app.use(express.static(__dirname + '/static'));
 
   // Automatically parse request body
-  app.use(express.bodyParser());
+  // app.use(bodyParser.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
+  app.use(bodyParser.json());
 
   // Register http handlers
   api.registerHttpHandlers(app);
-
+  
   // Register socket handlers
-  io.on("connection", function(socket) {
-    api.registerSocketHandlers(socket);
-  });
+  api.registerSocketHandlers();
+ 
 
   // Export for later
   exports.app = app;
@@ -47,4 +35,3 @@ function start() {
 }
 
 exports.start = start;
-
