@@ -87,8 +87,40 @@ Grid.prototype.xy = function(i) {
   }
 };
 
+Grid.prototype.validateGrid = function(color_grid){
+  //Validate a color array, notify user/dev if wrong.
+  return true;
+}
+
+Grid.prototype.set = function(color_grid, mode, strict){
+  switch(mode) {
+
+    case "xy":
+      for(var x=0; x<this.num_pixels_x; x++){
+        for(var y=0; y<this.num_pixels_y; y++) {
+          var index = this.getStrandIndex(x,y);
+          if(index != null) {
+            this.pixels[index*3] = color_grid[x][y][0];
+            this.pixels[(index*3)+1] = color_grid[x][y][1];
+            this.pixels[(index*3)+2] = color_grid[x][y][2];
+          }  
+        }
+      }
+    break;
+
+    case "logical":
+    default:
+      if(strict) var valid = this.validateGrid(color_grid);
+      if(!strict || strict && valid) this.pixels = color_grid;
+      // else return { error : "some error?" }
+    break;
+
+  }
+};
+
 Grid.prototype.setPixelColor = function(x, y, rgb) {
   var index = this.getStrandIndex(x,y);
+
   if (index == null) {
     return;
   }
@@ -97,6 +129,7 @@ Grid.prototype.setPixelColor = function(x, y, rgb) {
   this.pixels[index*3] = rgb[0];
   this.pixels[(index*3)+1] = rgb[1];
   this.pixels[(index*3)+2] = rgb[2];
+
 };
 
 // Set the color of an entire row
