@@ -23,6 +23,8 @@ Layer.prototype.update = function(data) {
 };
 
 Layer.prototype.toJson = function() {
+  console.log('Layer Source Options->')
+  // console.dir(this.source.toJson());
   return {
     'id': this.id,
     'name': this.name,

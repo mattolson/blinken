@@ -91,10 +91,10 @@ api.layer.get = function(layer_id) {
 api.layer.update = function(layer_id, layer_options) {
   // Look up layer
   var layer = mixer.find_layer(layer_id);
-  if (layer == null) return { error : util.format("ERROR: layer not found: '%d'", layer_id) };
-
+  if (layer == null) return { error : util.format("ERROR: layer not found: '%d'", layer_id) }
   // Update layer
   layer.update(layer_options);
+  // console.log(layer_options);
   return true;
 
 };
@@ -129,6 +129,7 @@ api.grid.getxy = function(x, y) {
 
 api.grid.set = function(color_grid, mode, strict){
   grid.set(color_grid, mode, strict);
+  return true;
 }
 
 api.grid.dimensions = function() {
@@ -139,7 +140,25 @@ api.grid.dimensions = function() {
 };
 
 api.grid.html = function(){
-  
+  var dim = api.grid.dimensions();
+  var html = '<table width="100%" height="100%;">';
+  var key = 0;
+  var grid = api.grid.get();
+  var html = '<table>';
+  for(var x = 0; x < dim.width; x++){
+    html += '<tr class="row">';
+    for(var y = 0; y < dim.height; y++){
+      var r = grid[key][0],
+          g = grid[key][1],
+          b = grid[key][2];
+
+      html += '<td class="pixel" id="'+key+'" style="background:rgb('+r+','+g+','+b+')">&nbsp;</td>';
+      key++;
+    }
+    html += '</tr>';
+  }
+  html += "</table>";
+  return html;
 }
 
 api.grid.map = function() {
@@ -210,28 +229,9 @@ exports.registerSocketHandlers = function() {
     socket.on('get grid', function(){ return api.grid.get(); } );
     socket.on('get grid meta', function(){ return api.grid.getMeta(); } );
     socket.on('get xy', function(x, y){ return api.grid.getxy(x, y); });
+    socket.on('get grid html', function(){ socket.emit("grid html", api.grid.html()) });
     socket.on('get grid map', function(){ return api.grid.map(); } );
     socket.on('get grid dimensions', function(){ socket.emit("grid dimensions", api.grid.dimensions() ) });
-
-    socket.on("update led", function(data) {
-      // Validate input values
-      var x = parseInt(data.x);
-      var y = parseInt(data.y);
-      var r = parseInt(data.rgb[0]);
-      var g = parseInt(data.rgb[1]);
-      var b = parseInt(data.rgb[2]);
-      r = r < 0 ? 0 : (r > 255 ? 255 : r);
-      g = g < 0 ? 0 : (g > 255 ? 255 : g);
-      b = b < 0 ? 0 : (b > 255 ? 255 : b);
-
-      // Change the pixel color
-      grid.setPixelColor(x, y, rgb);
-      grid.sync();
-
-      // Broadcast change to all other clients
-      socket.broadcast.emit("changed:led", { x: x, y: y, rgb: rgb }); 
-    });
-
 
    socket.on("off", function(data) {
       mixer.clear_layers();
@@ -241,7 +241,7 @@ exports.registerSocketHandlers = function() {
 
     setInterval(function(){
       io.sockets.emit("refresh grid", api.grid.get() );
-    }, 4000);
+    }, 2000);
 
   });
 
@@ -313,8 +313,5 @@ exports.registerHttpHandlers = function(app) {
     response.jsonp(result);
 
   });
-
-  // TODO: HACK FOR DEMO, REMOVE ME
-  // app.get('/attendance', get_attendance);
 
 };

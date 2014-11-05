@@ -86,11 +86,11 @@ FadeTo.prototype.step = function() {
 
 // Return js object containing all params and their types
 FadeTo.options_spec = function() {
-  return [
+  result = [
   {
     'name': 'color',
-      'type': 'color',
-      'default': [255,255,255]
+    'type': 'color',
+    'default': [255,255,255]
   },
   {
     'name': 'random_color',
@@ -98,6 +98,8 @@ FadeTo.options_spec = function() {
     'default': true
   }
   ].concat(Source.options_spec());
+
+  return result;
 }
 
 // Export public interface

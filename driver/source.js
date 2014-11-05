@@ -123,12 +123,16 @@ Source.prototype.update_options = function(new_options) {
     this.options[option] = new_options[option];
   }
 
+  // console.dir(this.options[option]);
+
   // Activate source again
   this.activate();
 };
 
 // Output current state as json
 Source.prototype.toJson = function() {
+  console.log('Source Options->')
+  // console.dir(this.options);
   return {
     'name': this.name,
     'active': this.active,

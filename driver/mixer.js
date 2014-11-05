@@ -114,3 +114,46 @@ Mixer.prototype.toJson = function() {
 
 // Export constructor directly
 module.exports = Mixer;
+
+//Attempt at real mixer.
+// Mixer.prototype.render = function() {
+//   // Lock to make sure this doesn't get called again until we're done
+//   this.rendering = true;
+
+//   // Loop through layers and have them render themselves
+//   var grid_changed = false;
+
+//   var raw_values = new Array(this.layers.length);
+//   var processed_values = [];
+
+//   for (var i = 0; i < this.layers.length; i++) {
+//     raw_values[i] = this.layers[i].render();
+//     // var layer_changed = this.layers[i].render();
+//     // grid_changed = grid_changed || layer_changed;
+//   }
+//   for (var i = 0; i < this.layers.length; i++) {
+//     if(i == 0) continue;
+//     if(i == 1) processed_values = this.blend(raw_values[i], raw_values[i-1]);
+//     if(i > 1) {
+//       processed_values = this.blend(raw_values[i], processed_values);
+//     }
+//   }
+
+//   this.grid.pixels = processed_values;
+
+//   // Blast updates to strip
+//   // if (grid_changed) {
+//     this.grid.sync();
+//   // }
+
+//   // Remove lock
+//   this.rendering = false;
+// };
+
+// Mixer.prototype.blend = function(current, previous){
+//   var result = [];
+//   for(var i = 0; i < current.length; i++) {
+//       result[i] = (current[i] + previous[i]) / 2;
+//   }
+//   return result;
+// }
