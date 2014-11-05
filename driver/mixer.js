@@ -1,67 +1,67 @@
-var Layer = require('./layer');
+var Channel = require('./channel');
 
 // This object encapsulates a list of sources and renders them
 // on a timer.
 function Mixer(grid) {
   this.grid = grid;
-  this.layers = [];
+  this.channels = [];
 
   // we keep a sequential id for later operations so deletions don't
   // pose any problems
-  this.next_layer_id = 1; 
+  this.next_channel_id = 1; 
 
   this.rendering = false;
   this.timer = null;
 }
 
-// Add layer to the mix
-Mixer.prototype.add_layer = function(name, source) {
+// Add channel to the mix
+Mixer.prototype.add_channel = function(name, source) {
   // Assign a globally sequential id for later operations
-  var layer_id = this.next_layer_id;
-  this.next_layer_id++;
-  // Create a new layer and add it to the list
-  var layer = new Layer(layer_id, name, source);
-  this.layers.push(layer);
-  return layer;
+  var channel_id = this.next_channel_id;
+  this.next_channel_id++;
+  // Create a new channel and add it to the list
+  var channel = new Channel(channel_id, name, source);
+  this.channels.push(channel);
+  return channel;
 };
 
-// Remove layer from the mix
-Mixer.prototype.remove_layer = function(layer_id) {
-  var index = this.layer_zindex(layer_id);
+// Remove channel from the mix
+Mixer.prototype.remove_channel = function(channel_id) {
+  var index = this.channel_zindex(channel_id);
   if (index != null) {
     // Remove it
-    this.layers.splice(index, 1);
+    this.channels.splice(index, 1);
 
-    // If this was the last layer, turn off lights
-    if (this.layers.length == 0) {
+    // If this was the last channel, turn off lights
+    if (this.channels.length == 0) {
       this.grid.off();
     }
   }
 };
 
-// Find layer based on id
-Mixer.prototype.find_layer = function(layer_id) {
-  for (var i = 0; i < this.layers.length; i++) {
-    if (this.layers[i].id == layer_id) {
-      return this.layers[i];
+// Find channel based on id
+Mixer.prototype.find_channel = function(channel_id) {
+  for (var i = 0; i < this.channels.length; i++) {
+    if (this.channels[i].id == channel_id) {
+      return this.channels[i];
     }
   }
   return null;
 };
 
-// Find layer index based on id
-Mixer.prototype.layer_zindex = function(layer_id) {
-  for (var i = 0; i < this.layers.length; i++) {
-    if (this.layers[i].id == layer_id) {
+// Find channel index based on id
+Mixer.prototype.channel_zindex = function(channel_id) {
+  for (var i = 0; i < this.channels.length; i++) {
+    if (this.channels[i].id == channel_id) {
       return i;
     }
   }
   return null;
 };
 
-// Remove all layers
-Mixer.prototype.clear_layers = function() {
-  this.layers = [];
+// Remove all channels
+Mixer.prototype.clear_channels = function() {
+  this.channels = [];
 };
 
 // Core mixer routine
@@ -87,11 +87,11 @@ Mixer.prototype.stop = function() {
 //   // Lock to make sure this doesn't get called again until we're done
 //   this.rendering = true;
 
-//   // Loop through layers and have them render themselves
+//   // Loop through channels and have them render themselves
 //   var grid_changed = false;
-//   for (var i = 0; i < this.layers.length; i++) {
-//     var layer_changed = this.layers[i].render();
-//     grid_changed = grid_changed || layer_changed;
+//   for (var i = 0; i < this.channels.length; i++) {
+//     var channel_changed = this.channels[i].render();
+//     grid_changed = grid_changed || channel_changed;
 //   }
 
 //   // Blast updates to strip
@@ -105,8 +105,8 @@ Mixer.prototype.stop = function() {
 
 Mixer.prototype.toJson = function() {
   var json = [];
-  for (var i = 0; i < this.layers.length; i++) {
-    json.push(this.layers[i].toJson());
+  for (var i = 0; i < this.channels.length; i++) {
+    json.push(this.channels[i].toJson());
   }
   return json;
 };
@@ -117,19 +117,19 @@ Mixer.prototype.render = function() {
   // Lock to make sure this doesn't get called again until we're done
   this.rendering = true;
 
-  // Loop through layers and have them render themselves
+  // Loop through channels and have them render themselves
   var grid_changed = false;
 
   var mixed_pixels = [];
 
-  // if(this.layers[0]) console.log(this.layers[0].source.grid.pixels);
+  // if(this.channels[0]) console.log(this.channels[0].source.grid.pixels);
 
-  for (var i = 0; i < this.layers.length; i++) {
+  for (var i = 0; i < this.channels.length; i++) {
     //Renders a frame.
-    this.layers[i].render();
+    this.channels[i].render();
     //Bufferland
-    if(i == 0) mixed_pixels = this.layers[i].display('array')
-    if(i > 0) mixed_pixels = this.blend(this.layers[i].display('array'), mixed_pixels);
+    if(i == 0) mixed_pixels = this.channels[i].display('array')
+    if(i > 0) mixed_pixels = this.blend(this.channels[i].display('array'), mixed_pixels);
 
   }
 
@@ -147,7 +147,7 @@ Mixer.prototype.render = function() {
   this.rendering = false;
 };
 
-Mixer.prototype.filters = function( layers ){
+Mixer.prototype.filters = function( channels ){
 
 }
 

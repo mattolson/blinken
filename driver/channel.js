@@ -1,23 +1,23 @@
-// Layer is a container for a single source (for now)
+// Channel is a container for a single source (for now)
 // and gets registered with the mixer for rendering.
-function Layer(id, name, source) {
+function Channel(id, name, source) {
   this.id = id;
   this.name = name;
   this.source = source;
   this.filters = new Array();
   // this.buffer = new Buffer(Config.grid.num_pixels_x * Config.grid.num_pixels_y * 3)
-  console.log("layer object");
+  console.log("channel object");
   console.log(this);
   console.log("------");
 }
 
-// For now, rendering a layer simply means rendering the source
-Layer.prototype.render = function() {
+// For now, rendering a channel simply means rendering the source
+Channel.prototype.render = function() {
   var source_output = this.source.render();
   return (source_output) ? this.apply_filters( this.source.getBuffer() ) : source_output;
 };
 
-Layer.prototype.apply_filters = function( output ){
+Channel.prototype.apply_filters = function( output ){
   if(!this.filters.length) return output;
   for(filter in this.filters) {
     output = filter.render( output );
@@ -26,7 +26,7 @@ Layer.prototype.apply_filters = function( output ){
 }
 
 // Update based on PUT request
-Layer.prototype.update = function(data) {
+Channel.prototype.update = function(data) {
   if ('name' in data) {
     this.name = data.name;
   }
@@ -36,12 +36,12 @@ Layer.prototype.update = function(data) {
   }
 };
 
-Layer.prototype.display = function(){
+Channel.prototype.display = function(){
    return this.source.grid.pixels;
 }
 
-Layer.prototype.toJson = function() {
-  console.log('Layer Source Options->')
+Channel.prototype.toJson = function() {
+  console.log('Channel Source Options->')
   // console.dir(this.source.toJson());
   return {
     'id': this.id,
@@ -51,4 +51,4 @@ Layer.prototype.toJson = function() {
 };
 
 // Export constructor directly
-module.exports = Layer;
+module.exports = Channel;
