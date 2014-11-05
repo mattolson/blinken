@@ -19,7 +19,6 @@ Mixer.prototype.add_layer = function(name, source) {
   // Assign a globally sequential id for later operations
   var layer_id = this.next_layer_id;
   this.next_layer_id++;
-
   // Create a new layer and add it to the list
   var layer = new Layer(layer_id, name, source);
   this.layers.push(layer);
@@ -126,9 +125,12 @@ Mixer.prototype.render = function() {
   // if(this.layers[0]) console.log(this.layers[0].source.grid.pixels);
 
   for (var i = 0; i < this.layers.length; i++) {
+    //Renders a frame.
     this.layers[i].render();
+    //Bufferland
     if(i == 0) mixed_pixels = this.layers[i].display('array')
     if(i > 0) mixed_pixels = this.blend(this.layers[i].display('array'), mixed_pixels);
+
   }
 
   // console.log('mixed pixels');
@@ -145,6 +147,10 @@ Mixer.prototype.render = function() {
   this.rendering = false;
 };
 
+Mixer.prototype.filters = function( layers ){
+
+}
+
 //Default: "Average" or "Difference"
 Mixer.prototype.blend = function(current, previous){
 
@@ -152,7 +158,6 @@ Mixer.prototype.blend = function(current, previous){
   for(var i = 0; i < (2880*3); i++) {
       result[i] = ((current[i] + previous[i]) <= 255) ? current[i] + previous[i] : 255;
   }
-  console.log(result);
   return result;
 }
 
