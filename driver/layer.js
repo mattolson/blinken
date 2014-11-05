@@ -4,6 +4,10 @@ function Layer(id, name, source) {
   this.id = id;
   this.name = name;
   this.source = source;
+  // this.buffer = new Buffer(Config.grid.num_pixels_x * Config.grid.num_pixels_y * 3)
+  console.log("layer object");
+  console.log(this);
+  console.log("------");
 }
 
 // For now, rendering a layer simply means rendering the source
@@ -21,6 +25,10 @@ Layer.prototype.update = function(data) {
     this.source.update_options(data.source.options);
   }
 };
+
+Layer.prototype.display = function(mode){
+   return this.source.grid.pixels;
+}
 
 Layer.prototype.toJson = function() {
   console.log('Layer Source Options->')
