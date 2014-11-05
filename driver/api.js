@@ -62,68 +62,68 @@ api.source.list =  function() {
 
 //**************************************
 //
-//              Layers
+//              Channels
 //
 //**************************************
 
-api.layer = new Object();
+api.channel = new Object();
 
-api.layer.list = function() {
+api.channel.list = function() {
     return mixer.toJson();
 };
 
-// POST /layers
+// POST /channels
 // expects request body to contain the following:
 // source[name]
 // source[options][...]
-api.layer.create = function(layer_name, source_name, source_options) {
+api.channel.create = function(channel_name, source_name, source_options) {
 
   // Lookup source
   var source = sources.find( source_name );
   if (source == null) return { error : util.format("ERROR: source not found: '%s'", source_name) };
 
-  // Add layer and return its json representation
-  var layer = mixer.add_layer(layer_name, new source(new Grid(), source_options));
-  return layer.toJson();
+  // Add channel and return its json representation
+  var channel = mixer.add_channel(channel_name, new source(new Grid(), source_options));
+  return channel.toJson();
 
 };
 
-api.layer.addFilter = function( layer_id, filter_name, filter_options ){
+api.channel.addFilter = function( channel_id, filter_name, filter_options ){
   // Lookup source
   var filter = filters.find( filter);
   if (filter == null) return { error : util.format("ERROR: filter not found: '%s'", source_name) };
 
-  // Add layer and return its json representation
-  // mixer.add_layer(layer_name, new filter(layer, layer_options));
-  // return layer.toJson();
+  // Add channel and return its json representation
+  // mixer.add_channel(channel_name, new filter(channel, channel_options));
+  // return channel.toJson();
 }
 
-// GET /layers/:id
-api.layer.get = function(layer_id) {
-  // Look up layer
-  var layer = mixer.find_layer(layer_id);
-  if (layer == null) return { error : util.format("ERROR: layer 'id' not found: '%d'", request.params.id) };
+// GET /channels/:id
+api.channel.get = function(channel_id) {
+  // Look up channel
+  var channel = mixer.find_channel(channel_id);
+  if (channel == null) return { error : util.format("ERROR: channel 'id' not found: '%d'", request.params.id) };
   // Return json representation
-  return layer.toJson();
+  return channel.toJson();
 };
 
-// PUT /layers/:id
-api.layer.update = function(layer_id, layer_options) {
-  // Look up layer
-  var layer = mixer.find_layer(layer_id);
-  if (layer == null) return { error : util.format("ERROR: layer not found: '%d'", layer_id) }
-  // Update layer
-  layer.update(layer_options);
-  // console.log(layer_options);
+// PUT /channels/:id
+api.channel.update = function(channel_id, channel_options) {
+  // Look up channel
+  var channel = mixer.find_channel(channel_id);
+  if (channel == null) return { error : util.format("ERROR: channel not found: '%d'", channel_id) }
+  // Update channel
+  channel.update(channel_options);
+  // console.log(channel_options);
   return true;
 
 };
 
-  // DELETE /layers/:id
-api.layer.destroy = function(layer_id) {
+  // DELETE /channels/:id
+api.channel.destroy = function(channel_id) {
 
-  mixer.remove_layer(layer_id);
-  return layer_id;
+  mixer.remove_channel(channel_id);
+  return channel_id;
 
 }
 
@@ -198,8 +198,8 @@ exports.registerSocketHandlers = function() {
   io.on('connection', function (socket) {
 
     function refresh_clients(){
-      socket.emit('refresh layers', api.layer.list() );
-      socket.broadcast.emit('refresh layers', api.layer.list() );
+      socket.emit('refresh channels', api.channel.list() );
+      socket.broadcast.emit('refresh channels', api.channel.list() );
     }
 
     console.log('User connected.');
@@ -215,35 +215,35 @@ exports.registerSocketHandlers = function() {
     socket.on('list sources', function(){ var result = api.source.list(); socket.emit('refresh sources', result) });
     // socket.on('add remote source', websocket.source.addRemoteSource);
 
-    // Layer
-    socket.on('list layers', function(){ 
-      var result = api.layer.list(); 
-      socket.emit('refresh layers', result) 
+    // Channel
+    socket.on('list channels', function(){ 
+      var result = api.channel.list(); 
+      socket.emit('refresh channels', result) 
     });
-    socket.on('create layer', function(layer_name, source_name, source_options){ 
-      var result = api.layer.create(layer_name, source_name, source_options); 
+    socket.on('create channel', function(channel_name, source_name, source_options){ 
+      var result = api.channel.create(channel_name, source_name, source_options); 
       console.log(result);
-      (!result.error) ? socket.emit('layer created', result) : socket.emit('error', result.error );
+      (!result.error) ? socket.emit('channel created', result) : socket.emit('error', result.error );
       if(result.error) console.log('Error: '+result.error);
       refresh_clients();
     });
-    socket.on('update layer', function(layer_id, layer_options) { 
-      var result = api.layer.update(layer_id, layer_options); 
-      (!result.error) ? socket.emit('layer updated', result ) : socket.emit('error', result.error );
+    socket.on('update channel', function(channel_id, channel_options) { 
+      var result = api.channel.update(channel_id, channel_options); 
+      (!result.error) ? socket.emit('channel updated', result ) : socket.emit('error', result.error );
       if(result.error) console.log('Error: '+result.error);
       refresh_clients();
     });
-    socket.on('destroy layer', function(layer_id) { 
-      var result = api.layer.destroy(layer_id);
-      (!result.error) ? socket.emit('layer destroyed', result ) : socket.emit('error', result.error );
+    socket.on('destroy channel', function(channel_id) { 
+      var result = api.channel.destroy(channel_id);
+      (!result.error) ? socket.emit('channel destroyed', result ) : socket.emit('error', result.error );
       if(result.error) console.log('Error: '+result.error);
       refresh_clients();
     });
-    socket.on('get layer', function(layer_name) { 
-      var result = api.layer.get(layer_name); 
-      return (!result.error) ? socket.emit('layer result', result ) : socket.emit('error', result.error );
+    socket.on('get channel', function(channel_name) { 
+      var result = api.channel.get(channel_name); 
+      return (!result.error) ? socket.emit('channel result', result ) : socket.emit('error', result.error );
     });
-    // socket.on('layer:destroyAll'), websocket.layer.destroyAll();
+    // socket.on('channel:destroyAll'), websocket.channel.destroyAll();
 
     //Grid
     socket.on('set grid', function(color_grid, mode, strict){ return api.grid.set(color_grid, mode, strict); } );
@@ -255,7 +255,7 @@ exports.registerSocketHandlers = function() {
     socket.on('get grid dimensions', function(){ socket.emit("grid dimensions", api.grid.dimensions() ) });
 
    socket.on("off", function(data) {
-      mixer.clear_layers();
+      mixer.clear_channels();
       grid.off();
       io.emit("update", grid.toJson());
     });
@@ -278,43 +278,43 @@ exports.registerHttpHandlers = function(app) {
     response.jsonp(result);
   });
 
-  // Layers
-  app.get('/mixer/layers', function(request, response){  
-    var result = api.layer.list();
+  // Channels
+  app.get('/mixer/channels', function(request, response){  
+    var result = api.channel.list();
     request.jsonp(result);
   });
-  app.post('/mixer/layers', function(request, response){  
+  app.post('/mixer/channels', function(request, response){  
 
-    var layer_name = request.body.name;
+    var channel_name = request.body.name;
     var source_name = request.body.source.name;
     var source_options = request.body.source.options;
 
-    var result = api.layer.create(layer_name, source_name, source_options);
+    var result = api.channel.create(channel_name, source_name, source_options);
 
     if(!result.error)  response.status(201).jsonp(result);
     else response.status(400).jsonp(errorResponse(400, result.error));
 
   });
-  app.get('/mixer/layers/:id', function(request, response){
-    var result = api.layer.get(request.params.id);
+  app.get('/mixer/channels/:id', function(request, response){
+    var result = api.channel.get(request.params.id);
     if(!result.error) response.status(201).jsonp(result);
     else jsonp(errorResponse(404, result.error));
   });
-  app.put('/mixer/layers/:id', function(request, response){
+  app.put('/mixer/channels/:id', function(request, response){
     
-    var layer_id = request.params.id;
-    var layer_options = request.body;
+    var channel_id = request.params.id;
+    var channel_options = request.body;
 
-    var result = api.layer.update(layer_id, layer_options);
+    var result = api.channel.update(channel_id, channel_options);
 
     if(!result.error) response.send(204);
     else response.status(404).jsonp(errorResponse(404, result.error));
 
   });
-  app.delete('/mixer/layers/:id', function(request, response){
+  app.delete('/mixer/channels/:id', function(request, response){
 
-    var layer_id = request.params.id;
-    api.layer.destroy(layer_id);
+    var channel_id = request.params.id;
+    api.channel.destroy(channel_id);
     response.send(204);
 
   });
