@@ -188,7 +188,7 @@ Grid.prototype.toJson = function() {
 // Clear pixel data
 Grid.prototype.clear = function() {
   this.pixels.fill(0);
-};
+}; 
 
 // A faster way of doing setGridColor([0,0,0])
 Grid.prototype.off = function() {

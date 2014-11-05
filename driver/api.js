@@ -21,6 +21,8 @@ var sources = require('./source_registry');
 
 var api = new Object();
 
+var config = require('./config')
+
 //**************************************
 //
 //              Errors
@@ -131,10 +133,14 @@ api.grid.set = function(color_grid, mode, strict){
 
 api.grid.dimensions = function() {
   return {
-    width : grid.number_pixels_x,
-    height : grid.number_pixels_y
+    width : config.grid.num_panels_x*config.grid.num_pixels_per_panel_x,
+    height : config.grid.num_panels_y*config.grid.num_pixels_per_panel_y
   }
 };
+
+api.grid.html = function(){
+  
+}
 
 api.grid.map = function() {
   return grid.pixel_map;
@@ -163,7 +169,8 @@ exports.registerSocketHandlers = function() {
       console.log('User disconnected');
     });
 
-    // socket.emit("message", "Welcome!");
+    //Send new user Grid Dimensions.
+    socket.emit("grid dimensions", api.grid.dimensions());
 
     // Sources
     socket.on('list sources', function(){ var result = api.source.list(); socket.emit('refresh sources', result) });
@@ -204,7 +211,7 @@ exports.registerSocketHandlers = function() {
     socket.on('get grid meta', function(){ return api.grid.getMeta(); } );
     socket.on('get xy', function(x, y){ return api.grid.getxy(x, y); });
     socket.on('get grid map', function(){ return api.grid.map(); } );
-    socket.on('get grid dimensions', function(){ return api.grid.dimensions(); } );
+    socket.on('get grid dimensions', function(){ socket.emit("grid dimensions", api.grid.dimensions() ) });
 
     socket.on("update led", function(data) {
       // Validate input values
@@ -231,6 +238,10 @@ exports.registerSocketHandlers = function() {
       grid.off();
       io.emit("update", grid.toJson());
     });
+
+    setInterval(function(){
+      io.sockets.emit("refresh grid", api.grid.get() );
+    }, 4000);
 
   });
 
