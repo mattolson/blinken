@@ -9,16 +9,17 @@ var util = require('util');
 var Grid = require('./grid');
 var grid = new Grid();
 
-
-
 // Setup mixer and set rendering loop in motion
 var Mixer = require('./mixer');
 var mixer = new Mixer(grid);
 mixer.run();
 
 // Get source registry (this loads sources themselves as well)
-var sources = require('./source_registry');
-
+var Registry = require('./registry');
+// console.log(registry);
+var sources = new Registry( 'sources' );
+var filters = new Registry( 'filters' );
+// console.log(sources);
 var api = new Object();
 
 var config = require('./config')
@@ -47,8 +48,17 @@ function errorResponse(code, description) {
 
 api.source =  new Object();
 api.source.list =  function() {
-  return sources.toJson();
+  console.log(sources.toJson('sources'));
+  return sources.toJson('sources');
 }
+
+//**************************************
+//
+//              Filters
+//
+//**************************************
+
+//todo.
 
 //**************************************
 //
@@ -69,7 +79,7 @@ api.layer.list = function() {
 api.layer.create = function(layer_name, source_name, source_options) {
 
   // Lookup source
-  var source = sources.find(source_name);
+  var source = sources.find( source_name );
   if (source == null) return { error : util.format("ERROR: source not found: '%s'", source_name) };
 
   // Add layer and return its json representation
@@ -77,6 +87,16 @@ api.layer.create = function(layer_name, source_name, source_options) {
   return layer.toJson();
 
 };
+
+api.layer.addFilter = function( layer_id, filter_name, filter_options ){
+  // Lookup source
+  var filter = filters.find( filter);
+  if (filter == null) return { error : util.format("ERROR: filter not found: '%s'", source_name) };
+
+  // Add layer and return its json representation
+  // mixer.add_layer(layer_name, new filter(layer, layer_options));
+  // return layer.toJson();
+}
 
 // GET /layers/:id
 api.layer.get = function(layer_id) {
@@ -202,6 +222,7 @@ exports.registerSocketHandlers = function() {
     });
     socket.on('create layer', function(layer_name, source_name, source_options){ 
       var result = api.layer.create(layer_name, source_name, source_options); 
+      console.log(result);
       (!result.error) ? socket.emit('layer created', result) : socket.emit('error', result.error );
       if(result.error) console.log('Error: '+result.error);
       refresh_clients();
