@@ -16,6 +16,9 @@ function ColorWheel(grid, options)
   ColorWheel.super_.call(this, NAME, grid, options);
 
   this.current_color = 0;
+  console.log("source object");
+  console.log(this);
+  console.log("------");
 }
 
 // Set up inheritance from Source

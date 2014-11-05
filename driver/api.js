@@ -73,7 +73,7 @@ api.layer.create = function(layer_name, source_name, source_options) {
   if (source == null) return { error : util.format("ERROR: source not found: '%s'", source_name) };
 
   // Add layer and return its json representation
-  var layer = mixer.add_layer(layer_name, new source(grid, source_options));
+  var layer = mixer.add_layer(layer_name, new source(new Grid(), source_options));
   return layer.toJson();
 
 };

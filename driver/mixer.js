@@ -84,25 +84,25 @@ Mixer.prototype.stop = function() {
   this.timer = null;
 };
 
-Mixer.prototype.render = function() {
-  // Lock to make sure this doesn't get called again until we're done
-  this.rendering = true;
+// Mixer.prototype.render = function() {
+//   // Lock to make sure this doesn't get called again until we're done
+//   this.rendering = true;
 
-  // Loop through layers and have them render themselves
-  var grid_changed = false;
-  for (var i = 0; i < this.layers.length; i++) {
-    var layer_changed = this.layers[i].render();
-    grid_changed = grid_changed || layer_changed;
-  }
+//   // Loop through layers and have them render themselves
+//   var grid_changed = false;
+//   for (var i = 0; i < this.layers.length; i++) {
+//     var layer_changed = this.layers[i].render();
+//     grid_changed = grid_changed || layer_changed;
+//   }
 
-  // Blast updates to strip
-  if (grid_changed) {
-    this.grid.sync();
-  }
+//   // Blast updates to strip
+//   if (grid_changed) {
+//     this.grid.sync();
+//   }
 
-  // Remove lock
-  this.rendering = false;
-};
+//   // Remove lock
+//   this.rendering = false;
+// };
 
 Mixer.prototype.toJson = function() {
   var json = [];
@@ -112,48 +112,49 @@ Mixer.prototype.toJson = function() {
   return json;
 };
 
+
+// Attempt at real mixer.
+Mixer.prototype.render = function() {
+  // Lock to make sure this doesn't get called again until we're done
+  this.rendering = true;
+
+  // Loop through layers and have them render themselves
+  var grid_changed = false;
+
+  var mixed_pixels = [];
+
+  // if(this.layers[0]) console.log(this.layers[0].source.grid.pixels);
+
+  for (var i = 0; i < this.layers.length; i++) {
+    this.layers[i].render();
+    if(i == 0) mixed_pixels = this.layers[i].display('array')
+    if(i > 0) mixed_pixels = this.blend(this.layers[i].display('array'), mixed_pixels);
+  }
+
+  // console.log('mixed pixels');
+  // console.log(mixed_pixels)
+
+  this.grid.pixels = mixed_pixels;
+
+  // Blast updates to strip
+  // if (grid_changed) {
+  this.grid.sync();
+  // }
+
+  // Remove lock
+  this.rendering = false;
+};
+
+//Default: "Average" or "Difference"
+Mixer.prototype.blend = function(current, previous){
+
+  var result = [];
+  for(var i = 0; i < (2880*3); i++) {
+      result[i] = ((current[i] + previous[i]) <= 255) ? current[i] + previous[i] : 255;
+  }
+  console.log(result);
+  return result;
+}
+
 // Export constructor directly
 module.exports = Mixer;
-
-//Attempt at real mixer.
-// Mixer.prototype.render = function() {
-//   // Lock to make sure this doesn't get called again until we're done
-//   this.rendering = true;
-
-//   // Loop through layers and have them render themselves
-//   var grid_changed = false;
-
-//   var raw_values = new Array(this.layers.length);
-//   var processed_values = [];
-
-//   for (var i = 0; i < this.layers.length; i++) {
-//     raw_values[i] = this.layers[i].render();
-//     // var layer_changed = this.layers[i].render();
-//     // grid_changed = grid_changed || layer_changed;
-//   }
-//   for (var i = 0; i < this.layers.length; i++) {
-//     if(i == 0) continue;
-//     if(i == 1) processed_values = this.blend(raw_values[i], raw_values[i-1]);
-//     if(i > 1) {
-//       processed_values = this.blend(raw_values[i], processed_values);
-//     }
-//   }
-
-//   this.grid.pixels = processed_values;
-
-//   // Blast updates to strip
-//   // if (grid_changed) {
-//     this.grid.sync();
-//   // }
-
-//   // Remove lock
-//   this.rendering = false;
-// };
-
-// Mixer.prototype.blend = function(current, previous){
-//   var result = [];
-//   for(var i = 0; i < current.length; i++) {
-//       result[i] = (current[i] + previous[i]) / 2;
-//   }
-//   return result;
-// }
