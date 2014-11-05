@@ -4,6 +4,7 @@ function Layer(id, name, source) {
   this.id = id;
   this.name = name;
   this.source = source;
+  this.filters = new Array();
   // this.buffer = new Buffer(Config.grid.num_pixels_x * Config.grid.num_pixels_y * 3)
   console.log("layer object");
   console.log(this);
@@ -12,8 +13,17 @@ function Layer(id, name, source) {
 
 // For now, rendering a layer simply means rendering the source
 Layer.prototype.render = function() {
-  return this.source.render();
+  var source_output = this.source.render();
+  return (source_output) ? this.apply_filters( this.source.getBuffer() ) : source_output;
 };
+
+Layer.prototype.apply_filters = function( output ){
+  if(!this.filters.length) return output;
+  for(filter in this.filters) {
+    output = filter.render( output );
+  }
+  return output;
+}
 
 // Update based on PUT request
 Layer.prototype.update = function(data) {
@@ -26,7 +36,7 @@ Layer.prototype.update = function(data) {
   }
 };
 
-Layer.prototype.display = function(mode){
+Layer.prototype.display = function(){
    return this.source.grid.pixels;
 }
 
