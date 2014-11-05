@@ -7,14 +7,16 @@ var validation = require('./validation');
 //   period = number of milliseconds between steps
 function Source(name, grid, opts) {
   opts = opts || {};
-
   this.name = name;
   this.grid = grid;
   this.started_at = 0; // when did this effect first begin?
   this.rendered_at = 0; // when was the last time we rendered a step?
   this.active = true; // source can opt-out of future rendering cycles
-
   this.options = this.validate_options(opts, true);
+}
+
+Source.prototype.getBuffer = function(){
+  return this.grid.pixels;
 }
 
 Source.prototype.render = function() {
