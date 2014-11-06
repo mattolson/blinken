@@ -94,6 +94,8 @@ Source.prototype.validate_options = function(new_options, use_defaults) {
           break;
         case 'select':
           break;
+        case 'file':
+          break;
       }
 
       // Apply new value to self

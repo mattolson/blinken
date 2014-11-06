@@ -1,10 +1,9 @@
 // The grid object maps the 2D logical space to the 1D physical space
 // and handles device operations
 var Config = require('./config');
-//var spi = require('spi');
-var spi = 0;
 
 function Grid() {
+
   // Store dimensions for later
   this.num_panels_x = Config.grid.num_panels_x;
   this.num_panels_y = Config.grid.num_panels_y;
@@ -58,16 +57,12 @@ function Grid() {
     }
   }
 
-  // Instantiate SPI device
-  if (spi) {
-	  this.device = new spi.Spi(Config.device.name, {
-		"mode": spi.MODE[Config.device.spi_mode],
-		"chipSelect": spi.CS[Config.device.spi_chip_select],
-		"maxSpeed": Config.device.max_speed
-	  }, function(d) { d.open(); });
-	}
-  // Clear the display
   this.off();
+
+  this.display = require('./output');
+  this.display.setup();
+  
+
 }
 
 Grid.prototype.getStrandIndex = function(x, y) {
@@ -199,8 +194,8 @@ Grid.prototype.off = function() {
 // Write to device
 Grid.prototype.sync = function() {
   // Blast out updates
-  if (this.device) {
-	this.device.write(this.pixels);
+  if (this.display) {
+	 this.display.writeLogicalArray(this.pixels);
   }
 
   // Notify listeners

@@ -1,10 +1,14 @@
 var Channel = require('./channel');
+var Fps = require('./fps');
+//Display Output
 
 // This object encapsulates a list of sources and renders them
 // on a timer.
 function Mixer(grid) {
   this.grid = grid;
   this.channels = [];
+  this.fps = Fps;
+
 
   // we keep a sequential id for later operations so deletions don't
   // pose any problems
@@ -73,7 +77,7 @@ Mixer.prototype.run = function() {
   var mixer = this;
   this.timer = setInterval(function() { 
     if (!mixer.rendering) {
-      mixer.render(); 
+      mixer.render();
     }
   }, 1);
 };
@@ -123,25 +127,23 @@ Mixer.prototype.render = function() {
   var mixed_pixels = [];
 
   // if(this.channels[0]) console.log(this.channels[0].source.grid.pixels);
-
+  var rendered;
   for (var i = 0; i < this.channels.length; i++) {
     //Renders a frame.
-    this.channels[i].render();
+    rendered = this.channels[i].render();
     //Bufferland
     if(i == 0) mixed_pixels = this.channels[i].display('array')
     if(i > 0) mixed_pixels = this.blend(this.channels[i].display('array'), mixed_pixels);
-
   }
-
-  // console.log('mixed pixels');
-  // console.log(mixed_pixels)
 
   this.grid.pixels = mixed_pixels;
 
   // Blast updates to strip
-  // if (grid_changed) {
-  this.grid.sync();
-  // }
+  if (rendered) {
+    // console.log('!!! SENT !!!! @ '+this.fps.get()+' fps');
+    this.grid.sync();
+    this.fps.frame();
+  }
 
   // Remove lock
   this.rendering = false;
@@ -159,6 +161,7 @@ Mixer.prototype.blend = function(current, previous){
       result[i] = ((current[i] + previous[i]) <= 255) ? current[i] + previous[i] : 255;
   }
   return result;
+
 }
 
 // Export constructor directly

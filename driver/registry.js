@@ -16,6 +16,7 @@ function Registry( type ) {
   
   var dir = path.resolve(__dirname, this.type);
   require("fs").readdirSync(dir).forEach(function(file) {
+    if(file == '.DS_Store') return;
     var module = require(dir + "/" + file);
     registry[registry.type][module.name] = module.constructor;
     // console.log(registry[registry.type][module.name]);

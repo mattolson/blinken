@@ -48,7 +48,7 @@ function errorResponse(code, description) {
 
 api.source =  new Object();
 api.source.list =  function() {
-  console.log(sources.toJson('sources'));
+  // console.log(sources.toJson('sources'));
   return sources.toJson('sources');
 }
 
@@ -222,7 +222,7 @@ exports.registerSocketHandlers = function() {
     });
     socket.on('create channel', function(channel_name, source_name, source_options){ 
       var result = api.channel.create(channel_name, source_name, source_options); 
-      console.log(result);
+      // console.log(result);
       (!result.error) ? socket.emit('channel created', result) : socket.emit('error', result.error );
       if(result.error) console.log('Error: '+result.error);
       refresh_clients();
@@ -247,7 +247,7 @@ exports.registerSocketHandlers = function() {
 
     //Grid
     socket.on('set grid', function(color_grid, mode, strict){ return api.grid.set(color_grid, mode, strict); } );
-    socket.on('get grid', function(){ return api.grid.get(); } );
+    socket.on('get grid', function(){ socket.emit("refresh grid", api.grid.get())});
     socket.on('get grid meta', function(){ return api.grid.getMeta(); } );
     socket.on('get xy', function(x, y){ return api.grid.getxy(x, y); });
     socket.on('get grid html', function(){ socket.emit("grid html", api.grid.html()) });
@@ -260,9 +260,11 @@ exports.registerSocketHandlers = function() {
       io.emit("update", grid.toJson());
     });
 
-    setInterval(function(){
-      io.sockets.emit("refresh grid", api.grid.get() );
-    }, 2000);
+   refresh_clients();
+
+    // setInterval(function(){
+    //   if( mixer.fps.get() > 0) io.sockets.emit("refresh grid", api.grid.get() );
+    // }, 5000);
 
   });
 
