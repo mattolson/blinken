@@ -13,8 +13,9 @@ function Channel(id, name, source) {
 
 // For now, rendering a channel simply means rendering the source
 Channel.prototype.render = function() {
-  var source_output = this.source.render();
-  return (source_output) ? this.apply_filters( this.source.getBuffer() ) : source_output;
+  // var source_output = this.source.render();
+  // return (source_output) ? this.apply_filters( this.source.getBuffer() ) : source_output;
+  return this.source.render();
 };
 
 Channel.prototype.apply_filters = function( output ){
