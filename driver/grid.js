@@ -4,6 +4,10 @@ var Config = require('./config');
 
 function Grid() {
 
+  this.display = require('./output');
+  this.display.setup();
+  this.pixel_map = this.display.getMap(); //Meta.
+
   // Store dimensions for later
   this.num_panels_x = Config.grid.num_panels_x;
   this.num_panels_y = Config.grid.num_panels_y;
@@ -16,61 +20,21 @@ function Grid() {
   this.num_pixels = this.num_pixels_x * this.num_pixels_y;
 
   // Setup data structures for pixels
-  this.pixel_map = new Array(this.num_pixels_x * this.num_pixels_y); // Maps logical index to strand index
+  // this.pixel_map = new Array(this.num_pixels_x * this.num_pixels_y); // Maps logical index to strand index
   this.pixels = new Buffer(this.num_pixels_x * this.num_pixels_y * 3); // 3 octets per pixel, stores color values
 
   // Setup list of listeners
   this.listeners = [];
 
-  // Instantiate pixels. Loop through in logical order, and then
-  // calculate the strand index.
-  var i, j, k, l, x, y, panel_index, strand_index;
-  panel_index = strand_index = x = y = 0;
-  for (i = 0; i < this.num_panels_x; i++) {
-    for (j = 0; j < this.num_panels_y; j++) {
-      for (k = 0; k < this.num_pixels_per_panel_x; k++) {
-        for (l = 0; l < this.num_pixels_per_panel_y; l++) {
-          // Figure out where we are in the logical grid.
-          x = (i * this.num_pixels_per_panel_x) + k;
-          y = (j * this.num_pixels_per_panel_y) + l;
-
-          // Figure out where we are in the strand. See the wiring diagrams
-          // in the docs folder for details on the wiring layout. We start by
-          // figuring out for the given position how many panels came before us.
-          panel_index = (i*this.num_panels_y);
-          panel_index += (i % 2 == 0) ? Math.floor(y / this.num_pixels_per_panel_y) : Math.floor((this.num_pixels_y - y - 1) / this.num_pixels_per_panel_y);
-          strand_index = panel_index * this.num_pixels_per_panel_x * this.num_pixels_per_panel_y;
-
-          // Now just worry about the index within the current panel. Note that the
-          // wiring is reversed on odd-numbered columns.
-          if (i % 2 == 0) {
-            strand_index += (l * this.num_pixels_per_panel_x);
-            strand_index += (l % 2 == 1) ? k : (this.num_pixels_per_panel_x - k - 1);
-          } else {
-            strand_index += ((this.num_pixels_per_panel_y - l - 1) * this.num_pixels_per_panel_x);
-            strand_index += (l % 2 == 1) ? k : (this.num_pixels_per_panel_x - k - 1);
-          }
-
-          this.pixel_map[(this.num_pixels_x * y) + x] = strand_index;
-        }
-      }
-    }
-  }
-
   this.off();
-
-  this.display = require('./output');
-  this.display.setup();
-  
 
 }
 
-Grid.prototype.getStrandIndex = function(x, y) {
+Grid.prototype.index = function(x, y) {
   if (x < 0 || y < 0 || x >= this.num_pixels_x || y >= this.num_pixels_y) {
     return null;
   }
-
-  return this.pixel_map[(y*this.num_pixels_x)+x];
+  return y * this.num_pixels_x + x;
 };
 
 // Used for iteration, if you want to loop through entire grid
@@ -93,7 +57,7 @@ Grid.prototype.set = function(color_grid, mode, strict){
     case "xy":
       for(var x=0; x<this.num_pixels_x; x++){
         for(var y=0; y<this.num_pixels_y; y++) {
-          var index = this.getStrandIndex(x,y);
+          var index = this.index(x,y);
           if(index != null) {
             this.pixels[index*3] = color_grid[x][y][0];
             this.pixels[(index*3)+1] = color_grid[x][y][1];
@@ -114,7 +78,7 @@ Grid.prototype.set = function(color_grid, mode, strict){
 };
 
 Grid.prototype.setPixelColor = function(x, y, rgb) {
-  var index = this.getStrandIndex(x,y);
+  var index = this.index(x,y);
 
   if (index == null) {
     return;
@@ -157,7 +121,7 @@ Grid.prototype.setGridColor = function(rgb) {
 
 // Retrieve pixel color
 Grid.prototype.getPixelColor = function(x, y) {
-  var index = this.getStrandIndex(x,y);
+  var index = this.index(x,y);
   if (index == null) {
     return null;
   }
