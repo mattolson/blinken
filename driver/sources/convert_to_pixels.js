@@ -48,7 +48,7 @@ ConvertToPixels.prototype.step = function() {
     
     if( this.imageIx < dimensions[0] ) {
       var image = this.curImage.pick(imageIx, null, null, null);
-      this.grid.device.writeImage();
+      this.grid.device.writeImage(image);
       this.imageIx++;
     }
 
@@ -66,6 +66,7 @@ ConvertToPixels.prototype.step = function() {
     }
   }
   return true;
+  
 };
 
 ConvertToPixels.prototype.refresh = function(){
