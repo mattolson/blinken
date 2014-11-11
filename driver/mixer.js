@@ -1,5 +1,5 @@
 var Channel = require('./channel');
-var Fps = require('./fps');
+var Fps = require('./lib/fps');
 //Display Output
 
 // This object encapsulates a list of sources and renders them
@@ -148,10 +148,6 @@ Mixer.prototype.render = function() {
   // Remove lock
   this.rendering = false;
 };
-
-Mixer.prototype.filters = function( channels ){
-
-}
 
 //Default: "Average" or "Difference"
 Mixer.prototype.blend = function(current, previous){
