@@ -1,6 +1,6 @@
 /* jshint bitwise:false */
 
-var artnet = require('./artnet');
+var artnet = require('./lib/artnet-client');
 var config = require('./config');
 
 var WIDTH_PIXELS = 60;
@@ -17,14 +17,7 @@ var callbacks = []; // empty array holds callbacks for ticks, drives animation
 
 function LedCeilingCallback()
 {
-	// we are getting called every tick, so call all the callbacks and then send all the unis
 	var index;
-	
-	// for( index = 0 ; index < callbacks.length ; index++ )
-	// {
-	// 	callbacks[index]();
-	// }
-
 	refresh();
 }
 
@@ -144,8 +137,8 @@ function LedMap(len)
 			// X/Y grid into our leds and have it display  correctly
 
 			var leds = {
-					'uni': uni,
-					'led': led * 3, // we have an array or red, green, blue, red, green, blue, ...
+				'uni': uni,
+				'led': led * 3, // we have an array of red, green, blue ...
 			};
 			
 			ledMap.push(leds);
@@ -157,16 +150,8 @@ function LedMap(len)
 	return ledMap;
 }
 
-function allocData(){
-	var d = [];
-	var x;
-	
-	for( x = 0 ; x < PIXELS_PER_UNI * 3 ; x++)
-	{
-		d.push(0);
-	}
-	
-	return d;
+exports.getMap = function(){
+	return new LedMap(WIDTH_PIXELS * HEIGHT_PIXELS);
 }
 
 var width = exports.width = function(){
@@ -197,32 +182,24 @@ exports.setup = function()
 	
 	// setup the led map now 
 	
-	ledMap = new LedMap(WIDTH_PIXELS * HEIGHT_PIXELS);
+	this.map = new LedMap(WIDTH_PIXELS * HEIGHT_PIXELS);
 	
 	// this is the order of hosts and universes for Idea Fab Labs ceiling
-	
 	for(host = 107 ; host >= 100 ; host--)
 	{
 		hosts.push(artnet.createClient("192.168.1."+host, 6454, 4));
-		uniData.push(allocData());
+		uniData.push(new Array(PIXELS_PER_UNI*3));
 		hosts.push(artnet.createClient("192.168.1."+host, 6454, 1));
-		uniData.push(allocData());
+		uniData.push(new Array(PIXELS_PER_UNI*3));
 		hosts.push(artnet.createClient("192.168.1."+host, 6454, 3));
-		uniData.push(allocData());
+		uniData.push(new Array(PIXELS_PER_UNI*3));
 		hosts.push(artnet.createClient("192.168.1."+host, 6454, 2));
-		uniData.push(allocData());
+		uniData.push(new Array(PIXELS_PER_UNI*3));
 	}
-	
-	// push thier callback on the stack 
-	
-	// if( typeof callback === 'function')
-	// {
-	// 	callbacks.push(callback);
-	// }
-	
-	// clear the leds
-	
 	refresh();
+
+	// console.log(hosts);
+	// console.log(this.map);
 };
 
 exports.setPixel = function(x, y, color)
@@ -278,6 +255,10 @@ exports.writeImage = function(image)
 		}
 	}
 };
+
+exports.relay = function(){
+
+}
 
 exports.writeImageWithOffset = function(image,imgXOff,imgYOff,imgW,imgH,disX,disY)
 {
@@ -404,7 +385,7 @@ exports.writeArray = function(data)
 			
 			var color = data[y * width + x];
 			
-			uniData[ledMap[index].uni][ledMap[index].led] = (data >> 16) & 0xff;
+			uniData[ledMap[index].uni][ledMap[index].led] = (color >> 16) & 0xff;
 			uniData[ledMap[index].uni][ledMap[index].led + 1] = (color >> 8) & 0xff;
 			uniData[ledMap[index].uni][ledMap[index].led + 2] = color & 0xff;
 		}
@@ -438,5 +419,8 @@ exports.writeLogicalArray = function(data)
 	}
 	
 	refresh();
+
+	console.log("Artnet write");
+	console.log(data);
 	
 };
