@@ -18,7 +18,7 @@ mixer.run();
 var Registry = require('./registry');
 // console.log(registry);
 var sources = new Registry( 'sources' );
-var filters = new Registry( 'filters' );
+// var filters = new Registry( 'filters' );
 // console.log(sources);
 var api = new Object();
 
