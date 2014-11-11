@@ -1,5 +1,5 @@
 /* jshint bitwise:false */
-var config = require('./config');
+var config = require('../config');
 /* jshint bitwise:false */
 var dgram = require('dgram');
 var Buffer1 = require('buffer').Buffer;
@@ -22,7 +22,7 @@ function ArtNetClient(host, port, universe) {
 	this._host = host;
 	this._port = port;
 	
-	if (_socket === undefined )
+	if ( _socket === undefined )
 	{
 		_socket = dgram.createSocket("udp4");
 		_socket.bind(myPort++, function(err){
