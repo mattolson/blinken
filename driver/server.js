@@ -3,7 +3,11 @@ var express = require('express');
 var app = express(),
     http = require('http'),
     server = http.createServer(app);
-    io = require('socket.io').listen(server);
+
+//Websockets
+io = require('socket.io').listen(server);
+//Websocket streams
+require('socket.io-stream')(io);
 
 var api = require("./api");
 var Config = require("./config");
@@ -28,7 +32,6 @@ function start() {
   // Register socket handlers
   api.registerSocketHandlers();
  
-
   // Export for later
   exports.app = app;
   exports.io = io;
