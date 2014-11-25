@@ -160,6 +160,7 @@ Grid.prototype.sync = function() {
   // Blast out updates
   if (this.display) {
 	 this.display.writeLogicalArray(this.pixels);
+   // this.display.writeArray(this.pixels);
   }
 
   // Notify listeners

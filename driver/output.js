@@ -182,7 +182,8 @@ exports.setup = function()
 	
 	// setup the led map now 
 	
-	this.map = new LedMap(WIDTH_PIXELS * HEIGHT_PIXELS);
+	// this.map = new LedMap(WIDTH_PIXELS * HEIGHT_PIXELS);
+	ledMap = new LedMap(WIDTH_PIXELS * HEIGHT_PIXELS);
 	
 	// this is the order of hosts and universes for Idea Fab Labs ceiling
 	for(host = 107 ; host >= 100 ; host--)
@@ -400,8 +401,8 @@ exports.writeLogicalArray = function(data)
 {
 	// since this is a simple image 
 	// find out which is larger, the image or our display
-	var myHeight = Math.min(height, HEIGHT_PIXELS);
-	var myWidth = Math.min(width, WIDTH_PIXELS);
+	var myHeight = HEIGHT_PIXELS;
+	var myWidth = WIDTH_PIXELS;
 
 	// for now just start at the top left corner and set pixels
 	var y, x;
@@ -410,7 +411,7 @@ exports.writeLogicalArray = function(data)
 	{
 		for(x = 0 ; x < myWidth ; x++)
 		{
-			var index = (y * WIDTH_PIXELS) + x;
+			var index = (y * myWidth) + x;
 			
 			uniData[ledMap[index].uni][ledMap[index].led] = data[index];
 			uniData[ledMap[index].uni][ledMap[index].led+1] = data[index+1];
@@ -420,7 +421,7 @@ exports.writeLogicalArray = function(data)
 	
 	refresh();
 
-	console.log("Artnet write");
-	console.log(data);
+	//console.log("Artnet write");
+	//console.log(data);
 	
 };

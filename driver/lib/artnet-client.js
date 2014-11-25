@@ -81,7 +81,7 @@ ArtNetClient.prototype.send = function(data) {
 	}
 
 	// don't send if not connected
-	
+
 	if( _connected )
 	{
 		_socket.send(this.dmx, 0, this.dmx.length, this._port, this._host, on_success);
