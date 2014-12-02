@@ -1,3 +1,5 @@
+_alpha 0.2_
+
 # Welcome to Bliken!
 
 Blinken is a channel manager and mixer for a matrix of lights. It was designed for the cieling in Idea Fabrication Labs in Chico, CA for it's 2880 RGB pixel cieling array. It is a basically a channel mixer. Each channel can have a source assigned to it.
@@ -6,7 +8,7 @@ The app is located in /driver with project specific files in /docs
 
 ## What is the point?
 
-The vision is that Bliken would be running in the background at all times, allowing for multiple people to interact, collaborate and display output on the cieling. This would help eliminate fragmentation between separate users. Any user, could utilize as little or as much of the API as they desired. For example, the API could be bypassed with a UDP Passthrough if they want to use Glediator for instance, or if if they wanted to write some native logic, there is an interface for them to do so.
+The vision is that Bliken would be running in the background at all times, allowing for multiple people to interact, collaborate and display output on the cieling. This would help eliminate fragmentation between separate users. Any user, could utilize as little or as much of the API as they desired. A user choose bypass the mixer entirely with a UDP Passthrough on a Channel, if they want to use Glediator for instance, or if if they wanted to write some native logic, there is an plugin system to accomodate the functionality. 
 
 ## Sources? What?
 
@@ -14,11 +16,9 @@ We established everything is a source, but there are different types.
 
 * There are Display Sources (outputs), these return a grid
 * There are Data Sources (inputs), that are json objects containing data from the desired source (internet, sensors, etc)
-* There are Filters, which are similar to Effects, and are similar to Display Sources (outputs), except they require a grid as an input, and must return one as well. Example filters would be Luminosity, Invert Colors and Invert X/Y. 
+* There are Filters, which are similar to Display Sources (outputs), except they require a grid as an input, and must return one as well. Example filters would be Luminosity, Invert Colors and Invert X/Y. Think "effect"
 
-Presently, the only functioning sources are Display Sources, new branch will begin new developments. 
-
-_alpha 0.2_
+Presently, the only functioning sources are Display Sources, new branch will introduce the others. 
 
 # Installation
 
@@ -31,7 +31,7 @@ _alpha 0.2_
 Visit localhost:1337 and you will find the demo interface that utilizes the API. The demo uses websockets in order to fully convey the core concept. 
 
 # API
-
+ter
 The API can be accessed via REST of Websockets for bi-directional communication. There is presently no push API, so presently data sources (source inputs) are not available via REST. 
 
 ## REST
