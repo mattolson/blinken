@@ -8,15 +8,15 @@ The app is located in /driver with project specific files in /docs
 
 ## What is the point?
 
-The vision is that Bliken would be running in the background at all times, allowing for multiple people to interact, collaborate and display output on the cieling. This would help eliminate fragmentation between separate users. Any user, could utilize as little or as much of the API as they desired. A user choose bypass the mixer entirely with a UDP Passthrough on a Channel, if they want to use Glediator for instance, or if if they wanted to write some native logic, there is an plugin system to accomodate the functionality. 
+The vision is that Bliken would be running in the background at all times, allowing for multiple people to interact, collaborate and display output on the cieling. This would help eliminate fragmentation between separate users. Ideally, a `hello world` should be easily accomplished, and writing native extensions should be inherent to the platform.
 
 ## Sources? What?
 
 We established everything is a source, but there are different types.
 
-* There are Display Sources (outputs), these return a grid
-* There are Data Sources (inputs), that are json objects containing data from the desired source (internet, sensors, etc)
-* There are Filters, which are similar to Display Sources (outputs), except they require a grid as an input, and must return one as well. Example filters would be Luminosity, Invert Colors and Invert X/Y. Think "effect"
+* There are Display (grid?) Sources, these return a grid
+* There are Data Sources, that are json objects containing data from the desired source (internet, sensors, etc)
+* There are Filters, which are similar to Display Sources, except they require a grid as an input, and must return one as well. Example filters would be Luminosity, Invert Colors and Invert X/Y. Think "effect"
 
 Presently, the only functioning sources are Display Sources, new branch will introduce the others. 
 
