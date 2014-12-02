@@ -80,7 +80,7 @@ The API can be accessed via REST of Websockets for bi-directional communication.
 * grid - Contains pixel data
 * source - superclass that manages sources
 * registry - handles loading and initialization of sources
-* channel - a grid with a binded grid
+* channel - the binding between a unique grid and source output
 * mixer - handles rendering and blending between channels 
 
 # Functionality
