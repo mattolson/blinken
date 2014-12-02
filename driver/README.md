@@ -75,6 +75,14 @@ The API can be accessed via REST of Websockets for bi-directional communication.
 
 ```socket.emit('create channel', 'My Channel', 'sparkle', { period: 450 })```
 
+# Objects
+
+* grid - Contains pixel data
+* source - superclass that manages sources
+* registry - handles loading and initialization of sources
+* channel - a grid with a binded grid
+* mixer - handles rendering and blending between channels 
+
 # Functionality
 - Create channel and assign source
 - Update source values
@@ -88,3 +96,4 @@ The API can be accessed via REST of Websockets for bi-directional communication.
 - Convert sources to be both inputs (data) and ouputs (display)
 - User preferences
 - Session management
+
