@@ -71,6 +71,12 @@ The API can be accessed via REST of Websockets for bi-directional communication.
 
 #### Grid
 
+* 'get grid' - get master grid
+
+### example 
+
+```socket.emit('create channel', 'My Channel', 'sparkle', { period: 450 })```
+
 ### Events
 
 #### Sources
@@ -87,11 +93,13 @@ The API can be accessed via REST of Websockets for bi-directional communication.
 
 #### Grid
 
-* 'get grid' - get master grid
+* 'refresh grid' - returns grid object
 
 ### example 
 
-```socket.emit('create channel', 'My Channel', 'sparkle', { period: 450 })```
+```socket.on('refresh channels', function(channels){
+	alert(channels.length);
+})```
 
 # Objects
 
