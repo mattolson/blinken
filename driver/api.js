@@ -239,8 +239,8 @@ exports.registerSocketHandlers = function() {
       if(result.error) console.log('Error: '+result.error);
       refresh_clients();
     });
-    socket.on('get channel', function(channel_name) { 
-      var result = api.channel.get(channel_name); 
+    socket.on('get channel', function(channel_id) { 
+      var result = api.channel.get(channel_id); 
       return (!result.error) ? socket.emit('channel result', result ) : socket.emit('error', result.error );
     });
     // socket.on('channel:destroyAll'), websocket.channel.destroyAll();
