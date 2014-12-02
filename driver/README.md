@@ -1,4 +1,4 @@
-_alpha 0.2_
+_0.2.1 alpha_
 
 # Welcome to Bliken!
 
