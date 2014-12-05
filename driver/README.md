@@ -1,4 +1,4 @@
-_alpha 0.2_
+_0.2.1 alpha_
 
 # Welcome to Bliken!
 
@@ -55,11 +55,13 @@ The API can be accessed via REST of Websockets for bi-directional communication.
 
 ## Websockets
 
-### Sources
+### Methods
+
+#### Sources
 
 * 'list sources'
 
-### Channels 
+#### Channels 
 
 * 'list channels' 
 * 'create channel' *channel_name*, *source_name*, *source_options* returns channel_id
@@ -67,13 +69,45 @@ The API can be accessed via REST of Websockets for bi-directional communication.
 * 'destroy channel' *channel_id*
 * 'get channel' *channel_id*
 
-### Grid
+#### Grid
 
 * 'get grid' - get master grid
 
 ### example 
 
 ```socket.emit('create channel', 'My Channel', 'sparkle', { period: 450 })```
+
+### Events
+
+#### Sources
+
+* 'refresh sources' - returns sources
+
+#### Channels 
+
+* 'refresh channels' - returns channel object
+* 'channel created' - returns ID, 'refresh channels' event concurrently called.
+* 'channel updated' - returns ID, 'refresh channels' event concurrently called.
+* 'channel destroyed' - returns ID, 'refresh channels' event concurrently called.
+* 'channel result' - returns requested channel
+
+#### Grid
+
+* 'refresh grid' - returns grid object
+
+### example 
+
+```socket.on('refresh channels', function(channels){
+	alert(channels.length);
+})```
+
+# Objects
+
+* grid - Contains pixel data
+* source - superclass that manages sources
+* registry - handles loading and initialization of sources
+* channel - the binding between a unique grid and source output
+* mixer - handles rendering and blending between channels 
 
 # Functionality
 - Create channel and assign source
@@ -88,3 +122,4 @@ The API can be accessed via REST of Websockets for bi-directional communication.
 - Convert sources to be both inputs (data) and ouputs (display)
 - User preferences
 - Session management
+
