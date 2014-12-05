@@ -26,8 +26,10 @@ util.inherits(ColorWheel, Source);
 
 ColorWheel.prototype.step = function() {
   for (var i = 0; i < this.grid.num_pixels; i++) {
+    var j = (i / 10);
     var xy = this.grid.xy(i);
-    this.grid.setPixelColor(xy.x, xy.y, color_utils.wheel((i + this.current_color) % 256));
+    var c = (j + this.current_color) % 255;
+    this.grid.setPixelColor(xy.x, xy.y, color_utils.wheel(c));
   }
 
   // Update state

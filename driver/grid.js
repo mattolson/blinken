@@ -88,7 +88,7 @@ Grid.prototype.setPixelColor = function(x, y, rgb) {
   this.pixels[index*3] = rgb[0];
   this.pixels[(index*3)+1] = rgb[1];
   this.pixels[(index*3)+2] = rgb[2];
-
+    
 };
 
 // Set the color of an entire row
@@ -160,7 +160,6 @@ Grid.prototype.sync = function() {
   // Blast out updates
   if (this.display) {
 	 this.display.writeLogicalArray(this.pixels);
-   // this.display.writeArray(this.pixels);
   }
 
   // Notify listeners

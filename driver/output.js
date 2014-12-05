@@ -412,10 +412,11 @@ exports.writeLogicalArray = function(data)
 		for(x = 0 ; x < myWidth ; x++)
 		{
 			var index = (y * myWidth) + x;
+			var index2 = ((y * myWidth) + x) * 3;
 			
-			uniData[ledMap[index].uni][ledMap[index].led] = data[index];
-			uniData[ledMap[index].uni][ledMap[index].led+1] = data[index+1];
-			uniData[ledMap[index].uni][ledMap[index].led+2] = data[index+2];
+			uniData[ledMap[index].uni][ledMap[index].led] = data[index2];
+			uniData[ledMap[index].uni][ledMap[index].led+1] = data[index2+1];
+			uniData[ledMap[index].uni][ledMap[index].led+2] = data[index2+2];
 		}
 	}
 	
