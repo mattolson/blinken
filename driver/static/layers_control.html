@@ -99,7 +99,9 @@ function post_layer() {
         'source' : {
             name : 'frames',
             active : true,
-            period : 44,
+            options: {
+                period : 44
+            }
         }
      };
  
@@ -162,16 +164,19 @@ function put_frame() {
     //options['source[options][frame]'] = grid_data;
     options = {
         'source' : {
-            name : 'frames2',
+            name : 'frames',
             active : true,
-            period : 44,
+            options: {
+                period : 66,
+                frame: [[ [255,0,0], [0,255,0], [0,0,255] ], [[255,0,0], [0,255,0], [0,0,255] ]]
+            }
         }
     };
  
      //Create XMLHTTP Object and send. 
     $.ajax({
         type: "PUT",
-        url: global_url + "/layers/1",
+        url: global_url + "/mixer/channels/1",
         contentType: "application/json; charset=UTF-8",
         data: JSON.stringify(options)
     });

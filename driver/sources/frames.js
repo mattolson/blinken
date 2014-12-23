@@ -33,6 +33,8 @@ var NAME = path.basename(__filename, '.js'); // Our unique name
 function Frames(grid, options)
 {
   this.options = options || {};
+  console.log("frames.js constructor options");
+  console.log(this.options);
   Frames.super_.call(this, NAME, grid, options);
 }
 
@@ -41,12 +43,23 @@ util.inherits(Frames, Source);
 
 Frames.prototype.step = function() {
   // Set background color
+    
   if(!this.options.frame) return;
   
+  var frame = this.options.frame;
+  //console.log("frames.js step");
+  //console.log(frame); 
+    
   for (var i = 0; i < this.grid.num_pixels; i++) {
     var xy = this.grid.xy(i);
-    var frame = this.options.frame;
-    this.grid.setPixelColor(xy.x, xy.y, [ frame[i*3], frame[i*3+1], frame[i*3+2] ]);
+    if(xy.x < frame.length) {
+      if(xy.y < frame[xy.x].length) {
+        this.grid.setPixelColor(xy.x, xy.y, [ frame[xy.x][xy.y][0], frame[xy.x][xy.y][1], frame[xy.x][xy.y][2] ]);
+      }
+    }
+    //if(frame[i*3] != 0) {
+    //    console.log(frame[i*3]);
+    //}
   }
   return true;
 };

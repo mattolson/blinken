@@ -28,6 +28,9 @@ Channel.prototype.apply_filters = function( output ){
 
 // Update based on PUT request
 Channel.prototype.update = function(data) {
+  //console.log("channel.js update");
+  //console.log(data);
+
   if ('name' in data) {
     this.name = data.name;
   }

@@ -86,6 +86,7 @@ Source.prototype.validate_options = function(new_options, use_defaults) {
           break;
         case 'color_array':
           value = validation.to_color_array(raw_value);
+          //value = raw_value;
           break;
         case 'color':
           value = validation.to_color(raw_value);
@@ -121,6 +122,9 @@ Source.prototype.validate_options = function(new_options, use_defaults) {
 
 // Validate and update given options
 Source.prototype.update_options = function(new_options) {
+  console.log("source.js update_options");
+  console.log(new_options);
+
   // Merge validated options
   var validated = this.validate_options(new_options, false);
   for (option in new_options) {

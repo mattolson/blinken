@@ -34,10 +34,10 @@ function setup() {
 	grid.color_selected = '#FFFFFF'; // white
 	grid.color_default = '#000000';  // black
 
-	grid.cell_cols = 32;
-	grid.cell_rows = 10;
-	grid.cell_margin = 10;
-	grid.cell_size = 20;
+	grid.cell_cols = 60;
+	grid.cell_rows = 48;
+	grid.cell_margin = 2;
+	grid.cell_size = 8;
 	grid.cell_height = grid.cell_size;
 	grid.cell_width = grid.cell_size;
 	
@@ -275,7 +275,8 @@ function screen_update() {
 		}
 	  }
 	}
-	xmlhttp.open("GET","http://localhost:8888/grid",true);
+    var host = window.location.host;
+	xmlhttp.open("GET","http://" + host + "/output",true);
 	xmlhttp.send();
 }
 

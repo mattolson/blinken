@@ -114,7 +114,8 @@ api.channel.update = function(channel_id, channel_options) {
   if (channel == null) return { error : util.format("ERROR: channel not found: '%d'", channel_id) }
   // Update channel
   channel.update(channel_options);
-  // console.log(channel_options);
+  console.log("put /channels/:id");
+  console.log(channel_options);
   return true;
 
 };
@@ -320,10 +321,12 @@ exports.registerHttpHandlers = function(app) {
     
     var channel_id = request.params.id;
     var channel_options = request.body;
-
+      
+    //console.log("api.js /mixer/channel/:id");
+    //console.log(channel_options);
+ 
     var result = api.channel.update(channel_id, channel_options);
 
-    console.log("put /mixer/channel/:id");
     console.log(result);
       
     if(!result.error) response.sendStatus(204);
