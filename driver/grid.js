@@ -157,6 +157,9 @@ Grid.prototype.off = function() {
 
 // Write to device
 Grid.prototype.sync = function() {
+  
+  /// This is where we should put the switch for whether we blast updates out.
+
   // Blast out updates
   if (this.display) {
 	 this.display.writeLogicalArray(this.pixels);
