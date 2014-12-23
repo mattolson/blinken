@@ -35,8 +35,8 @@ function start() {
   exports.io = io;
     
   // Start http server
-  //server.listen(Config.server.port, 'localhost', function ()  {
-  app.listen(Config.server.port, '192.168.1.6', function ()  {
+  server.listen(Config.server.port, Config.server.host, function ()  {
+  // app.listen(Config.server.port, '192.168.1.6', function ()  {
     console.log('Listening on localhost:'+Config.server.port);
   });
 
