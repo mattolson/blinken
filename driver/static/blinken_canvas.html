@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html5>
 <head>
 <meta charset="utf-8">
 <style type="text/css"> 
@@ -18,8 +17,6 @@ visibility:hidden;
 }
 
 </style>
-</head>
-<body id="body" class="dimmed" onload="start()"; >
 <script>
 
 var x = '{"name": "color_wheel","options": [{"name": "period","type": "integer","default": 40}]}';
@@ -37,15 +34,15 @@ function setup() {
 	grid.color_selected = '#FFFFFF'; // white
 	grid.color_default = '#000000';  // black
 
-	grid.cell_cols = 60;
-	grid.cell_rows = 48;
-	grid.cell_margin = 3;
-	grid.cell_size = 10;
+	grid.cell_cols = 32;
+	grid.cell_rows = 10;
+	grid.cell_margin = 10;
+	grid.cell_size = 20;
 	grid.cell_height = grid.cell_size;
 	grid.cell_width = grid.cell_size;
 	
-	grid.x_margin = 10;
-	grid.y_margin = 10;
+	grid.x_margin = 20;
+	grid.y_margin = 20;
 	grid.done = false;
 
 	grid.timer_tick_interval_ms = 50; // milliseconds per timer tick
@@ -225,7 +222,7 @@ function start() {
 	body_html += "<button id='stop_button' name='stop' value='stop'>Stop</button>"
 	body_html += "<button id='test_button' name='test' value='test'>Test</button>"
 	body_html += "<div id='status_div'></div>";
-	body_html += "<canvas id='canvas' width='900' height='700'></canvas>";
+	body_html += "<canvas id='canvas' width='800' height='600'></canvas>";
 	body_html += "<div id='JSON'>JSON</div>";
 	document.getElementById("body").innerHTML = body_html;
 
@@ -278,13 +275,17 @@ function screen_update() {
 		}
 	  }
 	}
-	xmlhttp.open("GET","http://localhost:1337/output",true);
+	xmlhttp.open("GET","http://localhost:8888/grid",true);
 	xmlhttp.send();
 }
+
 
 //-----------------------------------------------------------------------------
 // end of javascript
 //-----------------------------------------------------------------------------
 </script> 
+
+</head>
+<body id="body" class="dimmed" onload="start()"; >
 </body>
 </html>

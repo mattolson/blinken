@@ -1,50 +1,28 @@
+<!DOCTYPE html5>
 <html>
 <head>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/socket.io-stream.js"></script>
-<script src="/assets/js/init.js"></script>
-<link rel="stylesheet" href="/assets/css/style.css"></link>
+<title>Blinken</title>
+<meta charset="utf-8">
 </head>
-<body>
-  <header></header>
-  <nav>
-    <ul>
-      <li><a href="#" id="show-channels">Channels</a></li>
-      <li><a href="#" id="show-sources">Sources</a></li>
-      <li><a href="#" id="show-grid">Grid</a></li>
-    </ul>
-  </nav>
-  <main>
-    <div id="new">
-      <form id="channel-create">
-        <label for="channel-name">Channel Name</label><input id="channel-name" name="channel-name"  />
-        <select id="sources"></select>
-        <button id="create-channel">+ Channel</button>
-      </form>
-      <form id="source-options"><ul></ul></form>
-    </div>
-    <section id="channels"><ul></ul></section>
-    <section id="sources"><ul></ul></section>
-    <section id="grid"><ul></ul></section>
-  </main>
-  <script>
-  $.fn.serializeObject = function() {
-    var o = {};
-    var a = this.serializeArray();
-    $.each(a, function() {
-      if (o[this.name]) {
-        if (!o[this.name].push) {
-          o[this.name] = [o[this.name]];
-        }
-        o[this.name].push(this.value || '');
-      } else {
-        o[this.name] = this.value || '';
-      }
-    });
-    return o;
-  };
-  </script>
-  
+<body id="body">
+<br>
+<br>Blinken
+<br>
+<br>User Interfaces
+<ul>
+<li><a href="/clunky_interface.html">Clunky Interface</a></li>
+<li><a href="/blinken_canvas.html">Blinken Canvas</a></li>
+<li>Other</li>
+</ul>
+<br>REST API
+<ul>
+<li><a href="/sources">GET /sources</a></li>
+<li><a href="/layers">GET /layers</a></li>
+<li><a href="/grid">GET /grid</a></li>
+<br>
+<li><a href="/POST_layers.html">POST /layers (source[name])</a></li>
+<li><a href="/layers_control.html">Layers Control</a></li>
+</ul>
+<br>
 </body>
 </html>

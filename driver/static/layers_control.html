@@ -49,10 +49,11 @@
     }
 </style>
     
-<script type="text/javascript" src="http://localhost:1337/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="assets/js/jquery-1.11.1.min.js"></script>
 <script>
 
-global_url = "htp://localhost:1337/";
+global_url = "http://192.168.1.6:1337";
+    
     
 function send() {
     post_screen();
@@ -79,8 +80,9 @@ function add_a_layer() {
      //Create XMLHTTP Object and send. 
     $.ajax({
         type: "POST",
-        url: "http://localhost:1337/mixer/channels",
-        data: options
+        url: global_url + "/mixer/channels",
+        contentType: "application/json; charset=UTF-8",
+        data: JSON.stringify(options)
     })
     get_current_layers();  // update the list display
 }
@@ -94,7 +96,7 @@ function post_layer() {
     //options['source[options][frame]'] = grid_data;
      options = {
         'source' : {
-            name : 'frames2',
+            name : 'frames',
             active : true,
             period : 44,
         }
@@ -104,9 +106,10 @@ function post_layer() {
     $.ajax({
         //type: "PUT",
         type: "POST",
-        url: "http://localhost:1337/layers",
+        url: global_url + "/mixer/channels",
         //data: { name: 'frames', active: true, options: { frame: [ [ [ 255,0,0 ] ] ] } }
-        data: options
+        contentType: "application/json; charset=UTF-8",
+        data: JSON.stringify(options)
     })
     get_current_layers();  // update the list display
 }
@@ -118,15 +121,16 @@ function delete_layer(layer_id) {
     // Create XMLHTTP Object and send
      options = {
         'source' : {
-            name : 'frames2',
+            name : 'frames',
             active : true,
             period : 44,
         }
     }
    $.ajax({
         type: "DELETE",
-        url: "http://localhost:1337/layers/" + layer_id,
-        data: options
+        url: global_url + "/mixer/channels/" + layer_id,
+        contentType: "application/json; charset=UTF-8",
+        data: JSON.stringify(options)
     })
     
     // fixme: javascript error "no element found"
@@ -166,8 +170,9 @@ function put_frame() {
      //Create XMLHTTP Object and send. 
     $.ajax({
         type: "PUT",
-        url: "http://localhost:1337/layers/1",
-        data: options
+        url: global_url + "/layers/1",
+        contentType: "application/json; charset=UTF-8",
+        data: JSON.stringify(options)
     });
     
     //data: { name: 'frames', active: true, options: { frame: [ [ [ 255,0,0 ] ] ] } }
@@ -188,7 +193,7 @@ function get_current_layers() {
             update_layers_display(layers_obj);
 	    }
 	}
-	xmlhttp.open("GET","http://localhost:8888/layers",true);
+	xmlhttp.open("GET", global_url + "/mixer/channels",true);
 	xmlhttp.send();    
 }
     
@@ -207,7 +212,7 @@ function get_sources_list() {
             //update_layers_display(layers_obj);
 	    }
 	}
-	xmlhttp.open("GET","http://localhost:8888/sources",true);
+	xmlhttp.open("GET",global_url + "/sources",true);
 	xmlhttp.send();    
 }
     
@@ -307,7 +312,7 @@ window.onload = init;
 </script>
 </head>
 <body id="body">
-<form action="/layers" method="post">
+<form method="post">
 <br>
 <div id="layer_form">   
 <div class="bigbold">Blinken Layers
