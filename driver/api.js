@@ -222,6 +222,7 @@ exports.registerSocketHandlers = function() {
     });
     socket.on('create channel', function(channel_name, source_name, source_options){ 
       var result = api.channel.create(channel_name, source_name, source_options); 
+      console.log(source_options);
       // console.log(result);
       (!result.error) ? socket.emit('channel created', result) : socket.emit('error', result.error );
       if(result.error) console.log('Error: '+result.error);
@@ -282,10 +283,13 @@ exports.registerHttpHandlers = function(app) {
 
   // Channels
   app.get('/mixer/channels', function(request, response){  
-    var result = api.channel.list();
-    request.jsonp(result);
+    var result = api.channel.list();    
+    response.jsonp(result);
   });
-  app.post('/mixer/channels', function(request, response){  
+
+  app.post('/mixer/channels', function(request, response){ 
+
+    console.log(request.params);  
 
     var channel_name = request.body.name;
     var source_name = request.body.source.name;
@@ -297,11 +301,13 @@ exports.registerHttpHandlers = function(app) {
     else response.status(400).jsonp(errorResponse(400, result.error));
 
   });
+
   app.get('/mixer/channels/:id', function(request, response){
     var result = api.channel.get(request.params.id);
     if(!result.error) response.status(201).jsonp(result);
     else jsonp(errorResponse(404, result.error));
   });
+
   app.put('/mixer/channels/:id', function(request, response){
     
     var channel_id = request.params.id;
@@ -309,15 +315,16 @@ exports.registerHttpHandlers = function(app) {
 
     var result = api.channel.update(channel_id, channel_options);
 
-    if(!result.error) response.send(204);
+    if(!result.error) response.status(204);
     else response.status(404).jsonp(errorResponse(404, result.error));
 
   });
+
   app.delete('/mixer/channels/:id', function(request, response){
 
     var channel_id = request.params.id;
     api.channel.destroy(channel_id);
-    response.send(204);
+    response.status(204);
 
   });
 
