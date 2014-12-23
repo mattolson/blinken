@@ -52,7 +52,8 @@
 <script type="text/javascript" src="assets/js/jquery-1.11.1.min.js"></script>
 <script>
 
-global_url = "http://192.168.1.6:1337";
+global_url = "http://" + window.location.host;
+//alert(window.location.host + " port " + window.location.port);
     
     
 function send() {
