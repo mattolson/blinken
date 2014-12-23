@@ -41,7 +41,8 @@ util.inherits(Frames, Source);
 
 Frames.prototype.step = function() {
   // Set background color
-  if(empty(this.options.frame)) return;
+  //if(empty(this.options.frame)) return;
+  if(!this.options.frame) return;
   
   for (var i = 0; i < this.grid.num_pixels; i++) {
     var xy = this.grid.xy(i);

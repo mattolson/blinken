@@ -281,18 +281,27 @@ exports.registerHttpHandlers = function(app) {
   });
 
   // Channels
-  app.get('/mixer/channels', function(request, response){  
+  app.get('/mixer/channels', function(request, response){ 
+      
+    console.log("get /mixer/channels");
+      
     var result = api.channel.list();
-    request.jsonp(result);
+    //request.jsonp(result);  // fixme: this is definitely broken - line below is fixed
+    response.jsonp(result);
+      
   });
-  app.post('/mixer/channels', function(request, response){  
-
+  app.put('/mixer/channels', function(request, response){ 
+      
+    console.log("post /mixer/channels request.body:");
+    console.log(request.body);
+      
     var channel_name = request.body.name;
     var source_name = request.body.source.name;
     var source_options = request.body.source.options;
 
     var result = api.channel.create(channel_name, source_name, source_options);
-
+    console.log("creating channel");
+    console.log(result);
     if(!result.error)  response.status(201).jsonp(result);
     else response.status(400).jsonp(errorResponse(400, result.error));
 
@@ -309,7 +318,10 @@ exports.registerHttpHandlers = function(app) {
 
     var result = api.channel.update(channel_id, channel_options);
 
-    if(!result.error) response.send(204);
+    console.log("put /mixer/channel/:id");
+    console.log(result);
+      
+    if(!result.error) response.sendStatus(204);
     else response.status(404).jsonp(errorResponse(404, result.error));
 
   });
