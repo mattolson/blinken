@@ -1,0 +1,50 @@
+<html>
+<head>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/socket.io-stream.js"></script>
+<script src="/assets/js/init.js"></script>
+<link rel="stylesheet" href="/assets/css/style.css"></link>
+</head>
+<body>
+  <header></header>
+  <nav>
+    <ul>
+      <li><a href="#" id="show-channels">Channels</a></li>
+      <li><a href="#" id="show-sources">Sources</a></li>
+      <li><a href="#" id="show-grid">Grid</a></li>
+    </ul>
+  </nav>
+  <main>
+    <div id="new">
+      <form id="channel-create">
+        <label for="channel-name">Channel Name</label><input id="channel-name" name="channel-name"  />
+        <select id="sources"></select>
+        <button id="create-channel">+ Channel</button>
+      </form>
+      <form id="source-options"><ul></ul></form>
+    </div>
+    <section id="channels"><ul></ul></section>
+    <section id="sources"><ul></ul></section>
+    <section id="grid"><ul></ul></section>
+  </main>
+  <script>
+  $.fn.serializeObject = function() {
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+      if (o[this.name]) {
+        if (!o[this.name].push) {
+          o[this.name] = [o[this.name]];
+        }
+        o[this.name].push(this.value || '');
+      } else {
+        o[this.name] = this.value || '';
+      }
+    });
+    return o;
+  };
+  </script>
+  
+</body>
+</html>

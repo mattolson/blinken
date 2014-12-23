@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style type="text/css"> 
+.positioned
+{
+position:absolute;
+}
+
+.dimmed
+{
+background-color:#555;
+}
+.hidden
+{
+visibility:hidden;
+}
+
+</style>
+</head>
+<body id="body" class="dimmed" onload="start()"; >
+<script>
+
+var x = '{"name": "color_wheel","options": [{"name": "period","type": "integer","default": 40}]}';
+  
+//-----------------------------------------------------------------------------
+
+var grid = Object();  // global object
+
+
+//-----------------------------------------------------------------------------
+function setup() {
+	document.title = "Blinken Canvas";
+	grid.color_background = '#000000';  // black
+	grid.color_highlighted = 'rgb(220,220,250)';  // light bluish color
+	grid.color_selected = '#FFFFFF'; // white
+	grid.color_default = '#000000';  // black
+
+	grid.cell_cols = 60;
+	grid.cell_rows = 48;
+	grid.cell_margin = 3;
+	grid.cell_size = 10;
+	grid.cell_height = grid.cell_size;
+	grid.cell_width = grid.cell_size;
+	
+	grid.x_margin = 10;
+	grid.y_margin = 10;
+	grid.done = false;
+
+	grid.timer_tick_interval_ms = 50; // milliseconds per timer tick
+	
+	grid.running = false;
+	grid.timer_count = 0;
+	grid.selected_cell_name = '';
+	
+	// insert content into html spans
+	grid_setup();
+	
+
+	// setup events
+	document.getElementById("start_button").onclick=function(){start_button_click()};
+	document.getElementById("stop_button").onclick=function(){stop_button_click()};
+	document.getElementById("test_button").onclick=function(){test_button_click()};
+
+	grid.availWidth = screen.availWidth;
+	grid.availHeight = screen.availHeight;
+	grid.screen_width = screen.width;
+	grid.screen_height = screen.height;
+
+	//start_button_click(); // start timer tick event
+}
+
+
+//-----------------------------------------------------------------------------
+function grid_setup() {
+	// create grid of cells
+	grid.board = {};
+	for(row_num=1; row_num<=grid.cell_rows; row_num++) {
+		for(col_num=1; col_num<=grid.cell_cols; col_num++) {
+			cell = Object();
+			cell.text = '';
+			cell.color = grid.color_default;
+			cell.name = 'cell_'+row_num+'_'+col_num;
+			cell.row = row_num;
+			cell.col = col_num;
+			cell.x_pos = grid.x_margin + (col_num * (grid.cell_width + grid.cell_margin));
+			cell.y_pos = grid.x_margin + (row_num * (grid.cell_width + grid.cell_margin));
+			
+			grid.board[cell.name] = cell;
+
+			cell_update_color(col_num, row_num, grid.color_default);
+		}
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+function timer_tick() {
+	// timer event called at regular interval
+	grid.timer_count++;
+	if (grid.running) {
+		msg = "running ";
+		msg += "("+grid.timer_tick_interval_ms/1000+" sec loop) ";
+		msg +=  " tick "+grid.timer_count;
+	} else {
+		msg = "stopped ";
+	}
+	
+	screen_update();
+	
+	status_update(msg);
+	
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+function save_settings_click() {
+	// called when "hide settings" button is clicked
+	document.getElementById("settings_div").style.display="none";
+	document.getElementById("save_settings_button").style.display="none";
+	document.getElementById("show_settings_button").style.display="inline";
+	
+	new_grid = false;
+	value = parseInt(document.getElementById("input_cols").value);
+	if (grid.cell_cols != value) {
+		grid.cell_cols = value;
+		new_grid = true;
+	}
+	value = parseInt(document.getElementById("input_rows").value);
+	if (grid.cell_rows != value) {
+		grid.cell_rows = value;
+		new_grid = true;
+	}
+	if (new_grid) {
+		grid_setup(); // re-setup grid
+	}
+	
+	value = document.getElementById("input_bgcolor").value;
+	document.getElementById("body").style.backgroundColor = value;
+	
+}
+
+
+
+//-----------------------------------------------------------------------------
+function show_settings_click() {
+	// event called when "show settings" button is clicked
+	document.getElementById("settings_div").style.display="block";
+	document.getElementById("save_settings_button").style.display="inline";
+	document.getElementById("show_settings_button").style.display="none";
+}
+
+
+//-----------------------------------------------------------------------------
+function start_button_click() {
+	// event called when "start" button is clicked
+	if (grid.running == false) {
+		grid.running = true;
+		ms = grid.timer_tick_interval_ms;
+		grid.timer_handle = window.setInterval(function(){timer_tick()}, ms);
+		mode_select_onchange();
+	}
+}
+
+
+
+
+
+
+
+//-----------------------------------------------------------------------------
+function stop_button_click() {
+	// event called when "stop" button is clicked
+	if (grid.running == true) {
+		grid.running = false;
+		window.clearInterval(grid.timer_handle);
+	}
+	//timer_tick();
+	mode_select_onchange();
+}
+
+
+//-----------------------------------------------------------------------------
+function test_button_click() {
+	// event called when "test" button is clicked
+
+	status_update("Test");
+	screen_update();
+}
+
+
+
+//-----------------------------------------------------------------------------
+//
+function cell_update_color(x,y,color) {
+	var pixel_x = 0;
+	var pixel_y = 0;
+	pixel_x = grid.x_margin + (x * (grid.cell_width + grid.cell_margin));
+	pixel_y = grid.y_margin + (y * (grid.cell_height + grid.cell_margin));
+	var canvas_el = document.getElementById("canvas");
+	var canvas_context = canvas_el.getContext("2d");
+	canvas_context.fillStyle = color;
+	canvas_context.fillRect(pixel_x, pixel_y, grid.cell_width, grid.cell_height);
+}
+
+
+//-----------------------------------------------------------------------------
+function status_update(status_str) {
+	html = "";
+	html += "<font color='#fff'>";
+	html += status_str;
+	html += "</font>";
+	document.getElementById("status_div").innerHTML = html;
+}
+
+//-----------------------------------------------------------------------------
+//
+function start() {
+	// content of html body
+	body_html = "";
+	body_html += "<button id='start_button' name='start' value='start'>Start</button>"
+	body_html += "<button id='stop_button' name='stop' value='stop'>Stop</button>"
+	body_html += "<button id='test_button' name='test' value='test'>Test</button>"
+	body_html += "<div id='status_div'></div>";
+	body_html += "<canvas id='canvas' width='900' height='700'></canvas>";
+	body_html += "<div id='JSON'>JSON</div>";
+	document.getElementById("body").innerHTML = body_html;
+
+	setup();
+	status_update("OK");
+}
+
+
+function mode_select_onchange() {
+	var status_str;
+	if (grid.running) {
+		status_str = "Running";
+	} else {
+		status_str = "Stopped";
+	}
+	status_update(status_str);
+}
+
+function int_to_hex(d) {
+	var padding = 2;
+    var hex = Number(d).toString(16);
+    padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
+
+    while (hex.length < padding) {
+        hex = "0" + hex;
+    }
+    return hex;
+}
+
+
+function screen_update() {
+	// get the current grid pixel colors from the server 
+    // then update the simulated screen with those colors
+    //
+	document.getElementById("JSON").innerHTML="getting grid";
+	var xmlhttp=new XMLHttpRequest();	
+	xmlhttp.onreadystatechange=function() {
+	  if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+		//status_update("got grid");
+		//document.getElementById("JSON").innerHTML=xmlhttp.responseText;
+		grid_data = JSON.parse(xmlhttp.responseText);
+		var i = 0;
+		for(row_num=1; row_num<=grid.cell_rows; row_num++) {
+			for(col_num=1; col_num<=grid.cell_cols; col_num++) {
+				color = grid_data[i];
+				color_str = "#" + int_to_hex(color[0]) + int_to_hex(color[1]) + int_to_hex(color[2]);
+				cell_update_color(col_num, row_num, color_str);
+				i++;
+			}
+		}
+	  }
+	}
+	xmlhttp.open("GET","http://localhost:1337/output",true);
+	xmlhttp.send();
+}
+
+//-----------------------------------------------------------------------------
+// end of javascript
+//-----------------------------------------------------------------------------
+</script> 
+</body>
+</html>
