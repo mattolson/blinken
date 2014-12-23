@@ -282,11 +282,16 @@ exports.registerHttpHandlers = function(app) {
   });
 
   // Channels
-  app.get('/mixer/channels', function(request, response){  
+  app.get('/mixer/channels', function(request, response){
+    console.log("get /mixer/channels");
     var result = api.channel.list();    
     response.jsonp(result);
   });
 
+  app.put('/mixer/channels', function(request, response){ 
+    console.log("put /mixer/channels");
+  });
+          
   app.post('/mixer/channels', function(request, response){ 
 
     console.log("post /mixer/channels request.body:");

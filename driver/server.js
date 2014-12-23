@@ -1,5 +1,4 @@
 var express = require('express');
-var connect = require('connect');
 
 var app = express();
 //var app = connect();
@@ -37,7 +36,7 @@ function start() {
     
   // Start http server
   //server.listen(Config.server.port, 'localhost', function ()  {
-  app.listen(Config.server.port, 'localhost', function ()  {
+  app.listen(Config.server.port, '192.168.1.6', function ()  {
     console.log('Listening on localhost:'+Config.server.port);
   });
 
