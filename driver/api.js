@@ -222,6 +222,7 @@ exports.registerSocketHandlers = function() {
     });
     socket.on('create channel', function(channel_name, source_name, source_options){ 
       var result = api.channel.create(channel_name, source_name, source_options); 
+      console.log(source_options);
       // console.log(result);
       (!result.error) ? socket.emit('channel created', result) : socket.emit('error', result.error );
       if(result.error) console.log('Error: '+result.error);
@@ -239,8 +240,8 @@ exports.registerSocketHandlers = function() {
       if(result.error) console.log('Error: '+result.error);
       refresh_clients();
     });
-    socket.on('get channel', function(channel_name) { 
-      var result = api.channel.get(channel_name); 
+    socket.on('get channel', function(channel_id) { 
+      var result = api.channel.get(channel_id); 
       return (!result.error) ? socket.emit('channel result', result ) : socket.emit('error', result.error );
     });
     // socket.on('channel:destroyAll'), websocket.channel.destroyAll();
@@ -281,20 +282,17 @@ exports.registerHttpHandlers = function(app) {
   });
 
   // Channels
-  app.get('/mixer/channels', function(request, response){ 
-      
-    console.log("get /mixer/channels");
-      
-    var result = api.channel.list();
-    //request.jsonp(result);  // fixme: this is definitely broken - line below is fixed
+  app.get('/mixer/channels', function(request, response){  
+    var result = api.channel.list();    
     response.jsonp(result);
-      
   });
-  app.put('/mixer/channels', function(request, response){ 
-      
+
+  app.post('/mixer/channels', function(request, response){ 
+
     console.log("post /mixer/channels request.body:");
     console.log(request.body);
-      
+    console.log(request.params);  
+
     var channel_name = request.body.name;
     var source_name = request.body.source.name;
     var source_options = request.body.source.options;
@@ -306,11 +304,13 @@ exports.registerHttpHandlers = function(app) {
     else response.status(400).jsonp(errorResponse(400, result.error));
 
   });
+
   app.get('/mixer/channels/:id', function(request, response){
     var result = api.channel.get(request.params.id);
     if(!result.error) response.status(201).jsonp(result);
     else jsonp(errorResponse(404, result.error));
   });
+
   app.put('/mixer/channels/:id', function(request, response){
     
     var channel_id = request.params.id;
@@ -325,11 +325,12 @@ exports.registerHttpHandlers = function(app) {
     else response.status(404).jsonp(errorResponse(404, result.error));
 
   });
+
   app.delete('/mixer/channels/:id', function(request, response){
 
     var channel_id = request.params.id;
     api.channel.destroy(channel_id);
-    response.send(204);
+    response.status(204);
 
   });
 

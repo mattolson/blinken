@@ -32,7 +32,7 @@ var NAME = path.basename(__filename, '.js'); // Our unique name
 
 function Frames(grid, options)
 {
-  options = options || {};
+  this.options = options || {};
   Frames.super_.call(this, NAME, grid, options);
 }
 
@@ -41,7 +41,6 @@ util.inherits(Frames, Source);
 
 Frames.prototype.step = function() {
   // Set background color
-  //if(empty(this.options.frame)) return;
   if(!this.options.frame) return;
   
   for (var i = 0; i < this.grid.num_pixels; i++) {
@@ -56,7 +55,7 @@ Frames.prototype.step = function() {
 Frames.options_spec = function() {
   return [
     {
-      'name': 'color',
+      'name': 'frame',
       'type': 'color_array',
       'default': []
     }
