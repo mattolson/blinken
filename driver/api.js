@@ -186,6 +186,10 @@ api.grid.map = function() {
   return grid.pixel_map;
 };
 
+api.grid.toggleDisplay = function() {
+  return grid.pixel_map;
+};
+
 //***************************************************************
 //
 //                Register handlers
@@ -355,6 +359,21 @@ exports.registerHttpHandlers = function(app) {
     var y = request.params.y;
     var result = api.grid.getxy(x, y);
     response.jsonp(result);
+
+  });
+  app.put('/output/display', function(request, response){
+
+    var display_toggle = request.params.display;
+      
+    //console.log("api.js /mixer/channel/:id");
+    //console.log(channel_options);
+ 
+    var result = api.output.update(display_toggle);
+
+    console.log(result);
+      
+    if(!result.error) response.sendStatus(204);
+    else response.status(404).jsonp(errorResponse(404, result.error));
 
   });
 
