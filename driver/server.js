@@ -19,10 +19,9 @@ function start() {
   // Configure to serve static files out of '/static' directory
   app.use(express.static(__dirname + '/static'));
 
-  // Automatically parse request body
+  // Automatically parse request body. Middleware.
   // app.use(bodyParser.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
-  app.use(bodyParser.json());
-  //app.use(express.json());
+  app.use(bodyParser.json());  
 
   // Register http handlers
   api.registerHttpHandlers(app);
@@ -37,7 +36,7 @@ function start() {
   // Start http server
   server.listen(Config.server.port, Config.server.host, function ()  {
   // app.listen(Config.server.port, '192.168.1.6', function ()  {
-    console.log('Listening on localhost:'+Config.server.port);
+    console.log('Listening on '+Config.server.host+':'+Config.server.port);
   });
 
 }
