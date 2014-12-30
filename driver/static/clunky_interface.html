@@ -89,9 +89,11 @@ background-color:#00ff00;
 }
 
 </style>
-<script type="text/javascript" src="http://localhost:8888/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="assets/js/jquery-1.11.1.min.js"></script>
 <script>
-
+        
+var global_url = "http://" + window.location.host;
+    
 var x = '{"name": "color_wheel","options": [{"name": "period","type": "integer","default": 40}]}';
   
 //-----------------------------------------------------------------------------
@@ -107,10 +109,10 @@ function setup() {
 	grid.color_selected = '#FFFFFF'; // white
 	grid.color_default = '#000000';  // black
 
-	grid.cell_cols = 32;
-	grid.cell_rows = 10;
-	grid.cell_margin = 10;
-	grid.cell_size = 20;
+	grid.cell_cols = 60;
+	grid.cell_rows = 48;
+	grid.cell_margin = 2;
+	grid.cell_size = 6;
 	grid.cell_height = grid.cell_size;
 	grid.cell_width = grid.cell_size;
 	
@@ -201,11 +203,12 @@ function grid_setup() {
 			grid.board[cell.name] = cell;
 		}
 	}
+
 	// create squares as html divs
 	content = "";	
 	for(row_num=1; row_num<=grid.cell_rows; row_num++) {
 		for(col_num=1; col_num<=grid.cell_cols; col_num++) {
-			var cell_name = 'cell_'+row_num+'_'+col_num;
+			var cell_name = "cell_"+row_num+"_"+col_num;
 			var cell = grid.board[cell_name];
 			content += "<div id='"+cell_name+"' class='positioned'";
 			content += " onclick='cell_onclick(event)'";
@@ -217,7 +220,7 @@ function grid_setup() {
 	// insert cells into div
 	var item = document.getElementById("cells")
 	item.innerHTML = content;
-	
+
 	// position cells
 	for(row_num=1; row_num<=grid.cell_rows; row_num++) {
 		y = grid.y_margin + ((grid.cell_height+grid.cell_margin) * row_num);
@@ -281,9 +284,11 @@ function timer_tick() {
 }
 
 function cache_screen() {
+    alert("cache_screen");
+                                               
 
 }
-    
+                                               
     
 function post_screen() {
     // send grid to server
@@ -304,13 +309,13 @@ function post_screen() {
     //Create XMLHTTP Object and send. 
     if (false) {
         var xmlhttp=new XMLHttpRequest();	    
-        xmlhttp.open("PUT","http://localhost:8888/layers/1",true)
+        xmlhttp.open("PUT", global_url + "/layers/1",true)
         xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xmlhttp.send("test");
     } else {
         $.ajax({
             type: "PUT",
-            url: "http://localhost:8888/layers/1",
+            url: global_url + "/layers/1",
             data: { name: 'frames', active: true, options: { frame: [ [ [ 255,0,0 ] ] ] } }
         })
     }
@@ -655,6 +660,7 @@ function step_button_click() {
 
 
 
+
 //-----------------------------------------------------------------------------
 function stop_button_click() {
 	// event called when "stop" button is clicked
@@ -671,7 +677,7 @@ function stop_button_click() {
 function stop_color_select_onchange(event){
 	color = event.target.value;
 	grid.stop_color = color;
-	document.getElementById("stop_color_select").style.backgroundColor = color
+	document.getElementById("stop_color_select").style.backgroundColor = color;
 }
 
 
@@ -688,9 +694,9 @@ function test_button_click() {
 				document.getElementById("xml").innerHTML = grid.xml;
 			}
 		}
-		xmlhttp.open("POST","http://localhost:8888/sources",true);
-		xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-		xmlhttp.send('data="'+x+'"');
+		//xmlhttp.open("POST",global_url + "/sources",true);
+		//xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		//xmlhttp.send('data="'+x+'"');
 	}
 	
     idoc = document.getElementById("iframe").contentDocument;
@@ -700,6 +706,33 @@ function test_button_click() {
     document.getElementById("tick_status").innerHTML = "tested";
 	//post_screen();
 }
+
+                    
+//-----------------------------------------------------------------------------
+// html helpers
+//-----------------------------------------------------------------------------
+function html_select(id, options, selected) {
+	// return html text for a select field
+	// with options filled from values in an array
+	// atext = "";
+
+    atext = "";
+    atext = '<select id="' + id + '">';
+                    
+                    
+	for (key in options) {
+		option = options[key];
+		atext += '<option value="'+key+'"';
+		if (key == selected) { 
+			atext += " selected ";
+		}
+		atext += 'id="'+id+" "+key+'"';
+		atext += '>'+option+'</option>';	
+	}
+	atext += '</select>';
+	return atext;
+}
+
 
 
 //-----------------------------------------------------------------------------
@@ -711,32 +744,8 @@ function cell_update(cell_name) {
 
 function cell_update_text(cell_name, text) {
 	grid.board[cell_name].text = text;
-	cell_update(cell_name)
+	cell_update(cell_name);
 }
-
-
-
-//-----------------------------------------------------------------------------
-// html helpers
-//-----------------------------------------------------------------------------
-function html_select(id, options, selected) {
-	// return html text for a select field
-	// with options filled from values in an array
-	text = "";
-	text += '<select id="'+id+'">';
-	for (key in options) {
-		option = options[key];
-		text += '<option value="'+key+'"';
-		if (key == selected) { 
-			text += " selected ";
-		}
-		text += 'id="'+id+" "+key+'"';
-		text += '>'+option+'</option>';	
-	}
-	text += '</select>';
-	return text;
-}
-
 
 
 
@@ -1387,6 +1396,6 @@ function cell_flood(cell_name, color) {
 <div id="xml">
 xml
 </div>
-<iframe id="iframe" src="http://localhost:8888/grid/" height="100" width="500" frameborder="0"></iframe>
+<iframe id="iframe" src="/output" height="100" width="500" frameborder="0"></iframe>
 </body>
 </html>

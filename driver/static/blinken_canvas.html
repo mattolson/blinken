@@ -18,11 +18,7 @@ visibility:hidden;
 
 </style>
 <script>
-
-var x = '{"name": "color_wheel","options": [{"name": "period","type": "integer","default": 40}]}';
-  
 //-----------------------------------------------------------------------------
-
 var grid = Object();  // global object
 
 
@@ -97,11 +93,11 @@ function timer_tick() {
 	// timer event called at regular interval
 	grid.timer_count++;
 	if (grid.running) {
-		msg = "running ";
+		msg = "Running ";
 		msg += "("+grid.timer_tick_interval_ms/1000+" sec loop) ";
 		msg +=  " tick "+grid.timer_count;
 	} else {
-		msg = "stopped ";
+		msg = "Stopped";
 	}
 	
 	screen_update();
@@ -164,10 +160,6 @@ function start_button_click() {
 
 
 
-
-
-
-
 //-----------------------------------------------------------------------------
 function stop_button_click() {
 	// event called when "stop" button is clicked
@@ -220,10 +212,9 @@ function start() {
 	body_html = "";
 	body_html += "<button id='start_button' name='start' value='start'>Start</button>"
 	body_html += "<button id='stop_button' name='stop' value='stop'>Stop</button>"
-	body_html += "<button id='test_button' name='test' value='test'>Test</button>"
-	body_html += "<div id='status_div'></div>";
+	body_html += "&nbsp; &nbsp; <span id='status_div'></span>";
+	body_html += "<br>";
 	body_html += "<canvas id='canvas' width='800' height='600'></canvas>";
-	body_html += "<div id='JSON'>JSON</div>";
 	document.getElementById("body").innerHTML = body_html;
 
 	setup();
@@ -257,12 +248,9 @@ function screen_update() {
 	// get the current grid pixel colors from the server 
     // then update the simulated screen with those colors
     //
-	document.getElementById("JSON").innerHTML="getting grid";
 	var xmlhttp=new XMLHttpRequest();	
 	xmlhttp.onreadystatechange=function() {
 	  if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-		//status_update("got grid");
-		//document.getElementById("JSON").innerHTML=xmlhttp.responseText;
 		grid_data = JSON.parse(xmlhttp.responseText);
 		var i = 0;
 		for(row_num=1; row_num<=grid.cell_rows; row_num++) {
@@ -275,8 +263,7 @@ function screen_update() {
 		}
 	  }
 	}
-    var host = window.location.host;
-	xmlhttp.open("GET","http://" + host + "/output",true);
+ 	xmlhttp.open("GET","http://" + window.location.host + "/output",true);
 	xmlhttp.send();
 }
 
@@ -284,8 +271,7 @@ function screen_update() {
 //-----------------------------------------------------------------------------
 // end of javascript
 //-----------------------------------------------------------------------------
-</script> 
-
+</script>
 </head>
 <body id="body" class="dimmed" onload="start()"; >
 </body>
