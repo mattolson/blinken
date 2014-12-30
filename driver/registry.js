@@ -22,8 +22,6 @@ function Registry( type ) {
     // console.log(registry[registry.type][module.name]);
   });
 
-  console.log(this[this.type])
-
 }
 
 Registry.prototype.find = function(name) {
