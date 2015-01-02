@@ -1,3 +1,22 @@
+//------------------------------------------------------------------------------
+// Blinken Server
+//------------------------------------------------------------------------------
+
+var blinken_version = "Blinken Server 2015-01-01";
+var debug_level = 2;
+
+// the following few lines of code require: "npm install minimist"
+// the "minimist" library easily parses command line arguments
+// this allows, for example, "--debug=0" as a comand-line option
+// could also be used to allow specifying, for example,  --port=1337 on command line (see ref to argv.port below)
+
+//var argv = require('minimist')(process.argv.slice(2));
+//debug_level = argv.debug;
+//console.log("debug_level: " + debug_level);
+//console.log(argv);
+
+if (debug_level > 0) console.log("\n" + blinken_version);
+
 // Make sure we have a good config file.
 try {        
     var Config = require.resolve("./config.js");
@@ -17,13 +36,13 @@ var http = require('http'),
 //Websockets
 io = require('socket.io').listen(server);
 //Websocket streams
-console.log("Loading socket.io-stream");
+if (debug_level > 1) console.log("Loading socket.io-stream");
 require('socket.io-stream')(io);
 
-console.log("Loading API");
+if (debug_level > 1) console.log("Loading API");
 var api = require("./api");
 
-console.log("Loading Config");
+if (debug_level > 1) console.log("Loading Config");
 var Config = require("./config");
 var bodyParser = require('body-parser');
 
@@ -36,21 +55,26 @@ function start() {
   app.use(bodyParser.json());  
 
   // Register http handlers
-  console.log("Registering HTTP handlers");
+  if (debug_level > 1) console.log("Registering HTTP handlers");
   api.registerHttpHandlers(app);
   
   // Register socket handlers
-  console.log("Registering socket handlers");
+  if (debug_level > 1) console.log("Registering socket handlers");
   api.registerSocketHandlers();
  
   // Export for later
   exports.app = app;
   exports.io = io;
     
+  // allows "--port=8888", for example, as a command-line argument
+  if (argv.port) {
+    Config.server.port = argv.port;
+  }
+    
   // Start http server
   //server.listen(Config.server.port, Config.server.host, function ()  {
-  server.listen(Config.server.port, function ()  {  // listens on all ip addresses if host is not specified    
-    console.log('\nListening on all IP addresses, on port: '+Config.server.port);
+  server.listen(Config.server.port, function ()  {  // listens on all ip addresses if host is not specified
+    console.log('\nBlinken is listening on all IP addresses, port: '+Config.server.port);
   });
 }
 
