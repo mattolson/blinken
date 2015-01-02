@@ -6,23 +6,28 @@
 var util = require('util');
 
 // Setup grid
+console.log("Loading Grid");
 var Grid = require('./grid');
 var grid = new Grid();
 
 // Setup mixer and set rendering loop in motion
+console.log("Loading Mixer");
 var Mixer = require('./mixer');
 var mixer = new Mixer(grid);
 mixer.run();
 
 // Get source registry (this loads sources themselves as well)
+console.log("Loading Sources");
 var Registry = require('./registry');
 // console.log(registry);
+
 var sources = new Registry( 'sources' );
 // var filters = new Registry( 'filters' );
 // console.log(sources);
 var api = new Object();
 
-var config = require('./config')
+console.log("Loading Config");
+var config = require('./config');  // fixme? this is also required() in server.js - any problem if this is re-loaded?
 
 //**************************************
 //
