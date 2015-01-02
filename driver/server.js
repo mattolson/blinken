@@ -2,22 +2,20 @@
 // Blinken Server
 //------------------------------------------------------------------------------
 
-var blinken_version = "Blinken Server 2015-01-01";
 var debug_level = 2;
 
-// the following few lines of code require: "npm install minimist"
+// the following few lines of code require: "npm install"  (minimist is now in package.json)
 // the "minimist" library easily parses command line arguments
 // this allows, for example, "--debug=0" as a comand-line option
 // could also be used to allow specifying, for example,  --port=1337 on command line (see ref to argv.port below)
 
 argv = {};
-
 //var argv = require('minimist')(process.argv.slice(2));
 //debug_level = argv.debug;
 //console.log("debug_level: " + debug_level);
 //console.log(argv);
 
-if (debug_level > 0) console.log("\n" + blinken_version);
+if (debug_level > 0) console.log("\n" + "Blinken Server");
 
 // Make sure we have a good config file.
 try {        
