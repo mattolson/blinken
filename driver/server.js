@@ -10,6 +10,8 @@ var debug_level = 2;
 // this allows, for example, "--debug=0" as a comand-line option
 // could also be used to allow specifying, for example,  --port=1337 on command line (see ref to argv.port below)
 
+argv = {};
+
 //var argv = require('minimist')(process.argv.slice(2));
 //debug_level = argv.debug;
 //console.log("debug_level: " + debug_level);
@@ -19,7 +21,8 @@ if (debug_level > 0) console.log("\n" + blinken_version);
 
 // Make sure we have a good config file.
 try {        
-    var Config = require.resolve("./config.js");
+    var Config = require.resolve("./config.js");  // fixme? this does not actually load the config file
+    //console.log(Config); // on windows, this outputs: "c:\blinken\driver\config.js"
 } catch(e) {
     console.error("Config file is not setup. Please rename config-default.js to config.js");
     process.exit(e.code);
