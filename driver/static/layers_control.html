@@ -141,20 +141,7 @@ function delete_layer(layer_id) {
 }
     
     
-function test(param) {
-    alert(param);
-    get_current_layers()
-}
-    
-    
-    
-function test2() {
-    alert("test2");
-    get_current_layers();
-}
-    
-    
-    
+        
 function put_frame() {
     //console.log("puting frame");
     // send grid to server
@@ -214,16 +201,31 @@ function get_sources_list() {
 	    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
 	        status_msg("got the list of sources from the server");
             var sources_list_obj = JSON.parse(xmlhttp.responseText);
-            alert("got" + sources_list_obj.length + " sources");
-            //update_layers_display(layers_obj);
-	    }
+             update_sources_options_list(sources_list_obj);
+ 	    }
 	}
 	xmlhttp.open("GET",global_url + "/sources",true);
 	xmlhttp.send();    
 }
-    
+
+function update_sources_options_list(sources_list_obj) {
+    //
+    // insert the list of sources into the option list
+    //
+    //status_msg(JSON.stringify(sources_list_obj));
+    var select = document.getElementById("source");
+    for(var i = 0; i < sources_list_obj.length; i++) {
+        var option = document.createElement('option');
+        option.text = sources_list_obj[i].name;
+        select.add(option);
+        //alert("got" + sources_list_obj.length + " sources");
+    }
+}
     
 function status_msg(status_string) {
+    //
+    // updates the status message on the page
+    //
     var d = new Date();
     var time_str = d.toTimeString().slice(0,8);
     document.getElementById("javascript_status").innerHTML = time_str + " " + status_string;    
@@ -232,7 +234,9 @@ function status_msg(status_string) {
 
     
 function del_button_html(id) {
-
+    //
+    // creates html for the delete buttons
+    //
     var button_id = "delete_layer_" + id;
     var button_html = "";
     button_html += "<input type='button'";
@@ -303,13 +307,15 @@ function update_layers_display(layers_obj) {
     
     
 function init() {
+    //
+    // this function is called when the page is loaded
+    //
     document.getElementById('add_a_layer').onclick = add_a_layer;
     document.getElementById('post_layer').onclick = post_layer;
     document.getElementById('put_frame').onclick = put_frame;
     document.getElementById('get_current_layers').onclick = get_current_layers;
-    document.getElementById('get_sources').onclick = get_sources_list;
-    document.getElementById('test2').onclick = test2;
     get_current_layers();
+    get_sources_list();
 }
     
 
@@ -331,15 +337,12 @@ window.onload = init;
 <br><div id="add_a_layer_div" class="javascript_status">
 <input type="button" id="add_a_layer" name="Add a Layer" value="Add a Layer"></input>
 <span>   
-    source[name]: <input name="source[name]" type="text" size=20 value="color_wheel"></input>
-</span><span>
-    period: <input name="source[options][period]" type="text" size=5 value="33"></input>
-</span> </div>
+    Source Name: <select id="source" name="source" value="color_wheel"></select>
+</span>
+</div>
 </div> 
 <br><input type="button" id="post_layer" name="Setup Layer" value="Setup Layer"></input>
 <br><input type="button" id="put_frame" name="Put Frame" value="Put Frame"></input>
-<br><input type="button" id="get_sources" name="Get Sources" value="Get Sources"></input>
-<br><input type="button" id="test2" name="test2" value="test2"></input>
 <div id="javascript_status" class='javascript_status'></div>
 </form>
 <a href="/">Back to Blinken Home</a>
