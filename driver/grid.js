@@ -4,6 +4,8 @@ var Config = require('./config');
 
 function Grid() {
 
+  this.output_to_ceiling = true;  // direct output to ceiling on or off
+    
   this.display = require('./output');
   this.display.setup();
   this.pixel_map = this.display.getMap(); //Meta.
@@ -29,6 +31,7 @@ function Grid() {
   this.off();
 
 }
+
 
 Grid.prototype.index = function(x, y) {
   if (x < 0 || y < 0 || x >= this.num_pixels_x || y >= this.num_pixels_y) {
@@ -157,12 +160,12 @@ Grid.prototype.off = function() {
 
 // Write to device
 Grid.prototype.sync = function() {
-  
-  /// This is where we should put the switch for whether we blast updates out.
 
-  // Blast out updates
-  if (this.display) {
-	 this.display.writeLogicalArray(this.pixels);
+  if (this.output_to_ceiling == true) {
+      // Blast out updates
+      if (this.display) {
+         this.display.writeLogicalArray(this.pixels);
+      }
   }
 
   // Notify listeners
@@ -170,6 +173,13 @@ Grid.prototype.sync = function() {
     this.listeners[i]();
   }
 };
+
+Grid.prototype.set_output_to_ceiling = function(on_or_off) {
+  // allow direct output to the ceiling to be turned on or off
+  this.output_to_ceiling = on_or_off;
+  //console.log("output_to_ceiling is", on_or_off);
+}
+
 
 // Support list of sync listeners
 Grid.prototype.addListener = function(listener) {

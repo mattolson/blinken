@@ -1,1 +1,1 @@
-c:\nodejs\node c:\blinken\driver\index.js
+c:\nodejs\node index.js

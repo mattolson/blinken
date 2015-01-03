@@ -24,6 +24,7 @@ var Registry = require('./registry');
 var sources = new Registry( 'sources' );
 // var filters = new Registry( 'filters' );
 // console.log(sources);
+
 var api = new Object();
 
 console.log("Loading Config");
@@ -195,6 +196,8 @@ api.grid.toggleDisplay = function() {
   return grid.pixel_map;
 };
 
+
+
 //***************************************************************
 //
 //                Register handlers
@@ -284,6 +287,18 @@ exports.registerSocketHandlers = function() {
 // Register http handlers. Called from server.js once http
 // server is up and running.
 exports.registerHttpHandlers = function(app) {
+
+  // Direct output to ceiling
+  app.get('/blastoff', function(request, response){
+    grid.set_output_to_ceiling(false);
+    var result = {};
+    response.jsonp(result);
+  });
+  app.get('/blaston', function(request, response){
+    grid.set_output_to_ceiling(true);
+    var result = {};
+    response.jsonp(result);
+  });
 
   // Sources
   app.get('/sources', function(request, response){

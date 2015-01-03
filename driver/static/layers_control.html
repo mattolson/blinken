@@ -14,11 +14,11 @@
         width: 50%;
     }
     .gray_bg {
-        background-color: #ccc;
+        background-color: #ddd;
     }
     .javascript_status {
         border:1px solid; 
-        background-color: #ddd;
+        background-color: #ddf;
         margin-top: 5px;
         padding: 2px 2px 2px 10px;
         width: 50%;
@@ -30,13 +30,13 @@
     }
     .no_layers {
         border:1px solid; 
-        background-color: #ddd;
+        background-color: #ddf;
         margin-top: 5px;
         padding: 2px 2px 2px 10px;
         width: 200px;
    } 
     .table_header {
-        background-color: #aaf;
+        background-color: #ddf;
         padding: 3px 10px 3px 10px;
     }
     .table_data {
@@ -69,16 +69,16 @@ function add_a_layer() {
     //Define Request Options
     var options = {};
     //options['source[options][frame]'] = grid_data;
-     options = {
+    options = {
         'source' : {
-            name : 'color_wheel',
+            name : '',
             active : true,
-            period : 22,
-            // frame: [ [ [ 255,0,0 ] ] ]
+            period : 100,
         }
-     };
- 
-     //Create XMLHTTP Object and send. 
+    };
+    options.source.name = document.getElementById("source").value;
+
+    //Create XMLHTTP Object and send.
     $.ajax({
         type: "POST",
         url: global_url + "/mixer/channels",
@@ -172,6 +172,38 @@ function put_frame() {
 }
 
 
+function set_ceiling_off() {
+    // set direct output to the ceilling off
+	status_msg("setting direct output to the ceiling off");
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.onreadystatechange=function() {
+	    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+	        status_msg("set direct output to the ceiling off");
+            var result_obj = JSON.parse(xmlhttp.responseText);
+            // currently result is always just an empty object
+	    }
+	}
+	xmlhttp.open("GET", global_url + "/blastoff",true);
+	xmlhttp.send();
+}
+
+
+function set_ceiling_on() {
+    // set direct output to the ceilling on
+	status_msg("setting direct output to the ceiling on");
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.onreadystatechange=function() {
+	    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+	        status_msg("set direct output to the ceiling on");
+            var result_obj = JSON.parse(xmlhttp.responseText);
+            // currently result is always just an empty object
+	    }
+	}
+	xmlhttp.open("GET", global_url + "/blaston",true);
+	xmlhttp.send();
+}
+
+
 function get_current_layers() {
     //
 	// get the current list of layers from the server
@@ -256,18 +288,28 @@ function update_layers_display(layers_obj) {
     if (layers_obj.length > 0) {
         status_html += "<table class='layer_table'>";
         status_html += "<tr class='table_header'>";
-        status_html += "<td class='table_header'>Layer ID</td>";
+        status_html += "<td class='table_header'> </td>";
+        status_html += "<td class='table_header'> </td>";
         status_html += "<td class='table_header'>Source Name</td>";
+        status_html += "<td class='table_header'>Layer ID</td>";
         status_html += "<td class='table_header'>Status</th>";
         status_html += "<td class='table_header'>Options</th>";
-        status_html += "<th></th><th></th>";
         status_html += "</tr>";
         for (var i = 0; i < layers_obj.length; i++) {
             var layer_obj = layers_obj[i];
             status_html += "<tr>";
-            status_html += "<td class='table_data'>" + layer_obj.id;
+            status_html += "<td class='table_buttons'>";
+            status_html += del_button_html(layer_obj.id);
+            status_html += "</td>";
+            status_html += "<td class='table_buttons'>";
+            var button_id = "edit_layer_" + layer_obj.id;
+            status_html += "<input type='button'";
+            status_html += "id='"+button_id+"' name='"+button_id+"' value='Edit'";
+            status_html += "</input>";
             status_html += "</td>";
             status_html += "<td class='table_data'>" + layer_obj.source.name;
+            status_html += "</td>";
+            status_html += "<td class='table_data'>" + layer_obj.id;
             status_html += "</td>";
             status_html += "<td class='table_data'>";
             if (layer_obj.source.active) {
@@ -278,21 +320,12 @@ function update_layers_display(layers_obj) {
             status_html += "</td>";
             status_html += "<td class='table_data'>" + JSON.stringify(layer_obj.source.options);
             status_html += "</td>";
-            status_html += "<td class='table_buttons'>";
-            status_html += del_button_html(layer_obj.id);
-            status_html += "</td>";
-            status_html += "<td class='table_buttons'>";
-            var button_id = "edit_layer_" + layer_obj.id;
-            status_html += "<input type='button'";
-            status_html += "id='"+button_id+"' name='"+button_id+"' value='Edit'";
-            status_html += "</input>";
-            status_html += "</td>";
             status_html += "</tr>";
         }
         status_html += "</table>";
     } else {
         status_html += "<div class='no_layers'>"
-        status_html += "There are currently No Layers";
+        status_html += "No active layers";
         status_html += "</div>";
     }
     document.getElementById("layer_status").innerHTML = status_html;
@@ -311,6 +344,8 @@ function init() {
     // this function is called when the page is loaded
     //
     document.getElementById('add_a_layer').onclick = add_a_layer;
+    document.getElementById('blast_off').onclick = set_ceiling_off;
+    document.getElementById('blast_on').onclick = set_ceiling_on;
     document.getElementById('post_layer').onclick = post_layer;
     document.getElementById('put_frame').onclick = put_frame;
     document.getElementById('get_current_layers').onclick = get_current_layers;
@@ -327,20 +362,28 @@ window.onload = init;
 <form method="post">
 <br>
 <div id="layer_form">   
-<div class="bigbold">Blinken Layers
-<span width=400 text-align="right">
-    <input type="button" id="get_current_layers" name="Refresh" value="Refresh"></input>
-</span>    
+<div class="bigbold">
+    <br>
+        Basic Blinken Controller
+    <br>
+    <br>
 </div>
-<div id="layer_status"></div>
-<br>    
-<br><div id="add_a_layer_div" class="javascript_status">
-<input type="button" id="add_a_layer" name="Add a Layer" value="Add a Layer"></input>
-<span>   
-    Source Name: <select id="source" name="source" value="color_wheel"></select>
+<div id="add_a_layer_div" class="javascript_status">
+<span>
+    <select id="source" name="source" value="color_wheel"></select>
 </span>
+<input type="button" id="add_a_layer" name="Add a Layer" value="Add a Layer"></input>
 </div>
+<br>
+<div id="layer_status"></div>
+<span width=400 text-align="right">
+    <input type="button" id="get_current_layers" name="Refresh" value="Refresh Layers List"></input>
+</span>
+<br>
 </div> 
+<br><input type="button" id="blast_off" name="blast_off" value="Output to Ceiling Off"></input>
+<br><input type="button" id="blast_on" name="blast_on" value="Output to Ceiling On"></input>
+<br>
 <br><input type="button" id="post_layer" name="Setup Layer" value="Setup Layer"></input>
 <br><input type="button" id="put_frame" name="Put Frame" value="Put Frame"></input>
 <div id="javascript_status" class='javascript_status'></div>
