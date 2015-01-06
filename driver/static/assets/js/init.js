@@ -1,4 +1,5 @@
- var socket = io('http://localhost:1337');
+ var socket = io(window.location.host);
+ // var socket = io('192.168.1.3:1337');
 
   var channels, sources, grid, dimensions, $app = $('body');
 
@@ -69,10 +70,10 @@
     console.dir(channel);
     console.log('-----------');
     var channel_id = $(this).attr('data-id');
-    alert('updating');
+    console.log('updating');
     // var source_options = {};
     $channel.find('.source-options form li input.changed').each(function(){
-      alert('adding to object '+$(this).attr('name')+':'+$(this).val());
+      console.log('adding to object '+$(this).attr('name')+':'+$(this).val());
       channel.source.options[$(this).attr('name')] = $(this).val();
     });
     console.log('Channels source options updated')
@@ -129,6 +130,7 @@
   }
 
   function refresh_grid( grid_array ){
+    
     grid = grid_array;
     // $('section#grid').html(grid_html);
     // console.log(grid_html)
@@ -172,7 +174,7 @@
     $( 'section#grid' ).html( html );
   }
 
-  var gridIntval, refreshEvery = 2000;
+  var gridIntval, refreshEvery = 80;
   
   function GridStart(){
     gridIntval = setInterval(function(){
