@@ -14,11 +14,11 @@
         width: 50%;
     }
     .gray_bg {
-        background-color: #ccc;
+        background-color: #ddd;
     }
     .javascript_status {
         border:1px solid; 
-        background-color: #ddd;
+        background-color: #ddf;
         margin-top: 5px;
         padding: 2px 2px 2px 10px;
         width: 50%;
@@ -30,13 +30,13 @@
     }
     .no_layers {
         border:1px solid; 
-        background-color: #ddd;
+        background-color: #ddf;
         margin-top: 5px;
         padding: 2px 2px 2px 10px;
         width: 200px;
    } 
     .table_header {
-        background-color: #aaf;
+        background-color: #ddf;
         padding: 3px 10px 3px 10px;
     }
     .table_data {
@@ -69,16 +69,16 @@ function add_a_layer() {
     //Define Request Options
     var options = {};
     //options['source[options][frame]'] = grid_data;
-     options = {
+    options = {
         'source' : {
-            name : 'color_wheel',
+            name : '',
             active : true,
-            period : 22,
-            // frame: [ [ [ 255,0,0 ] ] ]
+            period : 100,
         }
-     };
- 
-     //Create XMLHTTP Object and send. 
+    };
+    options.source.name = document.getElementById("source").value;
+
+    //Create XMLHTTP Object and send.
     $.ajax({
         type: "POST",
         url: global_url + "/mixer/channels",
@@ -141,20 +141,7 @@ function delete_layer(layer_id) {
 }
     
     
-function test(param) {
-    alert(param);
-    get_current_layers()
-}
-    
-    
-    
-function test2() {
-    alert("test2");
-    get_current_layers();
-}
-    
-    
-    
+        
 function put_frame() {
     //console.log("puting frame");
     // send grid to server
@@ -182,6 +169,38 @@ function put_frame() {
     });
     
     //data: { name: 'frames', active: true, options: { frame: [ [ [ 255,0,0 ] ] ] } }
+}
+
+
+function set_ceiling_off() {
+    // set direct output to the ceilling off
+	status_msg("setting direct output to the ceiling off");
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.onreadystatechange=function() {
+	    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+	        status_msg("set direct output to the ceiling off");
+            var result_obj = JSON.parse(xmlhttp.responseText);
+            // currently result is always just an empty object
+	    }
+	}
+	xmlhttp.open("GET", global_url + "/blastoff",true);
+	xmlhttp.send();
+}
+
+
+function set_ceiling_on() {
+    // set direct output to the ceilling on
+	status_msg("setting direct output to the ceiling on");
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.onreadystatechange=function() {
+	    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+	        status_msg("set direct output to the ceiling on");
+            var result_obj = JSON.parse(xmlhttp.responseText);
+            // currently result is always just an empty object
+	    }
+	}
+	xmlhttp.open("GET", global_url + "/blaston",true);
+	xmlhttp.send();
 }
 
 
@@ -214,16 +233,31 @@ function get_sources_list() {
 	    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
 	        status_msg("got the list of sources from the server");
             var sources_list_obj = JSON.parse(xmlhttp.responseText);
-            alert("got" + sources_list_obj.length + " sources");
-            //update_layers_display(layers_obj);
-	    }
+             update_sources_options_list(sources_list_obj);
+ 	    }
 	}
 	xmlhttp.open("GET",global_url + "/sources",true);
 	xmlhttp.send();    
 }
-    
+
+function update_sources_options_list(sources_list_obj) {
+    //
+    // insert the list of sources into the option list
+    //
+    //status_msg(JSON.stringify(sources_list_obj));
+    var select = document.getElementById("source");
+    for(var i = 0; i < sources_list_obj.length; i++) {
+        var option = document.createElement('option');
+        option.text = sources_list_obj[i].name;
+        select.add(option);
+        //alert("got" + sources_list_obj.length + " sources");
+    }
+}
     
 function status_msg(status_string) {
+    //
+    // updates the status message on the page
+    //
     var d = new Date();
     var time_str = d.toTimeString().slice(0,8);
     document.getElementById("javascript_status").innerHTML = time_str + " " + status_string;    
@@ -232,7 +266,9 @@ function status_msg(status_string) {
 
     
 function del_button_html(id) {
-
+    //
+    // creates html for the delete buttons
+    //
     var button_id = "delete_layer_" + id;
     var button_html = "";
     button_html += "<input type='button'";
@@ -252,18 +288,28 @@ function update_layers_display(layers_obj) {
     if (layers_obj.length > 0) {
         status_html += "<table class='layer_table'>";
         status_html += "<tr class='table_header'>";
-        status_html += "<td class='table_header'>Layer ID</td>";
+        status_html += "<td class='table_header'> </td>";
+        status_html += "<td class='table_header'> </td>";
         status_html += "<td class='table_header'>Source Name</td>";
+        status_html += "<td class='table_header'>Layer ID</td>";
         status_html += "<td class='table_header'>Status</th>";
         status_html += "<td class='table_header'>Options</th>";
-        status_html += "<th></th><th></th>";
         status_html += "</tr>";
         for (var i = 0; i < layers_obj.length; i++) {
             var layer_obj = layers_obj[i];
             status_html += "<tr>";
-            status_html += "<td class='table_data'>" + layer_obj.id;
+            status_html += "<td class='table_buttons'>";
+            status_html += del_button_html(layer_obj.id);
+            status_html += "</td>";
+            status_html += "<td class='table_buttons'>";
+            var button_id = "edit_layer_" + layer_obj.id;
+            status_html += "<input type='button'";
+            status_html += "id='"+button_id+"' name='"+button_id+"' value='Edit'";
+            status_html += "</input>";
             status_html += "</td>";
             status_html += "<td class='table_data'>" + layer_obj.source.name;
+            status_html += "</td>";
+            status_html += "<td class='table_data'>" + layer_obj.id;
             status_html += "</td>";
             status_html += "<td class='table_data'>";
             if (layer_obj.source.active) {
@@ -274,21 +320,12 @@ function update_layers_display(layers_obj) {
             status_html += "</td>";
             status_html += "<td class='table_data'>" + JSON.stringify(layer_obj.source.options);
             status_html += "</td>";
-            status_html += "<td class='table_buttons'>";
-            status_html += del_button_html(layer_obj.id);
-            status_html += "</td>";
-            status_html += "<td class='table_buttons'>";
-            var button_id = "edit_layer_" + layer_obj.id;
-            status_html += "<input type='button'";
-            status_html += "id='"+button_id+"' name='"+button_id+"' value='Edit'";
-            status_html += "</input>";
-            status_html += "</td>";
             status_html += "</tr>";
         }
         status_html += "</table>";
     } else {
         status_html += "<div class='no_layers'>"
-        status_html += "There are currently No Layers";
+        status_html += "No active layers";
         status_html += "</div>";
     }
     document.getElementById("layer_status").innerHTML = status_html;
@@ -303,13 +340,17 @@ function update_layers_display(layers_obj) {
     
     
 function init() {
+    //
+    // this function is called when the page is loaded
+    //
     document.getElementById('add_a_layer').onclick = add_a_layer;
+    document.getElementById('blast_off').onclick = set_ceiling_off;
+    document.getElementById('blast_on').onclick = set_ceiling_on;
     document.getElementById('post_layer').onclick = post_layer;
     document.getElementById('put_frame').onclick = put_frame;
     document.getElementById('get_current_layers').onclick = get_current_layers;
-    document.getElementById('get_sources').onclick = get_sources_list;
-    document.getElementById('test2').onclick = test2;
     get_current_layers();
+    get_sources_list();
 }
     
 
@@ -321,25 +362,30 @@ window.onload = init;
 <form method="post">
 <br>
 <div id="layer_form">   
-<div class="bigbold">Blinken Layers
-<span width=400 text-align="right">
-    <input type="button" id="get_current_layers" name="Refresh" value="Refresh"></input>
-</span>    
+<div class="bigbold">
+    <br>
+        Basic Blinken Controller
+    <br>
+    <br>
 </div>
-<div id="layer_status"></div>
-<br>    
-<br><div id="add_a_layer_div" class="javascript_status">
+<div id="add_a_layer_div" class="javascript_status">
+<span>
+    <select id="source" name="source" value="color_wheel"></select>
+</span>
 <input type="button" id="add_a_layer" name="Add a Layer" value="Add a Layer"></input>
-<span>   
-    source[name]: <input name="source[name]" type="text" size=20 value="color_wheel"></input>
-</span><span>
-    period: <input name="source[options][period]" type="text" size=5 value="33"></input>
-</span> </div>
+</div>
+<br>
+<div id="layer_status"></div>
+<span width=400 text-align="right">
+    <input type="button" id="get_current_layers" name="Refresh" value="Refresh Layers List"></input>
+</span>
+<br>
 </div> 
+<br><input type="button" id="blast_off" name="blast_off" value="Output to Ceiling Off"></input>
+<br><input type="button" id="blast_on" name="blast_on" value="Output to Ceiling On"></input>
+<br>
 <br><input type="button" id="post_layer" name="Setup Layer" value="Setup Layer"></input>
 <br><input type="button" id="put_frame" name="Put Frame" value="Put Frame"></input>
-<br><input type="button" id="get_sources" name="Get Sources" value="Get Sources"></input>
-<br><input type="button" id="test2" name="test2" value="test2"></input>
 <div id="javascript_status" class='javascript_status'></div>
 </form>
 <a href="/">Back to Blinken Home</a>

@@ -1,15 +1,16 @@
 {
   "name": "blinken-driver",
   "description": "Low level API for WS2801 LED array",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "dependencies": {
     "express": "*",
     "socket.io": "*",
-		"socket.io-stream": "*",
+    "socket.io-stream": "*",
     "easing": "*",
-		"body-parser": "*",
-		"get-pixels": "*",
-		"nodegit": "*"
+    "body-parser": "*",
+    "get-pixels": "*",
+    "nodegit": "*",
+    "minimist": "*"
   }
 }

@@ -3,7 +3,7 @@ var Config = {};
   // Server settings
   Config.server = {};
   Config.server.port = 1337;
-  Config.server.host = 'localhost';
+  Config.server.host = 'localhost';  // this is currently ignored, server listens on all IP addresses
   // Config.server.user = 'pi';
   // Config.server.group = 'pi';
 		
