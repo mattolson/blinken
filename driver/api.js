@@ -199,7 +199,7 @@ api.grid.map = function() {
 };
 
 api.grid.toggleDisplay = function() {
-  return grid.pixel_map;
+  return;
 };
 
 
