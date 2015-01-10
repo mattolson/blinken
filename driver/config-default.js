@@ -4,6 +4,8 @@ var Config = {};
   Config.server = {};
   Config.server.port = 1337;
   Config.server.host = 'localhost';  // this is currently ignored, server listens on all IP addresses
+
+  // Config.debug_level = 3;
   // Config.server.user = 'pi';
   // Config.server.group = 'pi';
 		

@@ -3,12 +3,20 @@
 //                Setup
 //
 //**************************************
+
+console.log("Loading Config");
+try {
+    var config = require('./config.js');  // fixme? this is also loaded in server.js
+} catch(e) {
+    var config = require('./config-default.js');
+}
+
 var util = require('util');
 
 // Setup grid
 console.log("Loading Grid");
 var Grid = require('./grid');
-var grid = new Grid();
+var grid = new Grid(config);
 
 // Setup mixer and set rendering loop in motion
 console.log("Loading Mixer");
@@ -27,8 +35,6 @@ var sources = new Registry( 'sources' );
 
 var api = new Object();
 
-console.log("Loading Config");
-var config = require('./config');  // fixme? this is also required() in server.js - any problem if this is re-loaded?
 
 //**************************************
 //
@@ -89,7 +95,7 @@ api.channel.create = function(channel_name, source_name, source_options) {
   if (source == null) return { error : util.format("ERROR: source not found: '%s'", source_name) };
 
   // Add channel and return its json representation
-  var channel = mixer.add_channel(channel_name, new source(new Grid(), source_options));
+  var channel = mixer.add_channel(channel_name, new source(new Grid(config), source_options));
   return channel.toJson();
 
 };

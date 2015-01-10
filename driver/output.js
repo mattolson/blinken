@@ -1,7 +1,7 @@
 /* jshint bitwise:false */
 
 var artnet = require('./lib/artnet-client');
-var config = require('./config');
+//var config = require('./config');
 
 var WIDTH_PIXELS = 60;
 var HEIGHT_PIXELS = 48;

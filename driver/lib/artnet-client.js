@@ -1,5 +1,5 @@
 /* jshint bitwise:false */
-var config = require('../config');
+//var config = require('../config');
 /* jshint bitwise:false */
 var dgram = require('dgram');
 var Buffer1 = require('buffer').Buffer;

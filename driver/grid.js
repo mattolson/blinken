@@ -1,8 +1,7 @@
 // The grid object maps the 2D logical space to the 1D physical space
 // and handles device operations
-var Config = require('./config');
 
-function Grid() {
+function Grid(config) {
 
   this.output_to_ceiling = true;  // direct output to ceiling on or off
     
@@ -11,10 +10,10 @@ function Grid() {
   this.pixel_map = this.display.getMap(); //Meta.
 
   // Store dimensions for later
-  this.num_panels_x = Config.grid.num_panels_x;
-  this.num_panels_y = Config.grid.num_panels_y;
-  this.num_pixels_per_panel_x = Config.grid.num_pixels_per_panel_x;
-  this.num_pixels_per_panel_y = Config.grid.num_pixels_per_panel_y;
+  this.num_panels_x = config.grid.num_panels_x;
+  this.num_panels_y = config.grid.num_panels_y;
+  this.num_pixels_per_panel_x = config.grid.num_pixels_per_panel_x;
+  this.num_pixels_per_panel_y = config.grid.num_pixels_per_panel_y;
 
   // Figure out overall dimensions
   this.num_pixels_x = this.num_panels_x * this.num_pixels_per_panel_x;
@@ -28,7 +27,7 @@ function Grid() {
   // Setup list of listeners
   this.listeners = [];
 
-  this.off();
+  //this.off();
 
 }
 
