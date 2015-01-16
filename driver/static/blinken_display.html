@@ -2,32 +2,48 @@
 <head>
 <meta charset="utf-8">
 <style type="text/css"> 
-.positioned
-{
-position:absolute;
-}
-
-.dimmed
-{
-background-color:#555;
-}
-.hidden
-{
-visibility:hidden;
-}
-
+#body { background-color:#555; }
+#status_div { margin-left:20px }
 </style>
+</head>
+<body id="body" onload="start()"; >
 <script>
 //-----------------------------------------------------------------------------
+
 var grid = Object();  // global object
+
+
+//-----------------------------------------------------------------------------
+function start() {
+    //
+	// called by html body.onload event
+    //
+    // add content to html body
+
+    setup_html_content();
+    setup();
+	status_update("OK");
+}
+
+
+function setup_html_content() {
+    //
+	body_html = "";
+	body_html += "<button id='start_button' name='start' value='start'>Start</button>"
+	body_html += "<button id='stop_button' name='stop' value='stop'>Stop</button>"
+	//body_html += "&nbsp; &nbsp; ";  // gap between buttons and status
+    body_html += "<span id='status_div'></span>";
+	body_html += "<br>";
+	body_html += "<canvas id='canvas' width='800' height='600'></canvas>";
+
+	document.getElementById("body").innerHTML = body_html;
+}
 
 
 //-----------------------------------------------------------------------------
 function setup() {
 	document.title = "Blinken Canvas";
 	grid.color_background = '#000000';  // black
-	grid.color_highlighted = 'rgb(220,220,250)';  // light bluish color
-	grid.color_selected = '#FFFFFF'; // white
 	grid.color_default = '#000000';  // black
 
 	grid.cell_cols = 60;
@@ -205,23 +221,6 @@ function status_update(status_str) {
 	document.getElementById("status_div").innerHTML = html;
 }
 
-//-----------------------------------------------------------------------------
-//
-function start() {
-	// content of html body
-	body_html = "";
-	body_html += "<button id='start_button' name='start' value='start'>Start</button>"
-	body_html += "<button id='stop_button' name='stop' value='stop'>Stop</button>"
-	body_html += "&nbsp; &nbsp; <span id='status_div'></span>";
-	body_html += "<br>";
-	body_html += "<canvas id='canvas' width='800' height='600'></canvas>";
-	document.getElementById("body").innerHTML = body_html;
-
-	setup();
-	status_update("OK");
-}
-
-
 function mode_select_onchange() {
 	var status_str;
 	if (grid.running) {
@@ -245,6 +244,7 @@ function int_to_hex(d) {
 
 
 function screen_update() {
+    //
 	// get the current grid pixel colors from the server 
     // then update the simulated screen with those colors
     //
@@ -267,12 +267,6 @@ function screen_update() {
 	xmlhttp.send();
 }
 
-
-//-----------------------------------------------------------------------------
-// end of javascript
-//-----------------------------------------------------------------------------
 </script>
-</head>
-<body id="body" class="dimmed" onload="start()"; >
 </body>
 </html>
