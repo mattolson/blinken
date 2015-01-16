@@ -33,8 +33,8 @@ var NAME = path.basename(__filename, '.js'); // Our unique name
 function Frames(grid, options)
 {
   this.options = options || {};
-  console.log("frames.js constructor options");
-  console.log(this.options);
+  //console.log("frames.js constructor options");
+  //console.log(this.options);
   Frames.super_.call(this, NAME, grid, options);
 }
 

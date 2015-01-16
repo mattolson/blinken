@@ -24,11 +24,8 @@ function Grid(config) {
   // this.pixel_map = new Array(this.num_pixels_x * this.num_pixels_y); // Maps logical index to strand index
   this.pixels = new Buffer(this.num_pixels_x * this.num_pixels_y * 3); // 3 octets per pixel, stores color values
 
-  // Setup list of listeners
-  this.listeners = [];
-
-  //this.off();
-
+  this.listeners = [];  // list of listeners
+  this.off();
 }
 
 

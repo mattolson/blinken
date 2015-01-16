@@ -95,7 +95,7 @@ Filter.prototype.validate_options = function(new_options, use_defaults) {
 
       // Apply new value to self
       if (value != null) {
-        console.log(util.format("parsed value '%s' for option '%s'", util.inspect(value), option_name));
+        //console.log(util.format("parsed value '%s' for option '%s'", util.inspect(value), option_name));
         validated[option_name] = value;
       }
     }

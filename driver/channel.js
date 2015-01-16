@@ -6,9 +6,9 @@ function Channel(id, name, source) {
   this.source = source;
   this.filters = new Array();
   // this.buffer = new Buffer(Config.grid.num_pixels_x * Config.grid.num_pixels_y * 3)
-  console.log("channel object");
-  console.log(this);
-  console.log("------");
+  //console.log("channel object");
+  //console.log(this);
+  //console.log("------");
 }
 
 // For now, rendering a channel simply means rendering the source
@@ -45,7 +45,7 @@ Channel.prototype.display = function(){
 }
 
 Channel.prototype.toJson = function() {
-  console.log('Channel Source Options->')
+  //console.log('Channel Source Options->')
   // console.dir(this.source.toJson());
   return {
     'id': this.id,

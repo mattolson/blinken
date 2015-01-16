@@ -121,13 +121,13 @@ api.channel.get = function(channel_id) {
 
 // PUT /channels/:id
 api.channel.update = function(channel_id, channel_options) {
+  console.log("put /channels/:id");
   // Look up channel
   var channel = mixer.find_channel(channel_id);
   if (channel == null) return { error : util.format("ERROR: channel not found: '%d'", channel_id) }
   // Update channel
   channel.update(channel_options);
-  console.log("put /channels/:id");
-  console.log(channel_options);
+  //console.log(channel_options);
   return true;
 
 };
@@ -326,8 +326,8 @@ exports.registerHttpHandlers = function(app) {
   app.post('/mixer/channels', function(request, response){ 
 
     console.log("post /mixer/channels request.body:");
-    console.log(request.body);
-    console.log(request.params);  
+    //console.log(request.body);
+    //console.log(request.params);  
 
     var channel_name = request.body.name;
     var source_name = request.body.source.name;
@@ -335,7 +335,7 @@ exports.registerHttpHandlers = function(app) {
 
     var result = api.channel.create(channel_name, source_name, source_options);
     console.log("creating channel");
-    console.log(result);
+    //console.log(result);
     if(!result.error)  response.status(201).jsonp(result);
     else response.status(400).jsonp(errorResponse(400, result.error));
 
@@ -357,7 +357,7 @@ exports.registerHttpHandlers = function(app) {
  
     var result = api.channel.update(channel_id, channel_options);
 
-    console.log(result);
+    //console.log(result);
       
     if(!result.error) response.sendStatus(204);
     else response.status(404).jsonp(errorResponse(404, result.error));
@@ -396,7 +396,7 @@ exports.registerHttpHandlers = function(app) {
  
     var result = api.output.update(display_toggle);
 
-    console.log(result);
+    //console.log(result);
       
     if(!result.error) response.sendStatus(204);
     else response.status(404).jsonp(errorResponse(404, result.error));
