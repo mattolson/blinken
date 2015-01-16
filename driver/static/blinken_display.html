@@ -42,7 +42,7 @@ function setup_html_content() {
 
 //-----------------------------------------------------------------------------
 function setup() {
-	document.title = "Blinken Canvas";
+	document.title = "Blinken Display";
 	grid.color_background = '#000000';  // black
 	grid.color_default = '#000000';  // black
 
@@ -107,19 +107,19 @@ function grid_setup() {
 //-----------------------------------------------------------------------------
 function timer_tick() {
 	// timer event called at regular interval
+    //
+    var frames_per_sec = 1/(grid.timer_tick_interval_ms/1000);
+    
 	grid.timer_count++;
 	if (grid.running) {
+	   screen_update();
 		msg = "Running ";
-		msg += "("+grid.timer_tick_interval_ms/1000+" sec loop) ";
+		msg += frames_per_sec +" frames/sec - ";
 		msg +=  " tick "+grid.timer_count;
 	} else {
 		msg = "Stopped";
 	}
-	
-	screen_update();
-	
-	status_update(msg);
-	
+	status_update(msg);	
 }
 
 
