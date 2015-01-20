@@ -1,4 +1,4 @@
 driver/node_modules
 .DS_Store
-config.js
+driver/config.js
 *.log
