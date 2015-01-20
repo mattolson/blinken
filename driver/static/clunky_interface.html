@@ -289,8 +289,8 @@ function cell_onclick(event) {
 	// called when mouse is clicked on a grid square
 	var x = event.clientX;
 	var y = event.clientY;
-	var row_num = Math.floor((y - grid.y_margin) / (grid.cell_size + grid.cell_margin));
-	var col_num = Math.floor((x - grid.x_margin) / (grid.cell_size + grid.cell_margin));
+	var row_num = Math.floor((y - grid.y_margin) / (grid.cell_size + grid.cell_margin)) - 1;
+	var col_num = Math.floor((x - grid.x_margin) / (grid.cell_size + grid.cell_margin)) - 1;
 
 	var content = "clicked cell row "+row_num+", col "+col_num;
 	document.getElementById("mouse_position").innerHTML = content;
@@ -336,10 +336,8 @@ function post_layer() {
     //
     // create a new layer
     //
-    //Define Request Options
     var options = {};
-    //options['source[options][frame]'] = grid_data;
-     options = {
+    options = {
         'source' : {
             name : 'frames',
             active : true,
@@ -351,10 +349,8 @@ function post_layer() {
  
      //Create XMLHTTP Object and send. 
     $.ajax({
-        //type: "PUT",
         type: "POST",
         url: global_url + "/mixer/channels",
-        //data: { name: 'frames', active: true, options: { frame: [ [ [ 255,0,0 ] ] ] } }
         contentType: "application/json; charset=UTF-8",
         data: JSON.stringify(options)
     })
@@ -627,7 +623,7 @@ function mode_select_onchange(event) {
 		document.getElementById("color_field_controls").style.display="block";
 		document.getElementById("color_bar_div").style.display="none";
 		document.getElementById("palette_select_span").style.display="none";
-		document.getElementById("clear_button").style.display="none";	
+		document.getElementById("clear_button").style.display="inline";	
 	}
 	
 	if (mode == "paint") {
@@ -1250,8 +1246,8 @@ function grid_color_field() {
 function grid_color_wheel() {
 	// color-wheel
 	if (true) {
-		center_col = 15;
-		center_row =  15;
+		center_col = 25;
+		center_row =  20;
 	} else {
 		center_col = 0;
 		center_row =  0;
@@ -1287,21 +1283,20 @@ function cell_flood(cell_name, color) {
 	// flood the color
 	range = grid.flood_range;
 	cell = grid.board[cell_name];
-	if(!cell) {
-		alert('unknown cell name: '+cell_name);
-	}
-	a_row = grid.board[cell_name].row;
-	a_col = grid.board[cell_name].col;
-	for(key in grid.board) {
-		cell = grid.board[key];
-		x_dist = Math.abs(a_col - cell.col);
-		y_dist = Math.abs(a_row - cell.row);
-		distance = Math.sqrt((x_dist*x_dist)+(y_dist*y_dist));
-		dim_percent = distance / range;
-		dim_color = color_dim(grid.color_selected, dim_percent);
-		new_color = color_add(cell.color, dim_color);
-		cell.color = new_color
-		cell_update(key);
+	if(cell) {
+        a_row = grid.board[cell_name].row;
+        a_col = grid.board[cell_name].col;
+        for(key in grid.board) {
+            cell = grid.board[key];
+            x_dist = Math.abs(a_col - cell.col);
+            y_dist = Math.abs(a_row - cell.row);
+            distance = Math.sqrt((x_dist*x_dist)+(y_dist*y_dist));
+            dim_percent = distance / range;
+            dim_color = color_dim(grid.color_selected, dim_percent);
+            new_color = color_add(cell.color, dim_color);
+            cell.color = new_color
+            cell_update(key);
+        }
 	}
 }
 
