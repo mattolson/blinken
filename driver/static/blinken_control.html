@@ -318,7 +318,7 @@ function update_layers_display(layers_obj) {
                 status_html += "Inactive";                 
             }
             status_html += "</td>";
-            status_html += "<td class='table_data'>" + JSON.stringify(layer_obj.source.options);
+            status_html += "<td class='table_data'>" + JSON.stringify(layer_obj.source.options).substring(0,100);
             status_html += "</td>";
             status_html += "</tr>";
         }
