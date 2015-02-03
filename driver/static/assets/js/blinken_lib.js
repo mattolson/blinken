@@ -1,59 +1,25 @@
-
-// uses JavaScript Module Pattern
+//-----------------------------------------------------------------------------
+// blinken client library
 //
-// see http://www.adequatelygood.com/JavaScript-Module-Pattern-In-Depth.html
-// see also http://www.adequatelygood.com/Writing-Testable-JavaScript.html
-// see also http://stackoverflow.com/questions/1646698/what-is-the-new-keyword-in-javascript
-
-//-----------------------------------------------------------------------------
-// beginning of closure
+// 
 //
-(function () {
-	// ... all vars and functions are in this scope only
-	// still maintains access to all globals
-
-var global_bc = {};  // blinken client
-
-
 //-----------------------------------------------------------------------------
-// BlinkenClient object constructor
-//-----------------------------------------------------------------------------
-BlinkenClient = function() {
-    // uses global_bc now
-}
-
-
-//-----------------------------------------------------------------------------
-BlinkenClient.prototype.connect = function(server_addr) {
-    // connect to server
+BlinkenClient = function(server_addr) {
+    // object constructor
     //
-    //console.log("connect server_addr: " + server_addr);
-    
-    //this.server_addr = server_addr;
-    //this.global_url = "http://" + server_addr;
-    
-    global_bc.global_url = "http://" + server_addr;
-    global_bc.server_addr = server_addr;
-    
-}
+    // methods are added to object prototype below
 
-
-//-----------------------------------------------------------------------------
-BlinkenClient.prototype.set_frame_id = function(frame_id) {
-    // set frame id
-    //
-    //this.frame_id = frame_id;
-    global_bc.frame_id = frame_id;
+    this.server_addr = server_addr;    
+    this.protocol = "http://";
 }
 
 
 
 //-----------------------------------------------------------------------------
-BlinkenClient.prototype.add_frame_layer = function() {
+BlinkenClient.prototype.add_frame_layer = function(callback) {
     //
     // create a new layer on the blinken server using the 'frames' source
     //
-    var local_frame_id = null;
     var options = {
         'source' : {
             name : 'frames',
@@ -62,77 +28,68 @@ BlinkenClient.prototype.add_frame_layer = function() {
                 period : 44
             }
         }
-     };
+    }
  
-    //console.log("adding a frame layer: " + this.global_url); // undefined
-    //console.log("adding a frame layer: " + BlinkenClient.prototype.global_url);  // undefined
-    //console.log("adding a frame layer: " + global_bc.global_url); // works
-    
-     //Create XMLHTTP Object and send. 
     $.ajax({
         type: "POST",
-        url: global_bc.global_url + "/mixer/channels",
+        url: this.protocol + this.server_addr + "/mixer/channels",
         contentType: "application/json; charset=UTF-8",
         data: JSON.stringify(options),
         success: function(response_data, textStatus, jqXHR) {
-            //alert("success" + JSON.stringify(data));
-            if ('id' in response_data) {
-                // keep track of frame_id for later
-                local_frame_id = response_data.id;
-                //console.log("got frame id: " + local_frame_id);
-                global_bc.frame_id = local_frame_id;
+            if (callback) {
+                callback(response_data);
             }
         }
-    })
+    });
 }
     
 
-
 //-----------------------------------------------------------------------------
-BlinkenClient.prototype.send_frame = function(frame) {
+BlinkenClient.prototype.get_sources_list = function(callback) {
     //
-    // send frame of pixel colors to server
+	// get the list of "sources" from the server
     //
-    //console.log("bclient sending a frame");
-    
-    if (global_bc.frame_id == null) {
-        //console.log("send_frame error: frame_id is null");
-        return; // not connected
-    }
-    
-    var options = {};
-    options = {
-        'source' : {
-            name : 'frames',
-            active : true,
-            options: {
-                period : 66,
-                frame: frame,
+    $.ajax({
+        type: "GET",
+        url: this.protocol + this.server_addr + "/sources",
+        contentType: "application/json; charset=UTF-8",
+        success: function(response_data, textStatus, jqXHR) {
+            if (callback) {
+                callback(response_data);
             }
         }
-    };
- 
-     //Create XMLHTTP Object and send. 
-    $.ajax({
-        type: "PUT",
-        url: global_bc.global_url + "/mixer/channels/" + global_bc.frame_id,
-        contentType: "application/json; charset=UTF-8",
-        data: JSON.stringify(options)
     });
 }
 
 
-
 //-----------------------------------------------------------------------------
-// end of closure (javascript function expression)
-}());
+BlinkenClient.prototype.send_frame = function(frame, frame_id) {
+    //
+    // send a "frame" of pixels to server
+    //
+    // each frame is array of rows
+    // each row is an array of pixel colors
+    // each color is an array of rgb or rgba values
+    //
+    
+    if (frame_id) {
+        options = {
+            'source' : {
+                name : 'frames',
+                active : true,
+                options: {
+                    period : 66,
+                    frame: frame,
+                }
+            }
+        };
+        $.ajax({
+            type: "PUT",
+            url: this.protocol + this.server_addr + "/mixer/channels/" + frame_id,
+            contentType: "application/json; charset=UTF-8",
+            data: JSON.stringify(options)
+            // no need to process response_data
+        });
+    }
+}
 
-
-
-//-----------------------------------------------------------------------------
-// example library module usage:
-//-----------------------------------------------------------------------------
-//
-//      blinken = new BlinkenClient();
-//      blinken.connect("localhost");
-//

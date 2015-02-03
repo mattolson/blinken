@@ -1,7 +1,7 @@
 <!DOCTYPE html5>
 <html>
 <head>
-<title>Blinken Layers</title>
+<title>Basic Blinken Control</title>
 <meta charset="utf-8">
 <style>
     .bordered {
@@ -50,10 +50,28 @@
 </style>
     
 <script type="text/javascript" src="assets/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="assets/js/blinken_lib.js"></script>
 <script>
 
 global_url = "http://" + window.location.host;
-//alert(window.location.host + " port " + window.location.port);
+
+    
+//------------------------------------------------------------------------------    
+function test_button_click() {   
+    
+    //alert(window.location.host + " port " + window.location.port);
+    blinken = new BlinkenClient(window.location.host);
+    console.log("connected");
+    
+    var callback = function(data) {
+        //console.log(JSON.stringify(data));
+        update_sources_options_list(data);
+    }
+    
+    blinken.get_sources_list(callback);
+}
+    
+    
     
     
 function send() {
@@ -228,17 +246,12 @@ function get_sources_list() {
 	// get the list of sources from the server
     //
 	status_msg("getting the list of sources from the server");
-	var xmlhttp=new XMLHttpRequest();	
-	xmlhttp.onreadystatechange=function() {
-	    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-	        status_msg("got the list of sources from the server");
-            var sources_list_obj = JSON.parse(xmlhttp.responseText);
-             update_sources_options_list(sources_list_obj);
- 	    }
-	}
-	xmlhttp.open("GET",global_url + "/sources",true);
-	xmlhttp.send();    
+    
+    var blinken = new BlinkenClient("localhost:8888");
+    //blinken.connect("localhost:8888");
+    blinken.get_sources_list(update_sources_options_list);
 }
+
 
 function update_sources_options_list(sources_list_obj) {
     //
@@ -254,6 +267,7 @@ function update_sources_options_list(sources_list_obj) {
     }
 }
     
+    
 function status_msg(status_string) {
     //
     // updates the status message on the page
@@ -262,7 +276,6 @@ function status_msg(status_string) {
     var time_str = d.toTimeString().slice(0,8);
     document.getElementById("javascript_status").innerHTML = time_str + " " + status_string;    
 }
-    
 
     
 function del_button_html(id) {
@@ -349,6 +362,7 @@ function init() {
     document.getElementById('post_layer').onclick = post_layer;
     document.getElementById('put_frame').onclick = put_frame;
     document.getElementById('get_current_layers').onclick = get_current_layers;
+    document.getElementById('test_button').onclick = test_button_click;
     get_current_layers();
     get_sources_list();
 }
@@ -386,6 +400,7 @@ window.onload = init;
 <br>
 <br><input type="button" id="post_layer" name="Setup Layer" value="Setup Layer"></input>
 <br><input type="button" id="put_frame" name="Put Frame" value="Put Frame"></input>
+<br><input type="button" id="test_button" name="test" value="Test"></input>
 <div id="javascript_status" class='javascript_status'></div>
 </form>
 <a href="/">Back to Blinken Home</a>

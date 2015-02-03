@@ -115,10 +115,8 @@ margin:0px;
 // Begin JavaScript
 //-----------------------------------------------------------------------------
 
-var bclient = new BlinkenClient();  
 var server_addr = window.location.host;
-console.log("window.location.host: " + server_addr);
-bclient.connect(server_addr);
+var bclient = new BlinkenClient(server_addr);  
 
 var grid = Object();  // global object
 
@@ -346,9 +344,14 @@ function start_send() {
     // create a new layer and start sending frames to the server
     //
     //console.log("starting frame layer");
-    bclient.add_frame_layer();    
-    grid.sending = true;
-    $("#connection_status").html("sending to server");
+    var callback = function(data) {
+        if ('id' in data) {
+            grid.layer_id = data.id;
+            grid.sending = true;
+            $("#connection_status").html("sending to server");        
+        }
+    }
+    bclient.add_frame_layer(callback);    
 }
 
 
@@ -385,7 +388,7 @@ function post_frame() {
         }
         frame.push(row);
     }
-    bclient.send_frame(frame);
+    bclient.send_frame(frame, grid.layer_id);
 }
 
 
