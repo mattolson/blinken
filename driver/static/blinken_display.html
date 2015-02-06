@@ -23,28 +23,30 @@ function setup() {
 	grid.color_background = '#000000';  // black
 	grid.color_default = '#000000';  // black
 
-	grid.pixel_cols = 60;
-	grid.pixel_rows = 48;
+	grid.cols = 60;
+	grid.rows = 48;
 	grid.pixel_margin = 2;
-	grid.pixel_size = 8;
-	grid.pixel_height = grid.pixel_size;
-	grid.pixel_width = grid.pixel_size;
+	grid.pixel_height = 8;
+	grid.pixel_width = 8;
 	
 	grid.x_margin = 20;
 	grid.y_margin = 20;
-	grid.done = false;
 
 	grid.timer_tick_interval_ms = 50; // milliseconds per timer tick
 	
 	grid.running = false;
 	grid.timer_count = 0;
 	
-	grid_setup();  // initialize grid pixels
+	// initialize grid of pixels
+	for(row=1; row<=grid.rows; row++) {
+		for(col=1; col<=grid.cols; col++) {
+			pixel_update_color(col, row, grid.color_default);
+		}
+	}
 	
 	// setup events
-	document.getElementById("start_button").onclick=function(){start_button_click()};
-	document.getElementById("stop_button").onclick=function(){stop_button_click()};
-	document.getElementById("test_button").onclick=function(){test_button_click()};
+	document.getElementById("start_button").onclick = start_button_click;
+	document.getElementById("stop_button").onclick = stop_button_click;
 
 	grid.availWidth = screen.availWidth;
 	grid.availHeight = screen.availHeight;
@@ -57,29 +59,6 @@ function setup() {
 
 
 //-----------------------------------------------------------------------------
-function grid_setup() {
-	// create grid of pixels
-	grid.board = {};
-	for(row_num=1; row_num<=grid.pixel_rows; row_num++) {
-		for(col_num=1; col_num<=grid.pixel_cols; col_num++) {
-			pixel = Object();
-			pixel.text = '';
-			pixel.color = grid.color_default;
-			pixel.name = 'cell_'+row_num+'_'+col_num;
-			pixel.row = row_num;
-			pixel.col = col_num;
-			pixel.x_pos = grid.x_margin + (col_num * (grid.pixel_width + grid.pixel_margin));
-			pixel.y_pos = grid.x_margin + (row_num * (grid.pixel_width + grid.pixel_margin));
-			
-			grid.board[pixel.name] = pixel;
-
-			pixel_update_color(col_num, row_num, grid.color_default);
-		}
-	}
-}
-
-
-//-----------------------------------------------------------------------------
 function timer_tick() {
 	// timer event called at regular interval
     //
@@ -87,7 +66,7 @@ function timer_tick() {
     
 	grid.timer_count++;
 	if (grid.running) {
-	   screen_update();
+        display_update();  // get the display pixel colors from the server
 		msg = "Running ";
 		msg += frames_per_sec +" frames/sec - ";
 		msg +=  " tick "+grid.timer_count;
@@ -103,9 +82,9 @@ function start_button_click() {
 	// event called when "start" button is clicked
 	if (grid.running == false) {
 		grid.running = true;
-		ms = grid.timer_tick_interval_ms;
-		grid.timer_handle = window.setInterval(function(){timer_tick()}, ms);
-		mode_select_onchange();
+        status_update("Running");
+		var ms = grid.timer_tick_interval_ms;
+		grid.timer_handle = window.setInterval(timer_tick, ms);
 	}
 }
 
@@ -115,46 +94,28 @@ function stop_button_click() {
 	// event called when "stop" button is clicked
 	if (grid.running == true) {
 		grid.running = false;
+        status_update("Stopped");
 		window.clearInterval(grid.timer_handle);
 	}
-	//timer_tick();
-	mode_select_onchange();
 }
 
 
 //-----------------------------------------------------------------------------
-//
 function pixel_update_color(x,y,color) {
-	var pixel_x = 0;
-	var pixel_y = 0;
-	pixel_x = grid.x_margin + (x * (grid.pixel_width + grid.pixel_margin));
-	pixel_y = grid.y_margin + (y * (grid.pixel_height + grid.pixel_margin));
+    // update the color of the "pixel" on the canvas
+	var x = grid.x_margin + (x * (grid.pixel_width + grid.pixel_margin));
+	var y = grid.y_margin + (y * (grid.pixel_height + grid.pixel_margin));
 	var canvas_el = document.getElementById("canvas");
 	var canvas_context = canvas_el.getContext("2d");
 	canvas_context.fillStyle = color;
-	canvas_context.fillRect(pixel_x, pixel_y, grid.pixel_width, grid.pixel_height);
+	canvas_context.fillRect(x, y, grid.pixel_width, grid.pixel_height);
 }
 
 
 //-----------------------------------------------------------------------------
 function status_update(status_str) {
-	html = "";
-	html += "<font color='#fff'>";
-	html += status_str;
-	html += "</font>";
+	html = "<font color='#fff'>" + status_str + "</font>";
 	document.getElementById("status_div").innerHTML = html;
-}
-
-
-//-----------------------------------------------------------------------------
-function mode_select_onchange() {
-	var status_str;
-	if (grid.running) {
-		status_str = "Running";
-	} else {
-		status_str = "Stopped";
-	}
-	status_update(status_str);
 }
 
 
@@ -170,7 +131,7 @@ function int_to_hex(d) {
 
 
 //-----------------------------------------------------------------------------
-function screen_update() {
+function display_update() {
     //
 	// get the current grid pixel colors from the server 
     // and update the display pixels to the current colors
@@ -180,11 +141,11 @@ function screen_update() {
 	  if (xmlhttp.readyState==4 && xmlhttp.status==200) {
 		grid_data = JSON.parse(xmlhttp.responseText);
 		var i = 0;
-		for(row_num=1; row_num<=grid.pixel_rows; row_num++) {
-			for(col_num=1; col_num<=grid.pixel_cols; col_num++) {
+		for(row=1; row<=grid.rows; row++) {
+			for(col=1; col<=grid.cols; col++) {
 				color = grid_data[i];
 				color_str = "#" + int_to_hex(color[0]) + int_to_hex(color[1]) + int_to_hex(color[2]);
-				pixel_update_color(col_num, row_num, color_str);
+				pixel_update_color(col, row, color_str);
 				i++;
 			}
 		}
