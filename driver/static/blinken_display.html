@@ -1,57 +1,34 @@
 <!DOCTYPE html5>
+<html>
 <head>
 <meta charset="utf-8">
-<style type="text/css"> 
-#body { background-color:#555; }
-#status_div { margin-left:20px }
-</style>
 </head>
-<body id="body" onload="start()"; >
+<body id="body" onload="setup()">
+<button id='start_button' name='start' value='start'>Start</button>
+<button id='stop_button' name='stop' value='stop'>Stop</button>   
+<span id='status_div' style='margin-left:20px'></span>
+<br>    
+<canvas id='canvas' width='800' height='600'></canvas>
 <script>
 //-----------------------------------------------------------------------------
 
 var grid = Object();  // global object
 
-
-//-----------------------------------------------------------------------------
-function start() {
-    //
-	// called by html body.onload event
-    //
-    // add content to html body
-
-    setup_html_content();
-    setup();
-	status_update("OK");
-}
-
-
-function setup_html_content() {
-    //
-	body_html = "";
-	body_html += "<button id='start_button' name='start' value='start'>Start</button>"
-	body_html += "<button id='stop_button' name='stop' value='stop'>Stop</button>"
-	//body_html += "&nbsp; &nbsp; ";  // gap between buttons and status
-    body_html += "<span id='status_div'></span>";
-	body_html += "<br>";
-	body_html += "<canvas id='canvas' width='800' height='600'></canvas>";
-
-	document.getElementById("body").innerHTML = body_html;
-}
-
-
 //-----------------------------------------------------------------------------
 function setup() {
 	document.title = "Blinken Display";
+    
+    document.getElementById("body").style.backgroundColor = "#555";
+    
 	grid.color_background = '#000000';  // black
 	grid.color_default = '#000000';  // black
 
-	grid.cell_cols = 60;
-	grid.cell_rows = 48;
-	grid.cell_margin = 2;
-	grid.cell_size = 8;
-	grid.cell_height = grid.cell_size;
-	grid.cell_width = grid.cell_size;
+	grid.pixel_cols = 60;
+	grid.pixel_rows = 48;
+	grid.pixel_margin = 2;
+	grid.pixel_size = 8;
+	grid.pixel_height = grid.pixel_size;
+	grid.pixel_width = grid.pixel_size;
 	
 	grid.x_margin = 20;
 	grid.y_margin = 20;
@@ -61,12 +38,9 @@ function setup() {
 	
 	grid.running = false;
 	grid.timer_count = 0;
-	grid.selected_cell_name = '';
 	
-	// insert content into html spans
-	grid_setup();
+	grid_setup();  // initialize grid pixels
 	
-
 	// setup events
 	document.getElementById("start_button").onclick=function(){start_button_click()};
 	document.getElementById("stop_button").onclick=function(){stop_button_click()};
@@ -78,27 +52,28 @@ function setup() {
 	grid.screen_height = screen.height;
 
 	//start_button_click(); // start timer tick event
+	status_update("OK");
 }
 
 
 //-----------------------------------------------------------------------------
 function grid_setup() {
-	// create grid of cells
+	// create grid of pixels
 	grid.board = {};
-	for(row_num=1; row_num<=grid.cell_rows; row_num++) {
-		for(col_num=1; col_num<=grid.cell_cols; col_num++) {
-			cell = Object();
-			cell.text = '';
-			cell.color = grid.color_default;
-			cell.name = 'cell_'+row_num+'_'+col_num;
-			cell.row = row_num;
-			cell.col = col_num;
-			cell.x_pos = grid.x_margin + (col_num * (grid.cell_width + grid.cell_margin));
-			cell.y_pos = grid.x_margin + (row_num * (grid.cell_width + grid.cell_margin));
+	for(row_num=1; row_num<=grid.pixel_rows; row_num++) {
+		for(col_num=1; col_num<=grid.pixel_cols; col_num++) {
+			pixel = Object();
+			pixel.text = '';
+			pixel.color = grid.color_default;
+			pixel.name = 'cell_'+row_num+'_'+col_num;
+			pixel.row = row_num;
+			pixel.col = col_num;
+			pixel.x_pos = grid.x_margin + (col_num * (grid.pixel_width + grid.pixel_margin));
+			pixel.y_pos = grid.x_margin + (row_num * (grid.pixel_width + grid.pixel_margin));
 			
-			grid.board[cell.name] = cell;
+			grid.board[pixel.name] = pixel;
 
-			cell_update_color(col_num, row_num, grid.color_default);
+			pixel_update_color(col_num, row_num, grid.color_default);
 		}
 	}
 }
@@ -123,46 +98,6 @@ function timer_tick() {
 }
 
 
-
-
-//-----------------------------------------------------------------------------
-function save_settings_click() {
-	// called when "hide settings" button is clicked
-	document.getElementById("settings_div").style.display="none";
-	document.getElementById("save_settings_button").style.display="none";
-	document.getElementById("show_settings_button").style.display="inline";
-	
-	new_grid = false;
-	value = parseInt(document.getElementById("input_cols").value);
-	if (grid.cell_cols != value) {
-		grid.cell_cols = value;
-		new_grid = true;
-	}
-	value = parseInt(document.getElementById("input_rows").value);
-	if (grid.cell_rows != value) {
-		grid.cell_rows = value;
-		new_grid = true;
-	}
-	if (new_grid) {
-		grid_setup(); // re-setup grid
-	}
-	
-	value = document.getElementById("input_bgcolor").value;
-	document.getElementById("body").style.backgroundColor = value;
-	
-}
-
-
-
-//-----------------------------------------------------------------------------
-function show_settings_click() {
-	// event called when "show settings" button is clicked
-	document.getElementById("settings_div").style.display="block";
-	document.getElementById("save_settings_button").style.display="inline";
-	document.getElementById("show_settings_button").style.display="none";
-}
-
-
 //-----------------------------------------------------------------------------
 function start_button_click() {
 	// event called when "start" button is clicked
@@ -173,7 +108,6 @@ function start_button_click() {
 		mode_select_onchange();
 	}
 }
-
 
 
 //-----------------------------------------------------------------------------
@@ -189,26 +123,16 @@ function stop_button_click() {
 
 
 //-----------------------------------------------------------------------------
-function test_button_click() {
-	// event called when "test" button is clicked
-
-	status_update("Test");
-	screen_update();
-}
-
-
-
-//-----------------------------------------------------------------------------
 //
-function cell_update_color(x,y,color) {
+function pixel_update_color(x,y,color) {
 	var pixel_x = 0;
 	var pixel_y = 0;
-	pixel_x = grid.x_margin + (x * (grid.cell_width + grid.cell_margin));
-	pixel_y = grid.y_margin + (y * (grid.cell_height + grid.cell_margin));
+	pixel_x = grid.x_margin + (x * (grid.pixel_width + grid.pixel_margin));
+	pixel_y = grid.y_margin + (y * (grid.pixel_height + grid.pixel_margin));
 	var canvas_el = document.getElementById("canvas");
 	var canvas_context = canvas_el.getContext("2d");
 	canvas_context.fillStyle = color;
-	canvas_context.fillRect(pixel_x, pixel_y, grid.cell_width, grid.cell_height);
+	canvas_context.fillRect(pixel_x, pixel_y, grid.pixel_width, grid.pixel_height);
 }
 
 
@@ -221,6 +145,8 @@ function status_update(status_str) {
 	document.getElementById("status_div").innerHTML = html;
 }
 
+
+//-----------------------------------------------------------------------------
 function mode_select_onchange() {
 	var status_str;
 	if (grid.running) {
@@ -231,33 +157,34 @@ function mode_select_onchange() {
 	status_update(status_str);
 }
 
-function int_to_hex(d) {
-	var padding = 2;
-    var hex = Number(d).toString(16);
-    padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
 
-    while (hex.length < padding) {
+//-----------------------------------------------------------------------------
+function int_to_hex(d) {
+    // convert a number to a hex string
+    var hex = Number(d).toString(16);
+    while (hex.length < 2) {
         hex = "0" + hex;
     }
     return hex;
 }
 
 
+//-----------------------------------------------------------------------------
 function screen_update() {
     //
 	// get the current grid pixel colors from the server 
-    // then update the simulated screen with those colors
+    // and update the display pixels to the current colors
     //
 	var xmlhttp=new XMLHttpRequest();	
 	xmlhttp.onreadystatechange=function() {
 	  if (xmlhttp.readyState==4 && xmlhttp.status==200) {
 		grid_data = JSON.parse(xmlhttp.responseText);
 		var i = 0;
-		for(row_num=1; row_num<=grid.cell_rows; row_num++) {
-			for(col_num=1; col_num<=grid.cell_cols; col_num++) {
+		for(row_num=1; row_num<=grid.pixel_rows; row_num++) {
+			for(col_num=1; col_num<=grid.pixel_cols; col_num++) {
 				color = grid_data[i];
 				color_str = "#" + int_to_hex(color[0]) + int_to_hex(color[1]) + int_to_hex(color[2]);
-				cell_update_color(col_num, row_num, color_str);
+				pixel_update_color(col_num, row_num, color_str);
 				i++;
 			}
 		}
