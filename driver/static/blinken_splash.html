@@ -1,0 +1,178 @@
+<!DOCTYPE html5>
+<head>
+    <meta charset="utf-8">
+</head>
+<body id="body" onload="setup()"; >
+    <button id="splash_button">Splash</button>
+    <button id="start_button">Start</button>
+    <span id="status" style="border:1px solid red;padding:5 5 5 5">xxx</span>
+    <br>
+    <br>
+    <span id="tick_status" style="border:1px solid blue;padding:5 5 5 5">xxx</span>
+    <script type="text/javascript" src="assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="assets/js/blinken_lib.js"></script>
+    <script>
+//-----------------------------------------------------------------------------
+// Begin JavaScript
+//-----------------------------------------------------------------------------
+
+var server_addr = window.location.host;
+var bclient = new BlinkenClient(server_addr);  
+
+var splash = Object();  // global object
+
+    
+//-----------------------------------------------------------------------------
+function setup() {
+    //console.log("starting setup");
+	document.title = "Blinken Splash";
+
+    splash.color_default = '#000000';  // black
+
+	$("#splash_button").click(splash_button_click);
+	$("#start_button").click(start_button_click);
+    
+    //start_send(); // connect to server
+    
+	splash.timer_tick_interval_ms = 100; // milliseconds per timer tick
+	splash.timer_count = 0;
+    splash.running = true;
+    ms = splash.timer_tick_interval_ms;
+    //splash.timer_handle = window.setInterval(function(){timer_tick()}, ms);    
+    splash.timer_handle = window.setInterval(timer_tick, ms);    
+	$("#status").html("setup done");
+}
+
+
+//-----------------------------------------------------------------------------
+// Events
+//-----------------------------------------------------------------------------
+function timer_tick() {
+    //
+	// timer event - called multiple times per second
+    //
+	splash.timer_count++;
+    var msg = "tick "+splash.timer_count;
+	if (!splash.running) {
+        msg += " stopped"
+    } else {
+        msg +=  " running";
+
+        process_frame();
+        
+        if(bclient.layer_id) {
+            bclient.send_frame(bclient.grid, bclient.layer_id);
+            msg += " (layer" + bclient.layer_id + ")";
+        } else {
+            msg += " (not connected)";
+        }
+    }
+	$("#tick_status").html(msg);
+}
+
+
+//-----------------------------------------------------------------------------
+function start_send() {
+    //
+    // create a new layer and start sending frames to the server
+    //
+    //console.log("starting frame layer");
+    var callback = function(data) {
+        if ('id' in data) {
+            bclient.layer_id = data.id;
+            bclient.running = true;
+            $("#status").html("connected");        
+        } else {
+            $("#status").html("not connected");
+        }
+    }
+    bclient.add_layer('frames', callback);    
+}
+
+
+    
+//-----------------------------------------------------------------------------
+function start_button_click() {
+	// when "start" button is clicked
+    $("#status").html("start button clicked");
+    start_send();
+	bclient.start();
+}
+
+
+//-----------------------------------------------------------------------------
+function step_button_click() {
+    //
+	// when "single-step" button is clicked
+    //
+	bclient.stop();
+    timer_tick();
+}
+
+
+//-----------------------------------------------------------------------------
+function stop_button_click() {
+    //
+	// when "stop" button is clicked
+    //
+	if (splash.running) {
+		window.clearInterval(splash.timer_handle);
+		splash.running = false;
+	}
+    bclient.stop();
+	timer_tick();
+    $("#status").html("stopped sending to server");
+}
+
+
+//-----------------------------------------------------------------------------
+function splash_button_click() {
+    //
+	// when "splash" button is clicked
+    // resets the counter so the animation will start over
+    //
+    splash.timer_count = 0;
+}
+
+
+//-----------------------------------------------------------------------------
+function process_frame() {
+    //
+	// called on every timer tick
+    //
+    
+    var center_x = (bclient.cols / 2);
+    var center_y = (bclient.rows / 2);
+    
+    for(var x=0; x<bclient.cols; x++) {
+        for(var y=0; y<bclient.rows; y++) {
+            dx = Math.abs(center_x - x);
+            dy = Math.abs(center_y - y);
+            dist = Math.sqrt((dx*dx) + (dy*dy));
+            var pixel_color = [0,50,0];
+            
+            if(splash.timer_count < 50) {
+                //pixel_color[0] = ((1 / dist) * 20 / splash.timer_count);
+                if (Math.abs(dist - splash.timer_count) < 5){
+                    pixel_color = [200,200,200];                    
+                }
+            }
+            try {
+                bclient.grid[x][y] = pixel_color;
+            }
+            catch(e) {
+                //console.log("error",x,y);
+                $("#status").html("error in process frame"+x+","+y);
+            }
+            
+        }
+    }
+}
+
+
+//-----------------------------------------------------------------------------
+// end of javascript
+//-----------------------------------------------------------------------------
+</script> 
+</body>
+</html>
