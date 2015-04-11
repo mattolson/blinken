@@ -8,8 +8,7 @@ function Mixer(grid) {
   this.grid = grid;
   this.channels = [];
   this.fps = Fps;
-
-
+  
   // we keep a sequential id for later operations so deletions don't
   // pose any problems
   this.next_channel_id = 1; 
@@ -35,7 +34,6 @@ Mixer.prototype.remove_channel = function(channel_id) {
   if (index != null) {
     // Remove it
     this.channels.splice(index, 1);
-
     // If this was the last channel, turn off lights
     if (this.channels.length == 0) {
       this.grid.off();
@@ -86,26 +84,6 @@ Mixer.prototype.stop = function() {
   clearInterval(this.timer);
   this.timer = null;
 };
-
-// Mixer.prototype.render = function() {
-//   // Lock to make sure this doesn't get called again until we're done
-//   this.rendering = true;
-
-//   // Loop through channels and have them render themselves
-//   var grid_changed = false;
-//   for (var i = 0; i < this.channels.length; i++) {
-//     var channel_changed = this.channels[i].render();
-//     grid_changed = grid_changed || channel_changed;
-//   }
-
-//   // Blast updates to strip
-//   if (grid_changed) {
-//     this.grid.sync();
-//   }
-
-//   // Remove lock
-//   this.rendering = false;
-// };
 
 Mixer.prototype.toJson = function() {
   var json = [];
