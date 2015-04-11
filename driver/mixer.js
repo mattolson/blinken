@@ -87,26 +87,6 @@ Mixer.prototype.stop = function() {
   this.timer = null;
 };
 
-// Mixer.prototype.render = function() {
-//   // Lock to make sure this doesn't get called again until we're done
-//   this.rendering = true;
-
-//   // Loop through channels and have them render themselves
-//   var grid_changed = false;
-//   for (var i = 0; i < this.channels.length; i++) {
-//     var channel_changed = this.channels[i].render();
-//     grid_changed = grid_changed || channel_changed;
-//   }
-
-//   // Blast updates to strip
-//   if (grid_changed) {
-//     this.grid.sync();
-//   }
-
-//   // Remove lock
-//   this.rendering = false;
-// };
-
 Mixer.prototype.toJson = function() {
   var json = [];
   for (var i = 0; i < this.channels.length; i++) {
@@ -138,9 +118,8 @@ Mixer.prototype.render = function() {
 
   this.grid.pixels = mixed_pixels;
 
-  // Blast updates to strip
-  if (rendered) {
-    // console.log('!!! SENT !!!! @ '+this.fps.get()+' fps');
+
+if (rendered) {
     this.grid.sync();
     this.fps.frame();
   }
@@ -149,7 +128,7 @@ Mixer.prototype.render = function() {
   this.rendering = false;
 };
 
-//Default: "Average" or "Difference"
+//Todo: Modular Blending Modes via Abstraction
 Mixer.prototype.blend = function(current, previous){
 
   var result = [];
