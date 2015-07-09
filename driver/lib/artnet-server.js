@@ -9,7 +9,8 @@ exports.listen = function(port, cb) {
 	
 	// Set up the socket
 	var sock = dgram.createSocket("udp4", function (msg, peer) {
-		var data = new Array();
+		var data = [];
+		var i;
 		for (i = 0; i < msg.length; i++) {
 			var d = msg.toString().charCodeAt(i);
 			// Since we can't do unsigned 8-bit integers, do some normalization
@@ -26,10 +27,10 @@ exports.listen = function(port, cb) {
 		// Deseralize the data - magic numbers are as per the Art-Net protocol
 		var sequence = data[12];
 		var physical = data[13];
-		var universe = (data[14] * 256) + data[15];
+		var universe = (data[15] * 256) + data[14];
 		var length = (data[16] * 256) + data[17];
 		
-		var rawData = new Array();
+		var rawData = [];
 		for (i = 0; i < length; i++) {
 			rawData.push(data[i + 18]);
 		}
@@ -41,7 +42,7 @@ exports.listen = function(port, cb) {
 		cb(retData, peer);
 	});
 	sock.bind(port);
-}
+};
 
 exports.forward = function(port, cb) {
 	this.port = port;
@@ -49,7 +50,8 @@ exports.forward = function(port, cb) {
 	
 	// Set up the socket
 	var sock = dgram.createSocket("udp4", function (msg, peer) {
-		var data = new Array();
+		var data = [];
+		var i;
 		for (i = 0; i < msg.length; i++) {
 			var d = msg.toString().charCodeAt(i);
 			// Since we can't do unsigned 8-bit integers, do some normalization
@@ -69,7 +71,7 @@ exports.forward = function(port, cb) {
 		var universe = (data[14] * 256) + data[15];
 		var length = (data[16] * 256) + data[17];
 		
-		var rawData = new Array();
+		var rawData = [];
 		for (i = 0; i < length; i++) {
 			rawData.push(data[i + 18]);
 		}
@@ -81,7 +83,7 @@ exports.forward = function(port, cb) {
 		cb(retData, peer);
 	});
 	sock.bind(port);
-}
+};
 
 // Setup EventEmitter for the ArtNetServer
 util.inherits(this, events.EventEmitter);

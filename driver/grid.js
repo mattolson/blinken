@@ -22,7 +22,7 @@ function Grid(config) {
 
   // Setup data structures for pixels
   // this.pixel_map = new Array(this.num_pixels_x * this.num_pixels_y); // Maps logical index to strand index
-  this.pixels = new Buffer(this.num_pixels_x * this.num_pixels_y * 3); // 3 octets per pixel, stores color values
+  this.pixels = new Buffer(this.num_pixels * 3); // 3 octets per pixel, stores color values
 
   this.listeners = [];  // list of listeners
   this.off();
@@ -42,28 +42,54 @@ Grid.prototype.xy = function(i) {
   return {
     x: i % this.num_pixels_x,
     y: Math.floor(i / this.num_pixels_x)
-  }
+  };
 };
 
 Grid.prototype.validateGrid = function(color_grid){
   //Validate a color array, notify user/dev if wrong.
   return true;
+};
+
+function setMultiArray(grid, color_grid)
+{
+	for(var x=0; x<grid.num_pixels_x; x++){
+		for(var y=0; y<grid.num_pixels_y; y++) {
+			var index = grid.index(x,y);
+			if((index !== null) && (x < color_grid.length) && (y < color_grid[x].length) ) {
+				grid.pixels[index*3] = color_grid[x][y][0];
+				grid.pixels[(index*3)+1] = color_grid[x][y][1];
+				grid.pixels[(index*3)+2] = color_grid[x][y][2];
+			}  
+		}
+	}
+}
+
+// this all assumes that the color_grid is the same size as the grid in pixels
+function setImageData(grid, color_grid){
+	for(var x=0; x<grid.num_pixels_x; x++){
+		for(var y=0; y<grid.num_pixels_y; y++) {
+			var index = grid.index(x,y);
+			if((index !== null) && ((index * 4) < color_grid.length)) {
+				grid.pixels[index*3] = color_grid[index * 4];
+				grid.pixels[(index*3)+1] = color_grid[(index * 4) + 1];
+				grid.pixels[(index*3)+2] = color_grid[(index * 4) + 2];				
+			}
+		}
+	}
 }
 
 Grid.prototype.set = function(color_grid, mode, strict){
   switch(mode) {
 
     case "xy":
-      for(var x=0; x<this.num_pixels_x; x++){
-        for(var y=0; y<this.num_pixels_y; y++) {
-          var index = this.index(x,y);
-          if(index != null) {
-            this.pixels[index*3] = color_grid[x][y][0];
-            this.pixels[(index*3)+1] = color_grid[x][y][1];
-            this.pixels[(index*3)+2] = color_grid[x][y][2];
-          }  
-        }
-      }
+    	if(Array.isArray(color_grid)){
+    		if(Array.isArray(color_grid[0])){
+    			setMultiArray(this, color_grid);
+    		}
+    	}
+    	else if(color_grid.constructor.name === "ImageData"){
+    		setImageData(this, color_grid.data);
+    	}
     break;
 
     case "logical":
@@ -79,7 +105,7 @@ Grid.prototype.set = function(color_grid, mode, strict){
 Grid.prototype.setPixelColor = function(x, y, rgb) {
   var index = this.index(x,y);
 
-  if (index == null) {
+  if (index === null) {
     return;
   }
 
@@ -95,19 +121,19 @@ Grid.prototype.setRowColor = function(y, rgb){
 	for (var x = 0 ; x < this.num_pixels_x; x++) {
 		this.setPixelColor(x, y, rgb);
 	}
-}
+};
 
 // Set the color of an entire column
 Grid.prototype.setColColor = function(x, rgb){
 	for (var y = 0; y < this.num_pixels_y; y++) {
 		this.setPixelColor(x, y, rgb);
 	}
-}
+};
 
 // Alias
 Grid.prototype.setColumnColor = function(x, rgb) { 
   this.setColColor(x, rgb); 
-}
+};
 
 // Set color of entire grid
 Grid.prototype.setGridColor = function(rgb) {
@@ -121,7 +147,7 @@ Grid.prototype.setGridColor = function(rgb) {
 // Retrieve pixel color
 Grid.prototype.getPixelColor = function(x, y) {
   var index = this.index(x,y);
-  if (index == null) {
+  if (index === null) {
     return null;
   }
 
@@ -157,7 +183,7 @@ Grid.prototype.off = function() {
 // Write to device
 Grid.prototype.sync = function() {
 
-  if (this.output_to_ceiling == true) {
+  if (this.output_to_ceiling === true) {
       // Blast out updates
       if (this.display) {
          this.display.writeLogicalArray(this.pixels);
@@ -174,7 +200,7 @@ Grid.prototype.set_output_to_ceiling = function(on_or_off) {
   // allow direct output to the ceiling to be turned on or off
   this.output_to_ceiling = on_or_off;
   //console.log("output_to_ceiling is", on_or_off);
-}
+};
 
 
 // Support list of sync listeners

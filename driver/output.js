@@ -15,12 +15,6 @@ var hosts = []; // empty array holds artnet client
 var ledMap;
 var callbacks = []; // empty array holds callbacks for ticks, drives animation
 
-function LedCeilingCallback()
-{
-	var index;
-	refresh();
-}
-
 // util.inherits(LEDCieling, Display);
 
 function LedMap(len)
@@ -152,7 +146,7 @@ function LedMap(len)
 
 exports.getMap = function(){
 	return new LedMap(WIDTH_PIXELS * HEIGHT_PIXELS);
-}
+};
 
 var width = exports.width = function(){
 	return WIDTH_PIXELS;
@@ -175,6 +169,12 @@ var refresh = exports.refresh = function refresh()
 		}
 	}
 };
+
+function LedCeilingCallback()
+{
+	var index;
+	refresh();
+}
 
 exports.setup = function()
 {
@@ -259,7 +259,7 @@ exports.writeImage = function(image)
 
 exports.relay = function(){
 
-}
+};
 
 exports.writeImageWithOffset = function(image,imgXOff,imgYOff,imgW,imgH,disX,disY)
 {
