@@ -238,7 +238,7 @@ function drawWin(player)
     // clear our grid
     this.grid.setGridColor([ 0, 0, 0 ]);
 
-	this.grid.setCursor(10, 2);
+	this.grid.setCursor(8, 2);
 
 	if (player === 1)
 	{
@@ -248,7 +248,7 @@ function drawWin(player)
 	{
 		this.grid.print("Player 2");
 	}
-	this.grid.setCursor(20, 12);
+	this.grid.setCursor(18, 12);
 	this.grid.print("Wins!");
 }
 
@@ -371,13 +371,13 @@ function Pong(grid, options) {
     // clear our grid
     this.grid.setGridColor([ 0, 0, 0 ]);
 
-    this.grid.setCursor(14, 5);
+    this.grid.setCursor(12, 5);
     this.grid.print("Press A");
-    this.grid.setCursor(2, 13);
+    this.grid.setCursor(0, 13);
     this.grid.print("for single");
-    this.grid.setCursor(14, 30);
+    this.grid.setCursor(12, 30);
     this.grid.print("Press B");
-    this.grid.setCursor(6, 38);
+    this.grid.setCursor(4, 38);
     this.grid.print("for multi");
 }
 
