@@ -5,7 +5,7 @@ var ArtNet = require('../lib/artnet-server');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
-var NUM_LINES_PER_UNI 2;
+var NUM_LINES_PER_UNI = 2;
 
 var _ArtnetSelf;
 
