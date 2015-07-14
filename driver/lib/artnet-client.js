@@ -13,7 +13,7 @@ var LEN_OFF = 16;
 var DATA_OFF = 18;
 
 var seq = 0;
-var myPort = 6454;
+var myPort = 4000;  // no reason to be 6454 and it gets in the way when we want to be a server also
 
 var sema4 = 0;
 
