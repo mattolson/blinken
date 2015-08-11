@@ -116,9 +116,8 @@ Mixer.prototype.render = function() {
 
   this.grid.pixels = mixed_pixels;
 
-  // Blast updates to strip
-  if (rendered) {
-    // console.log('!!! SENT !!!! @ '+this.fps.get()+' fps');
+
+if (rendered) {
     this.grid.sync();
     this.fps.frame();
   }
@@ -127,7 +126,7 @@ Mixer.prototype.render = function() {
   this.rendering = false;
 };
 
-//Default: "Average" or "Difference"
+//Todo: Modular Blending Modes via Abstraction
 Mixer.prototype.blend = function(current, previous){
 
   var result = [];
