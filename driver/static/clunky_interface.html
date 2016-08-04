@@ -109,11 +109,15 @@ margin:0px;
 
 
 <script type="text/javascript" src="assets/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="assets/js/blinken_lib.js"></script>
 <script>
 //-----------------------------------------------------------------------------
 // Begin JavaScript
 //-----------------------------------------------------------------------------
-        
+
+var server_addr = window.location.host;
+var bclient = new BlinkenClient(server_addr);  
+
 var grid = Object();  // global object
 
 var global_url = "http://" + window.location.host;
@@ -144,6 +148,7 @@ function setup() {
 
 	grid.done = false;
     grid.sending = false;  // not sending to server at start
+    grid.frame_id = 0; // id is returned by server when layer is created
 
     $('#connection_status').text("not sending");
 
@@ -331,92 +336,43 @@ function write_message_on_canvas(canvas, message) {
 }
 
     
-//-----------------------------------------------------------------------------
-function post_layer() {
-    //
-    // create a new layer
-    //
-    var options = {};
-    options = {
-        'source' : {
-            name : 'frames',
-            active : true,
-            options: {
-                period : 44
-            }
-        }
-     };
- 
-     //Create XMLHTTP Object and send. 
-    $.ajax({
-        type: "POST",
-        url: global_url + "/mixer/channels",
-        contentType: "application/json; charset=UTF-8",
-        data: JSON.stringify(options)
-    })
-    get_current_layers();  // update the list display
-}
 
 
 //-----------------------------------------------------------------------------
 function start_send() {
-    
-    console.log("starting frame layer");
-    start_frames_layer();
-    grid.sending = true;
-    document.getElementById("connection_status").innerHTML = "sending";
-
-    console.log("posting screen");
-    post_frame();    
-}
-
-
-function stop_send() {
-    
-    console.log("stop sending to server");
-    //start_frames_layer();
-    grid.sending = false;
-    document.getElementById("connection_status").innerHTML = "not sending";
-}
-
-
-function start_frames_layer() {
-    // create a new layer
-   
-    //Define Request Options
-    var options = {};
-    //options['source[options][frame]'] = grid_data;
-     options = {
-        'source' : {
-            name : 'frames',
-            active : true,
-            options: {
-                period : 44
-            }
+    //
+    // create a new layer and start sending frames to the server
+    //
+    //console.log("starting frame layer");
+    var callback = function(data) {
+        if ('id' in data) {
+            grid.layer_id = data.id;
+            grid.sending = true;
+            $("#connection_status").html("sending to server");        
         }
-     };
- 
-     //Create XMLHTTP Object and send. 
-    $.ajax({
-        //type: "PUT",
-        type: "POST",
-        url: global_url + "/mixer/channels",
-        //data: { name: 'frames', active: true, options: { frame: [ [ [ 255,0,0 ] ] ] } }
-        contentType: "application/json; charset=UTF-8",
-        data: JSON.stringify(options)
-    })
-    //get_current_layers();  // update the list display
+    }
+    bclient.add_layer('frames', callback);    
 }
+
+
+    
+    
+//-----------------------------------------------------------------------------
+function stop_send() {    
+    //console.log("stop sending to server");
+    grid.sending = false;
+    $("#connection_status").html("not sending to server");
+}
+
     
 
+//-----------------------------------------------------------------------------
 function post_frame() {
     //
     // send grid to server
-    //
+    //    
+    //console.log("posting a frame");
     
-    console.log("posting a frame");
-    
-    //frame = [[ [255,0,0], [0,255,0], [0,0,255] ], [[255,0,0], [0,255,0], [0,0,255] ]];
     var frame = [];
     for(x=0; x<60; x++) {
         var row = [];
@@ -432,32 +388,14 @@ function post_frame() {
         }
         frame.push(row);
     }
-    
-    var options = {};
-    options = {
-        'source' : {
-            name : 'frames',
-            active : true,
-            options: {
-                period : 66,
-                frame: frame,
-            }
-        }
-    };
- 
-     //Create XMLHTTP Object and send. 
-    $.ajax({
-        type: "PUT",
-        url: global_url + "/mixer/channels/1",
-        contentType: "application/json; charset=UTF-8",
-        data: JSON.stringify(options)
-    });
+    bclient.send_frame(frame, grid.layer_id);
 }
 
 
+    
+//-----------------------------------------------------------------------------
 function update_status(msg) {
-    status_div = document.getElementById("status");
-    status_div.innerHTML = msg;
+    //$("#status").html(msg);
 }
 
     
@@ -1071,9 +1009,9 @@ function color_avg(color_str1, color_str2) {
 	// average two colors together and return the result
 	rgb1 = color_rgb(color_str1);
 	rgb2 = color_rgb(color_str2);
-	r = Math.floor(Math.floor(rgb1['r']) + Math.floor(rgb2['r']) / 2);
-	g = Math.floor(Math.floor(rgb1['g']) + Math.floor(rgb2['g']) / 2);
-	b = Math.floor(Math.floor(rgb1['b']) + Math.floor(rgb2['b']) / 2);
+	r = Math.floor((Math.floor(rgb1['r']) + Math.floor(rgb2['r'])) / 2);
+	g = Math.floor((Math.floor(rgb1['g']) + Math.floor(rgb2['g'])) / 2);
+	b = Math.floor((Math.floor(rgb1['b']) + Math.floor(rgb2['b'])) / 2);
 	if (r > 255) { r = 255 };
 	if (g > 255) { g = 255 };
 	if (b > 255) { b = 255 };
@@ -1291,11 +1229,13 @@ function cell_flood(cell_name, color) {
             x_dist = Math.abs(a_col - cell.col);
             y_dist = Math.abs(a_row - cell.row);
             distance = Math.sqrt((x_dist*x_dist)+(y_dist*y_dist));
-            dim_percent = distance / range;
-            dim_color = color_dim(grid.color_selected, dim_percent);
-            new_color = color_add(cell.color, dim_color);
-            cell.color = new_color
-            cell_update(key);
+            if(distance <= range) {
+                dim_percent = distance / range;
+                dim_color = color_dim(grid.color_selected, dim_percent);
+                new_color = color_avg(cell.color, dim_color);
+                cell.color = new_color
+                cell_update(key);
+            }
         }
 	}
 }
