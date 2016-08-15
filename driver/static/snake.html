@@ -54,7 +54,7 @@ function setup() {
 	
 
 	// setup events
-	document.getElementById("start_button").onclick=function(){start_button_click()};
+	document.getElementById("play_button").onclick=function(){play_button_click()};
 	document.getElementById("stop_button").onclick=function(){stop_button_click()};
 	document.getElementById("attach_button").onclick=function(){attach_button_click()};
 	document.getElementById("detach_button").onclick=function(){detach_button_click()};
@@ -93,8 +93,7 @@ function grid_setup() {
 }
 
 //-----------------------------------------------------------------------------
-function namespace_setup() {	
-//	grid.namespace = io.connect('/snakes');
+function namespace_setup() {
     grid.namespace = io.connect('/snakes');
 
 	grid.namespace.on('connect', function(){
@@ -198,8 +197,6 @@ function start_button_click() {
 	}
 }
 
-
-
 //-----------------------------------------------------------------------------
 function stop_button_click() {
 	// event called when "stop" button is clicked
@@ -242,6 +239,11 @@ function left_button_click() {
 	grid.namespace.emit('turn', {turn: 'LEFT'});
 }
 
+//-----------------------------------------------------------------------------
+function play_button_click() {
+    // event called when "left" button is clicked
+    grid.namespace.emit('play');
+}
 
 //-----------------------------------------------------------------------------
 function test_button_click() {
@@ -290,7 +292,7 @@ function status_update(status_str) {
 function start() {
 	// content of html body
 	body_html = "";
-	body_html += "<button id='start_button' name='start' value='start'>Start</button>"
+	body_html += "<button id='play_button' name='play' value='play'>Play</button>"
 	body_html += "<button id='stop_button' name='stop' value='stop'>Stop</button>"
 	body_html += "<button id='attach_button' name='attach' value='attach'>Attach Snake</button>"
 	body_html += "<button id='detach_button' name='detach' value='detach'>Detach Snake</button>"
