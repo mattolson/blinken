@@ -4,6 +4,18 @@ var Source = require('../source');
 
 var NAME = path.basename(__filename, '.js'); // Our unique name
 
+// find a free player and return them or undefined
+function findFreePlayer() {
+    if (this.player1.socket === undefined)
+    {
+        return this.player1;
+    }
+    else if (this.player2.socket === undefined) {
+        return this.player2;
+    }
+
+    return undefined;
+}
 
 // Constrain a paddle's position to within the display's border
 function constrainPosition(position)
@@ -14,7 +26,7 @@ function constrainPosition(position)
     {
         newPaddlePosY = this.paddle.halfHeight;
     }
-    else if (position + this.paddle.halfHeight > this.grid.num_pixels_y)
+    else if ((position + this.paddle.halfHeight) > this.grid.num_pixels_y)
     {
         newPaddlePosY = this.grid.num_pixels_y - this.paddle.halfHeight;
     }
@@ -26,30 +38,7 @@ function constrainPosition(position)
 
 function updatePaddlePositions()
 {
-    if (this.options.playMode !== 'Auto') {
-        // we need to figure out where we get this info from
-        // Update player 1's paddle:
-
-        //if (BUTTON_UP.pinRead() == LOW)
-        //{
-        //	this.player1.posY--;
-        //	if (this.player1.posY - this.paddle.halfHeight < 0)
-        //	{
-        //		this.player1.posY = this.paddle.halfHeight;
-        //	}
-        //}
-        //if (BUTTON_DOWN.pinRead() == LOW)
-        //{
-        //	this.player1.posY++;
-        //	if (this.player1.posY - this.paddle.halfHeight > this.grid.num_pixels_y)
-        //	{
-        //		this.player1.posY = this.grid.num_pixels_y - this.paddle.halfHeight;
-        //	}
-        //}
-        //this.player1.posY = constrainPosition(this.player1.posY);
-        //
-    }
-    else {
+    if (this.player1.socket === undefined) {
         // Update AI's paddle:
         // Follow along with the ball's position:
         if (this.player1.dir === 'DWN') {
@@ -78,8 +67,7 @@ function updatePaddlePositions()
 
     // Move player 2 paddle:
 
-	if ((this.options.playMode === 'Single') || (this.options.playMode === 'Auto'))
-	{
+    if (this.player2.socket === undefined) {
 		// Update AI's paddle:
 		// Follow along with the ball's position:
 		if (this.player2.posY < this.ball.posY)
@@ -91,32 +79,9 @@ function updatePaddlePositions()
             this.player2.posY -= this.enemyVelY;
 		}
 	}
-	//else if (playMode === 'Multi')
-	//{
-		//if (BUTTON_A.pinRead() == LOW)
-		//{
-		//	this.player2.posY--;
-		//	if (this.player2.posY - this.paddle.halfHeight < 0)
-		//	{
-		//		this.player2.posY = this.paddle.halfHeight;
-		//	}
-		//}
-		//if (BUTTON_B.pinRead() == LOW)
-		//{
-		//	this.player2.posY++;
-		//	if (this.player2.posY - this.paddle.halfHeight > this.grid.num_pixels_y)
-		//	{
-		//		this.player2.posY = this.grid.num_pixels_y - this.paddle.halfHeight;
-		//	}
-		//}
-	//}
 
+    this.player1.posY = constrainPosition.call(this, this.player1.posY);
     this.player2.posY = constrainPosition.call(this, this.player2.posY);
-   // this.player1.posX = Math.round(this.player1.posX);
-   // this.player1.posY = Math.round(this.player1.posY);
-   // this.player2.posX = Math.round(this.player2.posX);
-   // this.player2.posY = Math.round(this.player2.posY);
-
 }
 
 // Move the ball and re-calculate its position:
@@ -296,25 +261,51 @@ function drawWin(player)
 function Pong(grid, options) {
 	options = options || {};
 	Pong.super_.call(this, NAME, grid, options);
-//	var self = this;
-//	this.connections = 0;
+	var self = this;
+	this.connections = 0;
 
 	io.of('/pong').on('connection', function(socket) {
 		console.log("Connected to pong");
+        self.connections++;  // it seems wise to keep track
 		
 		socket.on('disconnect', function() {
 			console.log("disconnected from pong");
+            self.connections--;  // it seems wise to keep track
 		});
 
 		socket.on('attach', function() {
 			console.log("got an attach");
+            // so we should attach this socket to a player
+            socket.player = findFreePlayer.call(self);
+            if (socket.player !== undefined) {
+                socket.player.socket = socket;
+                console.log("attached to player " + socket.player.id);
+                socket.emit('player',
+                    {
+                        id: socket.player.id,
+                        color: socket.player.color,
+                        height: self.paddle.height
+                    });
+            } else {
+                console.log("cannot attach to player");
+                socket.emit('errorMsg', {text: 'No Player Available'});
+//				socketError(socket, 'No Snake Available');
+            }
 		});
 
 		socket.on('detach', function() {
+            if (socket.player !== undefined){
+                console.log('player ' + socket.player.id + ' detached from');
+                socket.player.socket = undefined;
+                socket.player = undefined;
+            }
 		});
-		
 
-		socket.on('turn', function(dir) {
+		socket.on('pos', function(position) {
+		    if (socket.player !== undefined) {
+		        socket.player.posY = constrainPosition.call(self, parseFloat(position.pos));
+                console.log("pos " + position.pos + " for player " + socket.player.id + " constrained " + socket.player.posY);
+            }
 		});
 	});
 
@@ -334,7 +325,8 @@ function Pong(grid, options) {
         velY: this.options.velY1,
         dir: 'DWN',
         showScore: 0,
-        color: [255, 0, 0]
+        color: [255, 0, 0],
+        id: 1
     };
 
     this.player2 = {
@@ -344,7 +336,8 @@ function Pong(grid, options) {
         velY:  this.options.velY2,
         dir: 'BALL',
         showScore: 0,
-        color: [0, 0, 255]
+        color: [0, 0, 255],
+        id: 2
     };
 
     this.enemyVelY = 0.5;
@@ -381,14 +374,14 @@ function Pong(grid, options) {
     // clear our grid
     this.grid.setGridColor([ 0, 0, 0 ]);
 
-    this.grid.setCursor(12, 5);
+/*    this.grid.setCursor(12, 5);
     this.grid.print("Press A");
     this.grid.setCursor(0, 13);
     this.grid.print("for single");
     this.grid.setCursor(12, 30);
     this.grid.print("Press B");
     this.grid.setCursor(4, 38);
-    this.grid.print("for multi");
+    this.grid.print("for multi");*/
 }
 
 // Set up inheritance from Source

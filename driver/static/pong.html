@@ -1,0 +1,423 @@
+<!DOCTYPE html5>
+<head>
+    <meta charset="utf-8">
+    <style type="text/css">
+        .positioned
+        {
+            position:absolute;
+        }
+
+        .dimmed
+        {
+            background-color:#555;
+        }
+        .hidden
+        {
+            visibility:hidden;
+        }
+
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        //-----------------------------------------------------------------------------
+        var grid = Object();  // global object
+
+        //-----------------------------------------------------------------------------
+        function setup() {
+            document.title = "Blinken Pong";
+            grid.color_background = '#000000';  // black
+            grid.color_highlighted = 'rgb(220,220,250)';  // light bluish color
+            grid.color_selected = '#FFFFFF'; // white
+            grid.color_default = '#000000';  // black
+
+            grid.cell_cols = 60;
+            grid.cell_rows = 48;
+            grid.cell_margin = 2;
+            grid.cell_size = 8;
+            grid.cell_height = grid.cell_size;
+            grid.cell_width = grid.cell_size;
+
+            grid.x_margin = 20;
+            grid.y_margin = 20;
+            grid.done = false;
+
+            grid.timer_tick_interval_ms = 50; // milliseconds per timer tick
+
+            grid.running = false;
+            grid.timer_count = 0;
+            grid.selected_cell_name = '';
+
+            // this is just the default. It should update when you attach and it is only used by the position calculation
+            grid.paddle = { height: 12,
+                            color: [128, 128, 128],
+                            pos: 6  // half the paddle height
+            };
+
+            namespace_setup();
+
+            // insert content into html spans
+            grid_setup();
+
+
+            // setup events
+            document.getElementById("play_button").onclick=function(){play_button_click()};
+            document.getElementById("stop_button").onclick=function(){stop_button_click()};
+            document.getElementById("attach_button").onclick=function(){attach_button_click()};
+            document.getElementById("detach_button").onclick=function(){detach_button_click()};
+            document.getElementById("right_button").onclick=function(){right_button_click()};
+            document.getElementById("left_button").onclick=function(){left_button_click()};
+
+            grid.availWidth = screen.availWidth;
+            grid.availHeight = screen.availHeight;
+            grid.screen_width = screen.width;
+            grid.screen_height = screen.height;
+
+            start_button_click(); // start timer tick event
+        }
+
+
+        //-----------------------------------------------------------------------------
+        function grid_setup() {
+            // create grid of cells
+            grid.board = {};
+            for(row_num=1; row_num<=grid.cell_rows; row_num++) {
+                for(col_num=1; col_num<=grid.cell_cols; col_num++) {
+                    cell = Object();
+                    cell.text = '';
+                    cell.color = grid.color_default;
+                    cell.name = 'cell_'+row_num+'_'+col_num;
+                    cell.row = row_num;
+                    cell.col = col_num;
+                    cell.x_pos = grid.x_margin + (col_num * (grid.cell_width + grid.cell_margin));
+                    cell.y_pos = grid.x_margin + (row_num * (grid.cell_width + grid.cell_margin));
+
+                    grid.board[cell.name] = cell;
+
+                    cell_update_color(col_num, row_num, grid.color_default);
+                }
+            }
+        }
+
+        //-----------------------------------------------------------------------------
+        function namespace_setup() {
+            grid.namespace = io.connect('/pong');
+
+            grid.namespace.on('connect', function(){
+                msg = "Connected";
+                status_update(msg);
+            });
+
+            grid.namespace.on('disconnect', function(){
+                button_update_color([220,220,220]);
+                status_update('Disconnected');
+            });
+
+            grid.namespace.on('player', function(player){
+                // they have returned to me a player object.
+                // I should take the color and set a color on the screen
+                msg = "Player " + player.id + " color " + player.color;
+                button_update_color(player.color);
+                grid.paddle.height = player.height;
+                grid.paddle.color = player.color;
+                status_update(msg);
+            });
+
+            grid.namespace.on('died', function(player){
+                // they have returned to me a player object.
+                // I should take the color and set a color on the screen
+                msg = "player " + player.id + " died";
+                button_update_color(player.color);
+                grid.paddle.color = player.color;
+                status_update(msg);
+            });
+
+            grid.namespace.on('errorMsg', function(msg){
+                // display the error message
+                status_update(msg.text);
+            });
+        }
+
+
+        //-----------------------------------------------------------------------------
+        function timer_tick() {
+            // timer event called at regular interval
+            grid.timer_count++;
+            if (grid.running) {
+                msg = "Running ";
+                msg += "("+grid.timer_tick_interval_ms/1000+" sec loop) ";
+                msg +=  " tick "+grid.timer_count;
+            } else {
+                msg = "Stopped";
+            }
+
+            screen_update();
+
+//	status_update(msg);
+
+        }
+
+
+        //-----------------------------------------------------------------------------
+        function save_settings_click() {
+            // called when "hide settings" button is clicked
+            document.getElementById("settings_div").style.display="none";
+            document.getElementById("save_settings_button").style.display="none";
+            document.getElementById("show_settings_button").style.display="inline";
+
+            new_grid = false;
+            value = parseInt(document.getElementById("input_cols").value);
+            if (grid.cell_cols != value) {
+                grid.cell_cols = value;
+                new_grid = true;
+            }
+            value = parseInt(document.getElementById("input_rows").value);
+            if (grid.cell_rows != value) {
+                grid.cell_rows = value;
+                new_grid = true;
+            }
+            if (new_grid) {
+                grid_setup(); // re-setup grid
+            }
+
+            value = document.getElementById("input_bgcolor").value;
+            document.getElementById("body").style.backgroundColor = value;
+
+        }
+
+
+
+        //-----------------------------------------------------------------------------
+        function show_settings_click() {
+            // event called when "show settings" button is clicked
+            document.getElementById("settings_div").style.display="block";
+            document.getElementById("save_settings_button").style.display="inline";
+            document.getElementById("show_settings_button").style.display="none";
+        }
+
+
+        //-----------------------------------------------------------------------------
+        function start_button_click() {
+            // event called when "start" button is clicked
+            if (grid.running == false) {
+                grid.running = true;
+                ms = grid.timer_tick_interval_ms;
+                grid.timer_handle = window.setInterval(function(){timer_tick()}, ms);
+                mode_select_onchange();
+            }
+        }
+
+        //-----------------------------------------------------------------------------
+        function stop_button_click() {
+            // event called when "stop" button is clicked
+            if (grid.running == true) {
+                grid.running = false;
+                window.clearInterval(grid.timer_handle);
+            }
+            //timer_tick();
+            mode_select_onchange();
+        }
+
+
+        //-----------------------------------------------------------------------------
+        function attach_button_click() {
+            // event called when "attach" button is clicked
+            grid.namespace.emit('attach');
+        }
+
+
+        //-----------------------------------------------------------------------------
+        function detach_button_click() {
+            // event called when "detach" button is clicked
+            grid.namespace.emit('detach');
+            button_update_color([220,220,220]);
+            status_update('Player detached');
+        }
+
+
+        //-----------------------------------------------------------------------------
+        function right_button_click() {
+            // event called when "right" button is clicked
+            // in the world of pong I want a position from 0 to 47 (some day we will normalized this)
+            if (grid.paddle.pos >= (47 - (grid.paddle.height / 2)) )
+            {
+                // blink the button
+                // set the button color to white, then setup a timer to set it back to the proper color
+                right_button_update_color([255, 255, 255]);
+                setTimeout(function(){right_button_update_color(grid.paddle.color)}, 300);
+            }
+            else
+            {
+                // move the position down by 1 position
+                grid.paddle.pos++;
+            }
+
+            grid.namespace.emit('pos', {pos: grid.paddle.pos});
+       }
+
+        //-----------------------------------------------------------------------------
+        function left_button_click() {
+            // event called when "left" button is clicked
+            // in the world of pong I want a position from 0 to 47 (some day we will normalized this)
+            if (grid.paddle.pos <= (grid.paddle.height / 2) )
+            {
+                // blink the screen
+                // set the button color to white, then setup a timer to set it back to the proper color
+                left_button_update_color([255, 255, 255]);
+                setTimeout(function(){left_button_update_color(grid.paddle.color)}, 300);
+            }
+            else
+            {
+                // move the position down by 1 position
+                grid.paddle.pos--;
+            }
+
+            grid.namespace.emit('pos', {pos: grid.paddle.pos});
+        }
+
+        //-----------------------------------------------------------------------------
+        function play_button_click() {
+            // event called when "left" button is clicked
+            grid.namespace.emit('play');
+        }
+
+        function outputUpdate(vol) {
+            document.querySelector('#volume').value = vol;
+            grid.paddle.pos = vol;
+            grid.namespace.emit('pos', {pos: grid.paddle.pos});
+        }
+
+        //-----------------------------------------------------------------------------
+        function test_button_click() {
+            // event called when "test" button is clicked
+
+            status_update("Test");
+            screen_update();
+        }
+
+
+        //-----------------------------------------------------------------------------
+        //
+        function button_update_color(color) {
+            var oldColor = document.getElementById("right_button").style.backgroundColor;
+            document.getElementById("right_button").style.backgroundColor =
+                    'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')';
+            document.getElementById("left_button").style.backgroundColor =
+                    'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')';
+        }
+
+        //-----------------------------------------------------------------------------
+        //
+        function right_button_update_color(color) {
+            var oldColor = document.getElementById("right_button").style.backgroundColor;
+            document.getElementById("right_button").style.backgroundColor =
+                    'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')';
+        }
+
+        //-----------------------------------------------------------------------------
+        //
+        function left_button_update_color(color) {
+            var oldColor = document.getElementById("right_button").style.backgroundColor;
+            document.getElementById("left_button").style.backgroundColor =
+                    'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')';
+        }
+
+        //-----------------------------------------------------------------------------
+        //
+        function cell_update_color(x,y,color) {
+            var pixel_x = 0;
+            var pixel_y = 0;
+            pixel_x = grid.x_margin + (x * (grid.cell_width + grid.cell_margin));
+            pixel_y = grid.y_margin + (y * (grid.cell_height + grid.cell_margin));
+            var canvas_el = document.getElementById("canvas");
+            var canvas_context = canvas_el.getContext("2d");
+            canvas_context.fillStyle = color;
+            canvas_context.fillRect(pixel_x, pixel_y, grid.cell_width, grid.cell_height);
+        }
+
+
+        //-----------------------------------------------------------------------------
+        function status_update(status_str) {
+            html = "";
+            html += "<font color='#fff'>";
+            html += status_str;
+            html += "</font>";
+            document.getElementById("status_div").innerHTML = html;
+        }
+
+        //-----------------------------------------------------------------------------
+        //
+        function start() {
+            // content of html body
+            body_html = "";
+            body_html += "<button id='play_button' name='play' value='play'>Play</button>"
+            body_html += "<button id='stop_button' name='stop' value='stop'>Stop</button>"
+            body_html += "<button id='attach_button' name='attach' value='attach'>Attach Player</button>"
+            body_html += "<button id='detach_button' name='detach' value='detach'>Detach Player</button>"
+            body_html += "<button id='left_button' name='leftt' value='left'>Left</button>"
+            body_html += "<button id='right_button' name='right' value='right'>Right</button>"
+            body_html += "&nbsp; &nbsp; <span id='status_div'></span>";
+            body_html += "<br>";
+            body_html += "<canvas id='canvas' width='800' height='600'></canvas>";
+            body_html += "<label for='fader'>Volume</label><input type='range' min='0' max='47' "
+            body_html += "value='23' id='fader' step='1' oninput='outputUpdate(value)'><output for='fader' id='volume'>50</output>"
+            document.getElementById("body").innerHTML = body_html;
+
+            setup();
+            status_update("OK");
+        }
+
+
+        function mode_select_onchange() {
+            var status_str;
+            if (grid.running) {
+                status_str = "Running";
+            } else {
+                status_str = "Stopped";
+            }
+            status_update(status_str);
+        }
+
+        function int_to_hex(d) {
+            var padding = 2;
+            var hex = Number(d).toString(16);
+            padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
+
+            while (hex.length < padding) {
+                hex = "0" + hex;
+            }
+            return hex;
+        }
+
+
+        function screen_update() {
+            // get the current grid pixel colors from the server
+            // then update the simulated screen with those colors
+            //
+            var xmlhttp=new XMLHttpRequest();
+            xmlhttp.onreadystatechange=function() {
+                if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+                    grid_data = JSON.parse(xmlhttp.responseText);
+                    var i = 0;
+                    for(row_num=1; row_num<=grid.cell_rows; row_num++) {
+                        for(col_num=1; col_num<=grid.cell_cols; col_num++) {
+                            color = grid_data[i];
+                            color_str = "#" + int_to_hex(color[0]) + int_to_hex(color[1]) + int_to_hex(color[2]);
+                            cell_update_color(col_num, row_num, color_str);
+                            i++;
+                        }
+                    }
+                }
+            }
+            xmlhttp.open("GET","http://" + window.location.host + "/output",true);
+            xmlhttp.send();
+        }
+
+
+        //-----------------------------------------------------------------------------
+        // end of javascript
+        //-----------------------------------------------------------------------------
+    </script>
+</head>
+<body id="body" class="dimmed" onload="start()"; >
+</body>
+</html>
