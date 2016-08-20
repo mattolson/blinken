@@ -220,6 +220,12 @@
                 $('body').attr('id', "disconnected")
             });
 
+            grid.namespace.on('reconnect', function(){
+                msg = "Connected";
+                $('body').attr('id', "idle")
+                // status_update(msg);
+            });
+
             grid.namespace.on('player', function(player){
                 // they have returned to me a player object.
                 // I should take the color and set a color on the screen
@@ -227,6 +233,11 @@
                 grid.paddle.set_color(player.color);
                 // status_update(msg);
             });
+
+            grid.namespace.on('detach', function(state){
+                console.log('server told me to detach, and socket.io is limited soo...');
+                grid.namespace.emit('detach');
+            })
 
             grid.namespace.on('state', function(state){
                 if(typeof grid.state[state] == "function") {

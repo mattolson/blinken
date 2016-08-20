@@ -308,8 +308,16 @@ function drawCountdown(player)
     // this.grid.setCursor(8, 2);
     // this.grid.print("Begins in");
     
-    this.grid.setCursor(20, 20);
-    this.grid.print(5-this.countdown_elapsed);
+    this.grid.setCursor(25, 20);
+    var tminus = 5-this.countdown_elapsed;
+    if(tminus < 1) {
+        this.grid.print("Go!");
+    }
+    else 
+    {
+        this.grid.print(tminus);    
+    }
+    
     var pong = this;
 }
 
@@ -368,7 +376,7 @@ function Pong(grid, options) {
         });
 
         socket.on('detach', function() {
-            // self.detach(socket);
+            self.detach(socket);
         });
 
         socket.on('pos', function(position) {
@@ -456,41 +464,49 @@ Pong.prototype.step = function() {
     //It's done like this to limit spaghetti code, without this pattern, state setting and running occurs all over the place, and is difficult to change.
                                                                             
     //This is where it loops around, so we need allow "finished" to complete.
-    if( this.total_attached() == 0 )                                      
-            this.state_set("idle") 
+    if( this.total_attached() == 0 )   
+    {                                   
+        this.state_set("idle") 
+        this.detachAll();
+    }
 
     //Only one player is attached
-    if( this.total_attached() == 1 && !this.state_is("playing") && !this.state_is("forfeit") )
+    else if( this.total_attached() == 1 && !this.state_is("playing") && !this.state_is("forfeit") )
     {                                     
-            this.state_set("waiting"); 
-            this.resetScores();
+        this.state_set("waiting"); 
+        this.resetScores();
     }
     
     //A player left in the middle of the game.
-    if( this.state_is("forfeit") || (this.state_is("playing") && this.total_attached() == 1) )
+    else if( this.state_is("forfeit") || (this.state_is("playing") && this.total_attached() == 1) )
     {
         this.state_set("forfeit");
     }
-    
+
     //They were waiting, but no longer
-    if( this.state_is("waiting") && this.total_attached() == 2 )         
+    else if( this.state_is("waiting") && this.total_attached() == 2 )   
+    {      
         this.state_set("countdown"); 
+    }
 
     //Time to move on to the game :)
-    if( 
+    else if( 
         (this.state_is("countdown") && this.countdown_elapsed > 5) ||
         (this.state_is("playing") && !checkWin.call(this))
       )  
     {
+        this.countdown_elapsed = 0;
         this.state_set("playing");
     }
+
     //Someone just won.
-    if( this.state_is("playing") && checkWin.call(this) )    
+    else if( this.state_is("playing") && checkWin.call(this) )    
     {          
         this.state_set("finished");
     }
+
     //Finished state will remove attached players after some time, triggering idle.
-    if( this.state_is("finished") && this.total_attached() == 0) 
+    else if( this.state_is("finished") && this.total_attached() == 0) 
     {                
         this.state_set("idle");
         this.reset(); 
@@ -650,6 +666,7 @@ Pong.prototype.attach = function(socket){
     console.log("got an attach");
     // so we should attach this socket to a player
     socket.player = findFreePlayer.call(this);
+    console.log("attached now", this.total_attached());
     if (socket.player !== undefined) {
         socket.player.socket = socket;
         console.log("attached to player " + socket.player.id);
@@ -659,7 +676,7 @@ Pong.prototype.attach = function(socket){
                 color: socket.player.color,
                 height: this.paddle.height
             });
-        this.emit_state();
+        // this.emit_state();
     } else {
         console.log("cannot attach to player");
         socket.emit('errorMsg', {text: 'No Player Available'});
@@ -676,8 +693,10 @@ Pong.prototype.detach = function(socket){
 }
 
 Pong.prototype.detachAll = function(){
-    if(this.player1.socket) this.detach(this.player1.socket);
-    if(this.player2.socket) this.detach(this.player2.socket);
+    // if(this.player1.socket) this.player1.socket.emit();
+    // if(this.player2.socket) this.detach(this.player2.socket);
+    if(this.player1.socket) this.player1.socket.emit('detach');
+    if(this.player2.socket) this.player2.socket.emit('detach');
 }
 
 Pong.prototype.paddles = function(){
