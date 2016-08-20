@@ -1,7 +1,10 @@
 'use strict';
 
-var funfetti = function(){
-  (function() {
+window.funfetti = function(sel){
+  var $el = $(sel);
+  $el.append('<canvas id="funfetti" class="won"></canvas>')
+  $('canvas', $el).css({ width: $(document).width(), height: $(document).height() })
+
   var COLORS, Confetti, NUM_CONFETTI, PI_2, canvas, confetti, context, drawCircle, i, range, resizeWindow, xpos;
 
   NUM_CONFETTI = 350;
@@ -14,9 +17,9 @@ var funfetti = function(){
 
   context = canvas.getContext("2d");
 
-  window.w = 0;
+  window.w = $(document).width();
 
-  window.h = 0;
+  window.h = $(document).height();
 
   resizeWindow = function() {
     window.w = canvas.width = window.innerWidth;
@@ -104,8 +107,9 @@ var funfetti = function(){
   })();
 
   window.step = function() {
+    console.log('confetti!');
     var c, j, len, results;
-    requestAnimationFrame(step);
+    if($('canvas', $el).length) requestAnimationFrame(step);
     context.clearRect(0, 0, w, h);
     results = [];
     for (j = 0, len = confetti.length; j < len; j++) {
@@ -116,6 +120,9 @@ var funfetti = function(){
   };
 
   step();
+}
 
-}).call(this);
+window.funfetti_remove = function(){
+  var $el = $('.finished.state canvas');
+  if($el.length) $el.remove();
 }
