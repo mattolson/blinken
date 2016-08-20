@@ -353,6 +353,7 @@ function Pong(grid, options) {
     this.queue = new Array();
     this.triggers = new Array();
     this.countdown_elapsed = 0;
+    this.countdown_begin = 0;
     this.total = 0;
     this.timeout = false;
 
@@ -467,7 +468,6 @@ Pong.prototype.step = function() {
     if( this.total_attached() == 0 )   
     {                                   
         this.state_set("idle") 
-        this.detachAll();
     }
 
     //Only one player is attached
@@ -495,7 +495,8 @@ Pong.prototype.step = function() {
         (this.state_is("playing") && !checkWin.call(this))
       )  
     {
-        this.countdown_elapsed = 0;
+        this.countdown_elapsed = 0
+        ,this.countdown_begin = 0;
         this.state_set("playing");
     }
 
@@ -561,6 +562,7 @@ Pong.prototype.idle = function(){
     updatePaddlePositions.call(this);
     moveBall.call(this);
     drawGame.call(this);
+    this.resetScores(); //Hack for  glitch
 }
 
 Pong.prototype.waiting = function(){
