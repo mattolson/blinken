@@ -57,6 +57,9 @@
             this.active = false;
             this.sel = "#paddle";
             this.$el = $(this.sel);
+
+            this.pos_cache = 0;
+            this.invert = false;
         }
 
         Paddle.prototype.set_color = function(color){
@@ -74,10 +77,10 @@
             if(!this.active) return;
             this.$el.css("left", e.pageX+"px");
             var paddle_pos = grid.normalize.get(e.pageX);
-            grid.namespace.emit('pos', paddle_pos );   
-            // console.log("normalize max", grid.normalize.max_input);
-            // console.log("mous pos x", e.pageX)
-            // console.log("paddle pos", paddle_pos)
+            if(paddle_pos != this.pos_cache) {
+                grid.namespace.emit('pos', paddle_pos );
+                this.pos_cache = paddle_pos;
+            }
         }
 
         Paddle.prototype.on = function(e){
