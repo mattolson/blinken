@@ -1,0 +1,292 @@
+<!DOCTYPE html5>
+<head>
+    <meta charset="utf-8">
+    <style type="text/css">
+        body { background:#000; }
+
+        div.state { display:none; position:absolute; top:0px; left:0px; right:0px; bottom:0px; } 
+        body#waiting .waiting.state { display:block; }
+        body#countdown .countdown.state { display:block; }
+        body#playing .playing.state { display:block; }
+        body#finished .finished.state { display:block; }
+        body#idle .idle.state { display:block; }
+
+        body#finished .finished.state > span {display:none;}
+        body#finished .finished.state.won .won {display:block;}
+        body#finished .finished.state.lost .lost {display:block;}
+
+        
+        #paddle { position:absolute; width:10%; height:10%; top:50%; left:50%; transform:translateY(-50%) translateX(-50%); background-color:#FFF; }
+
+        .status-text {position:absolute; top:50%; left:50%; transform:translateY(-50%) translateX(-50%); color:#fff; font-size:35px; }
+
+        .idle.state .status-text { background:white; width:300px; height:300px; border-radius:150px;}
+        .idle.state .status-text span { position:absolute; top:50%; left:50%; transform:translateY(-50%) translateX(-50%); color:black; }
+
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/assets/js/jquery-3.1.0.min.js"></script>
+    <script>
+        //-----------------------------------------------------------------------------
+        var grid = Object();  // global object
+
+        //-----------------------------------------------------------------------------
+        function setup() {
+            document.title = "Blinken Pong";
+            grid.paddle = new Paddle();
+            grid.normalize = new Normalize( $(document).width() );
+            namespace_setup();
+            unselectable();
+            // insert content into html span
+        }
+        //-----------------------------------------------------------------------------
+        var Paddle = function(){
+            this.color = [255,255,255];
+            this.active = false;
+            this.sel = "#paddle";
+            this.$el = $(this.sel);
+        }
+
+        Paddle.prototype.set_color = function(color){
+            this.color = color;
+        }
+
+        Paddle.prototype.paint = function(){
+            var color = this.color;
+
+            var rgb = "rgb("+color[0]+","+color[1]+","+color[2]+")";    
+            this.$el.css("background-color", "rgb(" +color[0]+ "," +color[1]+ "," +color[2]+")");
+        }
+
+        Paddle.prototype.move = function(e){
+            if(!this.active) return;
+            this.$el.css("left", e.pageX+"px");
+            var paddle_pos = grid.normalize.get(e.pageX);
+            grid.namespace.emit('pos', paddle_pos );   
+            // console.log("normalize max", grid.normalize.max_input);
+            // console.log("mous pos x", e.pageX)
+            // console.log("paddle pos", paddle_pos)
+        }
+
+        Paddle.prototype.on = function(e){
+            bind_playing();
+            this.active = true;
+        }
+        Paddle.prototype.off = function(e){
+            unbind_playing();
+            this.active = false;
+        }
+
+        //-----------------------------------------------------------------------------
+        grid.is_dragging = false;
+        //
+        function bind_playing(){
+                //
+                $('.state.playing').on('mousedown', bind_mousedown);
+                $('.state.playing').on('mousemove', bind_mousemove);
+                $('.state.playing').on('mouseup', bind_mouseup);
+                //
+                $('.state.playing').on('touchstart', touch_handler);
+                $('.state.playing').on('touchmove', touch_handler);
+                $('.state.playing').on('touchend', touch_handler);
+        }
+
+        function unbind_playing(){
+                //
+                $('.state.playing').off('mousedown', bind_mousedown);
+                $('.state.playing').off('mousemove', bind_mousemove);
+                $('.state.playing').off('mouseup', bind_mouseup);
+                //
+                $('.state.playing').off('touchstart', touch_handler);
+                $('.state.playing').off('touchmove', touch_handler);
+                $('.state.playing').off('touchend', touch_handler);
+        }
+
+        function bind_idle(){
+            console.log('bind', 'play button')
+            $('.play-btn').on('mousedown', function(){
+                grid.namespace.emit('attach');
+                console.log('press', 'play button')
+            })
+        }
+
+        function unbind_idle(){
+            $('.play-btn').off('mousedown');
+        }
+
+        function unselectable(){
+            $('body, #paddle')
+                .attr('unselectable','on')
+                .css({
+                    '-moz-user-select':'-moz-none',
+                    '-moz-user-select':'none',
+                    '-o-user-select':'none',
+                    '-khtml-user-select':'none', /* you could also put this in a class */
+                    '-webkit-user-select':'none',/* and add the CSS class here instead */
+                    '-ms-user-select':'none',
+                    'user-select':'none'})
+                .bind('selectstart', function(){ return false; });
+        }
+
+        function bind_mousedown(e){
+            grid.is_dragging = true;
+            grid.paddle.move(e);
+            e.preventDefault();
+        }
+
+        function bind_mousemove(e){
+            if(grid.is_dragging){
+                // dragging
+                grid.paddle.move(e);
+            }
+            e.preventDefault();
+        }
+
+        function bind_mouseup(e){
+            grid.is_dragging = false;
+            e.preventDefault();
+        }
+
+        function touch_handler(event) {
+            var touch = event.changedTouches[0];
+
+            var simulatedEvent = document.createEvent("MouseEvent");
+                simulatedEvent.initMouseEvent({
+                touchstart: "mousedown",
+                touchmove: "mousemove",
+                touchend: "mouseup"
+            }[event.type], true, true, window, 1,
+                touch.screenX, touch.screenY,
+                touch.clientX, touch.clientY, false,
+                false, false, false, 0, null);
+
+            touch.target.dispatchEvent(simulatedEvent);
+            event.preventDefault();
+        }
+        //-----------------------------------------------------------------------------
+
+        var Normalize = function(max_input){
+            //Cieling
+            this.min = 0;
+            this.max = 47;
+            //User's browser dims (width)
+            this.min_input = 0;
+            this.max_input = max_input;
+        }
+
+        Normalize.prototype.get = function(input){
+            // y = 1 + (x-A)*(10-1)/(B-A)
+            return Math.round(1 + (input-this.min_input)*(this.max-this.min)/(this.max_input-this.min_input));
+        }
+
+        //-----------------------------------------------------------------------------
+
+        grid.state = {};
+
+        grid.state.idle = function(state){
+            bind_idle();
+        }
+        
+        grid.state.waiting = function(state){
+            
+        }
+
+        grid.state.countdown = function(state){
+            
+        }
+
+        grid.state.playing = function(state){
+            grid.paddle.on();
+            grid.paddle.paint();
+        }
+
+        grid.state.finished = function(state){
+            grid.paddle.off();
+        }
+        
+        //-----------------------------------------------------------------------------
+ 
+        function namespace_setup() {
+            grid.namespace = io.connect('/pong');
+
+            grid.namespace.on('connect', function(){
+                msg = "Connected";
+                // status_update(msg);
+            });
+
+            grid.namespace.on('disconnect', function(){
+                // button_update_color([220,220,220]);
+                // status_update('Disconnected');
+                $('body').attr('id', "disconnected")
+            });
+
+            grid.namespace.on('player', function(player){
+                // they have returned to me a player object.
+                // I should take the color and set a color on the screen
+                msg = "Player " + player.id + " color " + player.color;
+                grid.paddle.set_color(player.color);
+                // status_update(msg);
+            });
+
+            grid.namespace.on('state', function(state){
+                if(typeof grid.state[state] == "function") {
+                    $('body').attr("id", state);
+                    console.log("State", state);
+                    grid.state[state]();
+                } else {
+                    console.log("Error", "Server sent a state we aren't accounting for: "+state);
+                }
+            });
+
+            grid.namespace.on('won', function(player){
+                console.log('You Won!')
+                $('.finished')
+                    .removeClass('lost')
+                    .addClass('won');
+            });
+
+            grid.namespace.on('lost', function(player){
+                console.log('You lost :(')
+                $('.finished')
+                    .removeClass('won')
+                    .addClass('lost');
+            });
+
+            grid.namespace.on('errorMsg', function(msg){
+                // status_update(msg.text);
+            });
+        }
+
+        $(function(){ setup(); });
+
+
+        //-----------------------------------------------------------------------------
+        // end of javascript
+        //-----------------------------------------------------------------------------
+    </script>
+</head>
+<body id="body">
+
+    <div class="idle state">
+        <span class="status-text play-btn"><span>Play</span></span>
+    </div>
+    
+    <div class="waiting state">
+        <span class="status-text">Waiting for Opponent</span>
+    </div>
+    
+    <div class="countdown state">
+        <span class="status-text">Game beginning in...</span>
+    </div>
+    
+    <div class="playing state">
+        <div id="paddle"></div>
+    </div>
+    
+    <div class="finished state">
+        <span class="status-text won">You Won!</span>
+        <span class="status-text lost">You Lost.</span>
+    </div>
+
+</body>
+</html>
