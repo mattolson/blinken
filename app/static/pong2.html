@@ -1,8 +1,9 @@
 <!DOCTYPE html5>
 <head>
     <meta charset="utf-8">
+    <link href="https://fonts.googleapis.com/css?family=Lato|Rubik+Mono+One" rel="stylesheet">
     <style type="text/css">
-        body { background:#000; }
+        body { background:#000; font-family: 'Lato', sans-serif; }
 
         div.state { display:none; position:absolute; top:0px; left:0px; right:0px; bottom:0px; } 
         body#waiting .waiting.state { display:block; }
@@ -15,12 +16,20 @@
         body#finished .finished.state.won .won {display:block;}
         body#finished .finished.state.lost .lost {display:block;}
 
+        .meta {display:none; text-align:center; width:100%; position:absolute; display:inline-block;}
+        body#idle .meta, body#waiting .meta {display:block;}
+        .title {top:5px; color:#BADA55; font-size:3vw; font-family: 'Rubik Mono One', sans-serif;}
+        .plebes {bottom:5px; font-size:8pt; color:#c0c0c0;}
+        .version {font-size:11pt;color:#f0f0f0;}
+
+        .plebes span {margin-right:15px; text-transform:uppercase;}
+        
         
         #paddle { position:absolute; width:10%; height:10%; top:50%; left:50%; transform:translateY(-50%) translateX(-50%); background-color:#FFF; }
 
         .status-text {position:absolute; top:50%; left:50%; transform:translateY(-50%) translateX(-50%); color:#fff; font-size:35px; }
 
-        .idle.state .status-text { background:white; width:300px; height:300px; border-radius:150px;}
+        .idle.state .status-text { background:white; width:240px; height:240px; border-radius:120px;}
         .idle.state .status-text span { position:absolute; top:50%; left:50%; transform:translateY(-50%) translateX(-50%); color:black; }
 
     </style>
@@ -37,6 +46,7 @@
             grid.normalize = new Normalize( $(document).width() );
             namespace_setup();
             unselectable();
+            anonymize_plebes()
             // insert content into html span
         }
         //-----------------------------------------------------------------------------
@@ -269,8 +279,34 @@
             });
         }
 
-        $(function(){ setup(); });
+        //-----------------------------------------------------------------------------
+        var anonymize_plebes = function(){
+            $(".plebes").randomize("span");
+        }
 
+        //-----------------------------------------------------------------------------
+
+        // (function($) {
+
+        $.fn.randomize = function(childElem) {
+          return this.each(function() {
+              var $this = $(this);
+              var elems = $this.children(childElem);
+
+              elems.sort(function() { return (Math.round(Math.random())-0.5); });  
+
+              $this.remove(childElem);  
+
+              for(var i=0; i < elems.length; i++)
+                $this.append(elems[i]);      
+
+          });    
+        }
+        // })(jQuery);
+
+        //-----------------------------------------------------------------------------
+
+        $(function(){ setup(); });
 
         //-----------------------------------------------------------------------------
         // end of javascript
@@ -278,6 +314,11 @@
     </script>
 </head>
 <body id="body">
+
+    <div class="meta">
+        <div class="title">Pong</div>
+        <span class="version">v0.2.0<span>
+    </div>
 
     <div class="idle state">
         <span class="status-text play-btn"><span>Play</span></span>
@@ -298,6 +339,13 @@
     <div class="finished state">
         <span class="status-text won">You Won!</span>
         <span class="status-text lost">You Lost.</span>
+    </div>
+
+    <div class="plebes meta">
+        <span>Michael Weisse</span>
+        <span>Sean Mitchell</span>
+        <span>Jordan Layman</span>
+        <span>Matt Olson</span>
     </div>
 
 </body>
