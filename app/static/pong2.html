@@ -12,6 +12,7 @@
         body#finished .finished.state { display:block; }
         body#busy .busy.state { display:block; }
         body#idle .idle.state { display:block; }
+        body#connection-error .error.state { display:block; }
 
         body#finished .finished.state > span {display:none;}
         body#finished .finished.state.won .won {display:block;}
@@ -50,6 +51,7 @@
             namespace_setup();
             unselectable();
             anonymize_plebes()
+            grid.audio = audio_init();
             // insert content into html span
         }
         //-----------------------------------------------------------------------------
@@ -202,22 +204,69 @@
 
         grid.state.idle = function(state){
             bind_idle();
+            setTimeout(function(){
+                grid.audio.win.pause();
+                grid.audio.busy.pause();
+                grid.audio.waiting.pause();
+                grid.audio.countdown.pause();
+                grid.audio.lose.pause();
+            }, 3000);
         }
         
-        grid.state.waiting = function(state){}
+        grid.state.waiting = function(state){
+            grid.audio.waiting.play();
+        }
 
-        grid.state.countdown = function(state){}
+        grid.state.countdown = function(state){
+            grid.audio.countdown.play();
+            setTimeout(function(){
+                grid.audio.waiting.pause();
+            }, 3000)
+        }
 
-        grid.state.busy = function(state){}
+        grid.state.busy = function(state){
+            grid.audio.busy.play();
+        }
+
+        grid.state.forfeit = function(state){}
 
         grid.state.playing = function(state){
             grid.paddle.on();
             grid.paddle.paint();
+            grid.audio.countdown.pause();
         }
 
         grid.state.finished = function(state){
             grid.paddle.off();
         }
+
+        //-----------------------------------------------------------------------------
+
+        var audio_init = function(){
+            var audio = {};
+                audio.waiting = new Audio("/assets/audio/busy.wav");
+                audio.countdown = new Audio("/assets/audio/countdown.wav");
+                audio.busy = new Audio("/assets/audio/busy.wav");
+                audio.hit = new Audio("/assets/audio/hit.wav");
+                audio.lose = new Audio("/assets/audio/lose.wav");
+                audio.win = new Audio("/assets/audio/win.wav");
+            return audio;
+        }
+
+        var audio = function(file){
+            this.file = new Audio('file');
+        }
+
+        audio.prototype.play = function(){
+            this.file.play();
+        }
+
+        audio.prototype.pause = function(){
+            this.file.pause();
+            this.file.currentTime = 0;
+        }
+
+        
         
         //-----------------------------------------------------------------------------
  
@@ -270,6 +319,7 @@
                     .removeClass('lost')
                     .addClass('won');
                 funfetti();
+                grid.audio.win.play();
             });
 
             grid.namespace.on('lost', function(player){
@@ -277,7 +327,15 @@
                 $('.finished')
                     .removeClass('won')
                     .addClass('lost');
+                grid.audio.lose.play();
             });
+
+            grid.namespace.on('connect_failed', function() {
+                setTimeout(function(){
+                    location.reload();
+                }, 3000);
+                $('body').attr("id", 'connection-error');
+            })
 
             grid.namespace.on('errorMsg', function(msg){
                 // status_update(msg.text);
@@ -340,6 +398,10 @@
     
     <div class="countdown state">
         <span class="status-text">Game beginning in...</span>
+    </div>
+
+    <div class="error state">
+        <span class="status-text">There was a connection error.</span>
     </div>
     
     <div class="playing state">

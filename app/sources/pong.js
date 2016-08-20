@@ -365,7 +365,7 @@ function Pong(grid, options) {
         self.connections++;  // it seems weisse to keep track
 
         self.attach(socket);
-        self.emit_state();
+        // self.emit_state();
         
         socket.on('disconnect', function() {
             console.log(socket.id + " disconnected from pong");
@@ -660,7 +660,7 @@ Pong.prototype.attach = function(socket){
     // so we should attach this socket to a player
     socket.player = findFreePlayer.call(this);
     console.log("attached now", this.total_attached());
-    if (socket.player !== undefined) {
+    if (socket.player !== undefined && !this.state_is("forfeit") && !this.state_is("finished")) {
         socket.player.socket = socket;
         console.log("attached to player " + socket.player.id);
         socket.emit('player',
@@ -669,11 +669,12 @@ Pong.prototype.attach = function(socket){
                 color: socket.player.color,
                 height: this.paddle.height
             });
+        socket.emit('state', this.state);
         // this.emit_state();
     } else {
         console.log("cannot attach to player");
         socket.emit('errorMsg', {text: 'No Player Available'});
-        socket.emit('state', 'busy');
+        socket.emit('state', "busy");
     //              socketError(socket, 'No Snake Available');
     }
 }
@@ -687,15 +688,11 @@ Pong.prototype.detach = function(socket){
 }
 
 Pong.prototype.detachAll = function(){
-    // if(this.player1.socket) this.player1.socket.emit();
-    // if(this.player2.socket) this.detach(this.player2.socket);
     if(this.player1.socket) {
         this.detach(this.player1.socket);
-        delete this.player1.socket;
     }
     if(this.player2.socket) {
         this.detach(this.player2.socket);
-        delete this.player2.socket;
     }
 }
 
