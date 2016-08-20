@@ -1,0 +1,1343 @@
+<!DOCTYPE html5>
+<head>
+<title>Blinken-JS</title>
+<meta charset="utf-8">
+<style type="text/css"> 
+.positioned
+{
+position:absolute;
+}
+
+.grid_style
+{
+height:480;
+width:1280;
+border-color:#000;
+border-width:2;
+border-style:solid;
+background-color:#444;
+}
+
+.bordered
+{
+border-color:#000;
+border-width:1;
+border-style:solid;
+padding:5px;
+}
+
+.grayback_bordered
+{
+border-color:#000000;
+border-width:1;
+border-style:solid;
+background-color:#AAA;
+padding:2px;
+margin:4px;
+margin-bottom:5px;
+overflow:hidden;
+}
+
+.widget
+{
+border-color:#000;
+border-width:1;
+border-style:solid;
+background-color:#AAA;
+margin-left:5px;
+margin-right:5px;
+margin-bottom:15px;
+padding-left:5px;
+padding-right:5px;
+overflow:hidden;
+}
+
+.colorbar
+{
+border-color:#000;
+border-width:1;
+border-style:solid;
+background-color:#999;
+padding-left:10px;
+padding-top:15px;
+padding-bottom:10px;
+padding-right:10px;
+margin:0px;
+}
+
+.dimmed
+{
+background-color:#555;
+}
+.hidden
+{
+visibility:hidden;
+}
+#test
+{
+border-color:#000000;
+border-width:1;
+border-style:solid;
+background-color:#999;
+height:100;
+width:200;
+}
+
+.ctest
+{
+background-color:#00ff00;
+}
+
+</style>
+<script>
+
+var x = '{"name": "color_wheel","options": [{"name": "period","type": "integer","default": 40}]}';
+  
+//-----------------------------------------------------------------------------
+
+var grid = Object();  // global object
+
+
+//-----------------------------------------------------------------------------
+function setup() {
+	document.title = "Blinken Light Mixer";
+	grid.color_background = '#000000';  // black
+	grid.color_highlighted = 'rgb(220,220,250)';  // light bluish color
+	grid.color_selected = '#FFFFFF'; // white
+	grid.color_default = '#000000';  // black
+
+	grid.cell_cols = 32;
+	grid.cell_rows = 10;
+	grid.cell_margin = 10;
+	grid.cell_size = 20;
+	grid.cell_height = grid.cell_size;
+	grid.cell_width = grid.cell_size;
+	
+	grid.x_margin = 20;
+	grid.y_margin = 20;
+	grid.done = false;
+
+	grid.palette = [];
+	grid.palette['primary'] = color_palette_primary();
+	grid.palette['grayscale'] = color_palette_grayscale();
+	grid.palette['rainbow'] = color_palette_rainbow();
+	
+	grid.flood_range = 10;  // a default setting for flood mode
+	//grid.mode_selected = "flood";
+	//grid.mode_selected = "color-field";
+	grid.mode_selected = "color-wheel";
+	grid.timer_tick_interval_ms = 200; // milliseconds per timer tick
+	grid.palette_selected = 'rainbow';
+	
+	// hide some parts of user interface by default
+	document.getElementById("settings_div").style.display="none";
+	document.getElementById("save_settings_button").style.display="none";
+	document.getElementById("color_field_controls").style.display="none";
+	document.getElementById("layers").style.display="none";
+
+	grid.running = false;
+	grid.timer_count = 0;
+	grid.selected_cell_name = '';
+	
+	// insert content into html spans
+	palette_select_setup();	
+	mode_select_setup(); 
+	flood_range_select_setup();
+	mode_select_onchange();
+	color_select_setup();
+	grid_setup();
+	
+	color_bar_setup(grid.palette_selected);
+	color_selected_update(grid.color_selected);
+
+
+	button = '<button id="test_button">Test</button>';
+	document.getElementById("buttons").innerHTML += button;
+	document.getElementById("test_button").onclick=function(){test_button_click()};
+
+
+	// setup events
+	document.getElementById("grid").onkeypress=function(){ doc_onkeypress(event) };
+ 	document.onmousedown=function(){ doc_onmousedown(event) };
+	document.onmouseup=function(){ doc_onmouseup(event) };
+
+	document.getElementById("clear_button").onclick=function(){clear_button_click()};
+	document.getElementById("save_settings_button").onclick=function(){save_settings_click()};
+	document.getElementById("show_settings_button").onclick=function(){show_settings_click()};
+	document.getElementById("start_button").onclick=function(){start_button_click()};
+	document.getElementById("stop_button").onclick=function(){stop_button_click()};
+	document.getElementById("step_button").onclick=function(){step_button_click()};
+
+	document.getElementById("mode_select").onchange=function(){mode_select_onchange(event)};
+	document.getElementById("flood_range_select").onchange=function(){flood_range_select_onchange(event)};
+	document.getElementById("palette_select").onchange=function(){palette_select_onchange(event)};
+	
+	grid.availWidth = screen.availWidth;
+	grid.availHeight = screen.availHeight;
+	grid.screen_width = screen.width;
+	grid.screen_height = screen.hieght;
+
+	start_button_click(); // start timer tick event
+}
+
+
+//-----------------------------------------------------------------------------
+function grid_setup() {
+	// create grid of cells 
+	grid.board = {};
+	for(row_num=1; row_num<=grid.cell_rows; row_num++) {
+		for(col_num=1; col_num<=grid.cell_cols; col_num++) {
+			cell = Object();
+			cell.text = '';
+			cell.color = grid.color_default;
+			cell.name = 'cell_'+row_num+'_'+col_num;
+			cell.row = row_num;
+			cell.col = col_num;
+			cell.x_pos = grid.x_margin + (col_num * (grid.cell_width + grid.cell_margin));
+			cell.y_pos = grid.x_margin + (row_num * (grid.cell_width + grid.cell_margin));
+			
+			grid.board[cell.name] = cell;
+		}
+	}
+	// create squares as html divs
+	content = "";	
+	for(row_num=1; row_num<=grid.cell_rows; row_num++) {
+		for(col_num=1; col_num<=grid.cell_cols; col_num++) {
+			var cell_name = 'cell_'+row_num+'_'+col_num;
+			var cell = grid.board[cell_name];
+			content += "<div id='"+cell_name+"' class='positioned'";
+			content += " onclick='cell_onclick(event)'";
+			content += " onmouseover='cell_onmouseover(event)'";
+			content += ">" + svg_cell(cell);
+			content += "</div>";
+		}
+	}
+	// insert cells into div
+	var item = document.getElementById("cells")
+	item.innerHTML = content;
+	
+	// position cells
+	for(row_num=1; row_num<=grid.cell_rows; row_num++) {
+		y = grid.y_margin + ((grid.cell_height+grid.cell_margin) * row_num);
+		for(col_num=1; col_num<=grid.cell_cols; col_num++) {
+			cell_name = "cell_"+row_num+'_'+col_num;
+			cell = grid.board[cell_name];			
+			var item = document.getElementById(cell_name);
+			item.style.left = cell.x_pos + "px";
+			item.style.top = cell.y_pos + "px";
+		}
+	}
+	height = ((grid.cell_rows+2) * (grid.cell_height + grid.cell_margin)) + grid.y_margin;
+	width = ((grid.cell_cols+2) * (grid.cell_width + grid.cell_margin)) + grid.x_margin;
+	width2 = (grid.cell_cols * (grid.cell_width + grid.cell_margin));
+	//width = 1000;
+	document.getElementById("grid").style.width = width;
+	document.getElementById("grid").style.height = height;
+	if (false) {
+		msg = "";
+		msg += "row height "+grid.cell_height+", ";
+		msg += "row width "+grid.cell_width+"\n";
+		msg += " rows "+grid.cell_rows+", cols "+grid.cell_cols+"\n";
+		msg += " x margin "+grid.x_margin+" y_margin "+grid.y_margin+"\n";
+		msg += "height "+height+", width "+width+"\n";
+		msg += "w2 "+width2;
+		alert(msg);
+	}	
+}
+
+
+//-----------------------------------------------------------------------------
+function timer_tick() {
+	// timer event called at regular interval
+	grid.timer_count++;
+	if (grid.running) {
+		msg = "running ";
+		msg += "("+grid.timer_tick_interval_ms/1000+" sec loop) ";
+	} else {
+		msg = "stopped ";
+	}
+	document.getElementById("tick_status").innerHTML = msg;
+	
+	msg = "";
+	if (grid.running) {
+		msg += "running";
+	} else {
+		msg += "stopped at ";
+	}
+	msg +=  " tick "+grid.timer_count;
+	document.getElementById("tick_counter").innerHTML = msg;
+	
+	if (grid.mode_selected == "color-field") {
+		grid_color_field(); //  process frame
+	}
+	if (grid.mode_selected == "color-wheel") {
+		grid_color_wheel(); //  process frame
+	}
+
+}
+
+
+//-----------------------------------------------------------------------------
+function doc_onkeypress(event) {
+	// event called when a keyboard key is pressed
+	//var key = event.keyIdentifier;
+	var chCode = ('charCode' in event) ? event.charCode : event.keyCode;
+	var key = String.fromCharCode(chCode);
+
+	cell_update_text(grid.selected_cell_name, key);
+}
+
+
+
+//-----------------------------------------------------------------------------
+function doc_onmousedown(event) {
+	// event called when a mouse button is pressed down
+	if (event.button == 0) {
+		grid.button0 = true;
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+function doc_onmouseup(event) {
+	// event called when a mouse button is released
+	if (event.button == 0) {
+		grid.button0 = false;
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+function flood_range_select_setup() {
+	options = [];
+	for(i=0; i<=9; i++) {
+		options[i] = "Size "+i;
+	}
+	for(i=10; i<=90; i+=10) {
+		options[i] = "Size "+i;
+	}
+	text = html_select("flood_range_select", options, grid.flood_range);
+	document.getElementById("flood_range_select_span").innerHTML = text;
+}
+
+
+//-----------------------------------------------------------------------------
+function mode_select_setup() {
+	grid.mode_options = [];
+	grid.mode_options["color-field"] = "Color-Field";
+	grid.mode_options["color-wheel"] = "Color-Wheel";
+	grid.mode_options["flood"] = "Flood  Paint";
+	grid.mode_options["paint"] = "Pixel Paint";
+	grid.mode_options["water-color"] = "Water-Color";
+	
+	text = html_select("mode_select", grid.mode_options, grid.mode_selected);	
+	document.getElementById("mode_select_span").innerHTML = text;
+}
+
+//-----------------------------------------------------------------------------
+function palette_select_setup() {
+	grid.palette_options = [];
+	grid.palette_options["primary"] = "Primary Palette";
+	grid.palette_options["grayscale"] = "Gray-scale Palette";
+	grid.palette_options["rainbow"] = "Rainbow Palette";
+	text = html_select("palette_select", grid.palette_options, grid.palette_selected);
+	document.getElementById("palette_select_span").innerHTML = text;
+}
+
+
+//-----------------------------------------------------------------------------
+function color_bar_setup(palette_name) {
+	// generate html content for color_bar
+	grid.color_bar_colors = grid.palette[palette_name];
+	block_height = 20;
+	block_width = 20;
+	color_bar = document.getElementById("color_bar");
+	content = "";
+	for (key in grid.color_bar_colors) {
+		color = grid.color_bar_colors[key];
+		id = "color_bar " + key;  // id must be unique for events to  work
+		content += svg_block(id, block_height ,block_width, color);
+	}	
+	content += "&nbsp;&nbsp;"; // bugfix: css 'padding-right' not working in chrome
+	content += "<br>";
+	color_bar.innerHTML = content;
+	// attach an onclick event to each color_bar block
+	for (key in grid.color_bar_colors) {
+		color = grid.color_bar_colors[key];
+		id = "color_bar " + key;
+		elem = document.getElementById(id);
+		elem.onclick=function(){color_bar_click(event)};
+	}
+	//elem = document.getElementById("palette_select_span");
+	//elem.innerHTML = palette_select_setup();
+}
+
+function color_bar_click(event) {
+	// event called when a block on the color bar is clicked 
+	id = event.target.parentNode.id;  // name of block clicked
+	key = id.split(" ")[1];
+	color = grid.color_bar_colors[key];
+	color_selected_update(color);
+	document.getElementById("status").innerHTML="selected color: "+color;
+}
+
+
+
+//-----------------------------------------------------------------------------
+function color_select_setup() {
+	// setup the "color select" drop-down list
+	value = "&nbsp;&nbsp;&nbsp;";
+	options = [];
+	options["#FF0000"] = value;
+	options["#FFFF00"] = value;
+	options["#00FF00"] = value;
+	options["#00FFFF"] = value;	
+	options["#0000FF"] = value;	
+	options["#FF00FF"] = value;	
+	id = "start_color_select";
+	text = html_select(id, options, "#FF0000");
+	document.getElementById("start_color_select_span").innerHTML = text;
+	elem = document.getElementById(id);
+	elem.style.backgroundColor = "#FF0000";
+	for (key in options) {
+		elem = document.getElementById(id+" "+key);
+		elem.style.backgroundColor = key;
+	}
+	id = "stop_color_select";
+	text = html_select(id, options, "#FF0000");
+	document.getElementById("stop_color_select_span").innerHTML = text;
+	elem = document.getElementById(id);
+	elem.style.backgroundColor = "#FF0000";
+	for (key in options) {
+		elem = document.getElementById(id+" "+key);
+		elem.style.backgroundColor = key;
+	}
+	document.getElementById("start_color_select").onchange=function(){start_color_select_onchange(event)};
+	document.getElementById("stop_color_select").onchange=function(){stop_color_select_onchange(event)};
+
+}
+
+
+
+//-----------------------------------------------------------------------------
+function cell_onclick(event) {
+	// called when mouse is clicked on a grid square
+	var x = event.clientX;
+	var y = event.clientY;
+	var row_num = Math.floor((y - grid.y_margin) / (grid.cell_size + grid.cell_margin));
+	var col_num = Math.floor((x - grid.x_margin) / (grid.cell_size + grid.cell_margin));
+
+	var content = "clicked cell row "+row_num+", col "+col_num;
+	document.getElementById("position").innerHTML = content;
+	cell_name = 'cell_'+row_num+'_'+col_num;
+	cell_select(cell_name);
+}
+
+
+
+//-----------------------------------------------------------------------------
+function cell_onmouseover(event) {
+	// called when mouse is over a grid square
+	var button = event.button;
+	//alert(button);
+	if (grid.button0) {
+		cell_onclick(event);
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+function clear_button_click() {
+	// clear the current board to black
+	flat_color = "rgb(0,0,0)";
+	for (key in grid.board) {
+		cell = grid.board[key];
+		cell.color = flat_color;
+		cell_update(key);
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+function color_selected_update(color) {
+	// updates the "color selected" display area
+	grid.color_selected = color;
+	block_height = 20;
+	block_width = 20;
+	content = svg_block("selected", block_height ,block_width, color);
+	content += " selected ";
+	document.getElementById("color_selected").innerHTML = content;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+function flood_range_select_onchange(event) {
+	grid.flood_range = event.target.value;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+function mode_select_onchange(event) {
+	if(event) {
+		mode = event.target.value;
+		grid.mode_selected = mode;
+	} else {
+		mode = grid.mode_selected; 
+	}
+	document.getElementById("layer 1 mode").innerHTML = mode;
+	if (mode == "color-field")  {
+		//document.getElementById("color_field_controls").style.visibility="visible";
+		document.getElementById("color_field_controls").style.display="block";
+		document.getElementById("color_bar_div").style.display="none";
+		document.getElementById("palette_select_span").style.display="none";
+		document.getElementById("clear_button").style.display="none";	
+	}
+	if (mode == "color-wheel")  {
+		//document.getElementById("color_field_controls").style.visibility="visible";
+		document.getElementById("color_field_controls").style.display="block";
+		document.getElementById("color_bar_div").style.display="none";
+		document.getElementById("palette_select_span").style.display="none";
+		document.getElementById("clear_button").style.display="none";	
+	}
+	
+	if (mode == "paint") {
+		document.getElementById("color_field_controls").style.display="none";
+		document.getElementById("color_bar_div").style.display="inline";
+		document.getElementById("palette_select_span").style.display="inline";
+		document.getElementById("clear_button").style.display="inline";	
+	}
+	
+	if (mode == "flood") {
+		document.getElementById("flood_range_select").style.display="inline";
+		document.getElementById("palette_select_span").style.display="inline";
+		document.getElementById("color_bar_div").style.display="inline";
+	} else {
+		document.getElementById("flood_range_select").style.display="none";	
+	}
+	
+	if (grid.running == true) {
+		document.getElementById("start_button").style.display="none";	
+		document.getElementById("stop_button").style.display="inline";	
+		document.getElementById("step_button").style.display="none";	
+	} else {
+		document.getElementById("start_button").style.display="inline";	
+		document.getElementById("stop_button").style.display="none";	
+		document.getElementById("step_button").style.display="inline";	
+	}
+}
+
+//-----------------------------------------------------------------------------
+function palette_select_onchange(event) {
+	grid.palette_selected = event.target.value;
+	color_bar_setup(grid.palette_selected);
+}
+
+
+
+//-----------------------------------------------------------------------------
+function save_settings_click() {
+	// called when "hide settings" button is clicked
+	document.getElementById("settings_div").style.display="none";
+	document.getElementById("save_settings_button").style.display="none";
+	document.getElementById("show_settings_button").style.display="inline";
+	
+	new_grid = false;
+	value = parseInt(document.getElementById("input_cols").value);
+	if (grid.cell_cols != value) {
+		grid.cell_cols = value;
+		new_grid = true;
+	}
+	value = parseInt(document.getElementById("input_rows").value);
+	if (grid.cell_rows != value) {
+		grid.cell_rows = value;
+		new_grid = true;
+	}
+	if (new_grid) {
+		grid_setup(); // re-setup grid
+	}
+	
+	value = document.getElementById("input_bgcolor").value;
+	document.getElementById("body").style.backgroundColor = value;
+	
+}
+
+
+
+//-----------------------------------------------------------------------------
+function show_settings_click() {
+	// event called when "show settings" button is clicked
+	document.getElementById("settings_div").style.display="block";
+	document.getElementById("save_settings_button").style.display="inline";
+	document.getElementById("show_settings_button").style.display="none";
+}
+
+
+//-----------------------------------------------------------------------------
+function start_button_click() {
+	// event called when "start" button is clicked
+	if (grid.running == false) {
+		grid.running = true;
+		ms = grid.timer_tick_interval_ms;
+		grid.timer_handle = window.setInterval(function(){timer_tick()}, ms);
+		mode_select_onchange();
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+function start_color_select_onchange(event) {
+	color = event.target.value;
+	grid.start_color = color;
+	document.getElementById("start_color_select").style.backgroundColor = color
+}
+
+
+//-----------------------------------------------------------------------------
+function step_button_click() {
+	// event called when "single-step" button is clicked
+	if (grid.running) {
+		grid.running = false;
+		mode_select_onchange();
+	} else {
+		timer_tick();	
+	}
+}
+
+
+
+//-----------------------------------------------------------------------------
+function stop_button_click() {
+	// event called when "stop" button is clicked
+	if (grid.running) {
+		window.clearInterval(grid.timer_handle);
+		grid.running = false;
+	}
+	timer_tick();
+	mode_select_onchange();
+}
+
+
+//-----------------------------------------------------------------------------
+function stop_color_select_onchange(event){
+	color = event.target.value;
+	grid.stop_color = color;
+	document.getElementById("stop_color_select").style.backgroundColor = color
+}
+
+
+
+//-----------------------------------------------------------------------------
+function test_button_click() {
+	// event called when "test" button is clicked
+	//alert("test button clicked");
+	if (false) {
+		xmlhttp=new XMLHttpRequest();
+		xmlhttp.onreadystatechange=function() {
+			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+				grid.xml = xmlhttp.responseText;
+				document.getElementById("xml").innerHTML = grid.xml;
+			}
+		}
+		xmlhttp.open("POST","http://localhost:8888/sources",true);
+		xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		xmlhttp.send('data="'+x+'"');
+	}
+	
+	idoc = document.getElementById("iframe").contentDocument;
+	grid.xml = "test";
+	document.getElementById("xml").innerHTML = "test" + grid.xml;
+}
+
+
+//-----------------------------------------------------------------------------
+function cell_update(cell_name) {
+	var cell = grid.board[cell_name];
+	document.getElementById(cell_name).innerHTML = svg_cell(cell);
+}
+
+
+function cell_update_text(cell_name, text) {
+	grid.board[cell_name].text = text;
+	cell_update(cell_name)
+}
+
+
+
+//-----------------------------------------------------------------------------
+// html helpers
+//-----------------------------------------------------------------------------
+function html_select(id, options, selected) {
+	// return html text for a select field
+	// with options filled from values in an array
+	text = "";
+	text += '<select id="'+id+'">';
+	for (key in options) {
+		option = options[key];
+		text += '<option value="'+key+'"';
+		if (key == selected) { 
+			text += " selected ";
+		}
+		text += 'id="'+id+" "+key+'"';
+		text += '>'+option+'</option>';	
+	}
+	text += '</select>';
+	return text;
+}
+
+
+
+
+
+
+//-----------------------------------------------------------------------------
+// svg functions
+//-----------------------------------------------------------------------------
+function svg_hline(length, width) {
+	var svg = "<svg height="+width+"px width="+length+"px>";
+	svg += "<line x1=1 y1=1 x2="+length+1+" y2=1";
+	svg += " style='stroke-width:"+width+";stroke:rgb(0,0,255)'";
+	svg += "/>";
+	svg += "</svg>";
+	return svg;
+}
+
+function svg_vline(length, width) {
+	var svg = "<svg height="+length+"px width="+width+"px>";
+	svg += "<line x1=1 y1=1 x2=1 y2="+length+1;
+	svg += " style='stroke-width:"+width+";stroke:rgb(0,0,255)'";
+	svg += "/>";
+	svg += "</svg>";
+	return svg;
+}
+
+function svg_rect(height, width) {
+	var svg = '<svg  xmlns="http://www.w3.org/2000/svg" version="1.1"';
+	svg += " height="+height+"px width="+width+"px";
+	svg += " >";
+	svg += " <rect width="+width+" height="+height;
+	//svg += ' stroke="black"';
+	//svg += ' stroke-width="2"';
+	svg += ' fill="rgb(200,200,250)" />';
+	svg += "</svg>";	
+	return svg;
+}
+
+function svg_block(id, height_px, width_px, color_str) {
+	var svg = '<svg  xmlns="http://www.w3.org/2000/svg" version="1.1"';
+	svg += " id='"+id+"' ";
+	svg += " height="+height_px+"px width="+width_px+"px";
+	svg += " >";
+	svg += " <rect width="+width_px+" height="+width_px;
+	svg += ' fill="'+color_str+'" />';
+	svg += "</svg>";	
+	return svg;
+}
+
+function svg_cell(cell) {
+	var svg = '<svg  xmlns="http://www.w3.org/2000/svg" version="1.1"';
+	svg += " height="+grid.cell_size+"px width="+grid.cell_size+"px";
+	svg += " >";
+	svg += " <rect width="+grid.cell_size+" height="+grid.cell_size;
+	svg += ' fill="'+cell.color+'" />';
+	if(cell.text) {
+		var text_size = 14;
+		var text_x = ((grid.cell_height - text_size) / 2);
+		var text_y = ((grid.cell_width + text_size) / 2);
+		svg += ' <text x="'+text_x+'" y="'+text_y+'" fill="black" font-size="'+text_size+'">'+cell.text+'</text>';
+	}
+	svg += "</svg>";	
+	return svg;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// color functions
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+function color_palette_grayscale() {
+	// return an array of graywcale palette colors
+	color_array = [];
+	
+	steps = 32;
+	step = Math.floor(256 / steps);
+	
+	// grayscale
+	for (i=256; i>=-1; i-=step) {
+		if (i <0) { i = 0 };
+		if (i > 255) { i = 255 };
+		r = i;
+		g = i;
+		b = i;
+		color = "rgb("+r+","+g+","+b+")";
+		color_array.push(color);
+	}
+	return color_array;
+}
+
+
+
+//-----------------------------------------------------------------------------
+function color_palette_primary() {
+	// return an array of primary palette colors
+	color_array = [];
+	
+	steps = 4;
+	step = Math.floor(256 / steps);
+	
+	// grayscale
+	for (i=256; i>=-1; i-=step) {
+		if (i <0) { i = 0 };
+		if (i > 255) { i = 255 };
+		r = i;
+		g = i;
+		b = i;
+		color = "rgb("+r+","+g+","+b+")";
+		color_array.push(color);
+	}
+	// red
+	for (i=256; i>=-1; i-=step) {
+		if (i <0) { i = 0 };
+		if (i > 255) { i = 255 };
+		r = i;
+		g = 0;
+		b = 0;
+		color = "rgb("+r+","+g+","+b+")";
+		color_array.push(color);
+	}
+	// yellow
+	for (i=256; i>=-1; i-=step) {
+		if (i <0) { i = 0 };
+		if (i > 255) { i = 255 };
+		r = i;
+		g = i;
+		b = 0;
+		color = "rgb("+r+","+g+","+b+")";
+		color_array.push(color);
+	}
+	// green
+	for (i=256; i>=-1; i-=step) {
+		if (i <0) { i = 0 };
+		if (i > 255) { i = 255 };
+		r = 0;
+		g = i;
+		b = 0;
+		color = "rgb("+r+","+g+","+b+")";
+		color_array.push(color);
+	}
+	// cyan
+	for (i=256; i>=-1; i-=step) {
+		if (i <0) { i = 0 };
+		if (i > 255) { i = 255 };
+		r = 0;
+		g = i;
+		b = i;
+		color = "rgb("+r+","+g+","+b+")";
+		color_array.push(color);
+	}
+	// blue
+	for (i=256; i>=-1; i-=step) {
+		if (i <0) { i = 0 };
+		if (i > 255) { i = 255 };
+		r = 0;
+		g = 0;
+		b = i;
+		color = "rgb("+r+","+g+","+b+")";
+		color_array.push(color);
+	}
+	// magenta
+	for (i=256; i>=-1; i-=step) {
+		if (i <0) { i = 0 };
+		if (i > 255) { i = 255 };
+		r = i;
+		g = 0;
+		b = i;
+		color = "rgb("+r+","+g+","+b+")";
+		color_array.push(color);
+	}
+	return color_array;
+}
+
+
+//-----------------------------------------------------------------------------
+function color_palette_rainbow() {
+	// return an array of graywcale palette colors
+	color_array = [];
+	
+	steps = 32;
+	step = Math.floor(100 / steps);
+	
+	// rainbow
+	color_array.push('#FFFFFF'); // white
+	for (i=100; i>=-1; i-=step) {
+		if (i <0) { i = 0 };
+		color = color_field(i/100);
+		color_array.push(color);
+	}
+	color_array.push('#000000'); // black
+	return color_array;
+}
+
+
+
+//-----------------------------------------------------------------------------
+function color_rgb(color_str) {
+	// convert color string to array of red, green, blue
+	rgb_array = [];
+	if (color_str.slice(0, 3) == "rgb") {
+		// format example: rgb(123,4,56)
+		nums = color_str.slice(4, color_str.length-1);
+		numsx = nums.split(",");
+		rgb_array['r'] = numsx[0].valueOf();
+		rgb_array['g'] = numsx[1].valueOf();
+		rgb_array['b'] = numsx[2].valueOf();
+	} else {
+		if (color_str.slice(0, 1) == "#") {
+			// format example: #FF00BB
+			rgb_array['r'] = parseInt(color_str.slice(1, 3), 16);
+			rgb_array['g'] = parseInt(color_str.slice(3,5), 16);
+			rgb_array['b'] = parseInt(color_str.slice(5,7), 16);
+		}	
+	}
+	if (rgb_array['r'] > 255) { rgb_array['r'] = 255 };
+	if (rgb_array['g'] > 255) { rgb_array['g'] = 255 };
+	if (rgb_array['b'] > 255) { rgb_array['b'] = 255 };	
+	return rgb_array;
+}
+
+
+
+//-----------------------------------------------------------------------------
+function color_add(color_str1, color_str2) {
+	// add two colors together with scaling and return the new color
+	rgb1 = color_rgb(color_str1);
+	rgb2 = color_rgb(color_str2);
+	r = Math.floor(rgb1['r']) + Math.floor(rgb2['r']);
+	g = Math.floor(rgb1['g']) + Math.floor(rgb2['g']);
+	b = Math.floor(rgb1['b']) + Math.floor(rgb2['b']);
+	max = 0;
+	if (r > max) { max = r };
+	if (g > max) { max = g };
+	if (b > max) { max = b };
+	if (max > 255) {
+		// scale the color channels evenly
+		scale = (255 / max);
+		r = Math.floor(r * scale);
+		g = Math.floor(g * scale);
+		b = Math.floor(b * scale);
+	}
+	if (r > 255) { r = 255 };
+	if (g > 255) { g = 255 };
+	if (b > 255) { b = 255 };
+	new_color = "rgb("+r+","+g+","+b+")";
+	return new_color;
+
+}
+
+//-----------------------------------------------------------------------------
+function color_avg(color_str1, color_str2) {
+	// average two colors together and return the result
+	rgb1 = color_rgb(color_str1);
+	rgb2 = color_rgb(color_str2);
+	r = Math.floor(Math.floor(rgb1['r']) + Math.floor(rgb2['r']) / 2);
+	g = Math.floor(Math.floor(rgb1['g']) + Math.floor(rgb2['g']) / 2);
+	b = Math.floor(Math.floor(rgb1['b']) + Math.floor(rgb2['b']) / 2);
+	if (r > 255) { r = 255 };
+	if (g > 255) { g = 255 };
+	if (b > 255) { b = 255 };
+	new_color = "rgb("+r+","+g+","+b+")";
+	return new_color;
+
+}
+
+//-----------------------------------------------------------------------------
+function color_dim(color_str, dim_percent) {
+	// dim a color by a specified percentage
+	if (dim_percent > 1) { dim_percent = 1 };
+	rgb = color_rgb(color_str);
+	r = rgb['r'] - Math.floor(rgb['r'] * dim_percent);
+	g = rgb['g'] - Math.floor(rgb['g'] * dim_percent);
+	b = rgb['b'] - Math.floor(rgb['b'] * dim_percent);
+	if (r < 0) { r = 0 };
+	if (g < 0) { g = 0 };
+	if (b < 0) { b = 0 };
+	if (r > 255) { r = 255 };
+	if (g > 255) { g = 255 };
+	if (b > 255) { b = 255 };
+	new_color = "rgb("+r+","+g+","+b+")";
+	return new_color;
+}
+
+
+//-----------------------------------------------------------------------------
+function color_field(position) {
+	// position should be a number between 0 and 1
+	// returns a color from the rainbow spectrum
+	r = 0;
+	g = 0;
+	b = 0;	
+	p = position * 6;  // section of field
+	q = p - Math.floor(p); // position within section
+	if (p == 6) { q = 0.9999 };
+	if ((p >= 0) && (p < 1)) {
+		r = 1;
+		g = q;
+	}
+	if ((p >= 1) && (p < 2)) {
+		r = 1-q;
+		g = 1;
+	}
+	if ((p >= 2) && (p < 3)) {
+		g = 1;
+		b = q;
+	}
+	if ((p >= 3) && (p < 4)) {
+		g = 1-q;
+		b = 1;
+	}
+	if ((p >= 4) && (p < 5)) {
+		r = q;
+		b = 1;
+	}
+	if (p >= 5) {
+		r = 1;
+		b = 1-q;
+	}
+	r = Math.floor(r * 255);
+	g = Math.floor(g * 255);
+	b = Math.floor(b * 255);
+	color_str = "rgb("+r+","+g+","+b+")";
+	return color_str;
+	
+}
+
+
+//-----------------------------------------------------------------------------
+function color_wheel(bearing, distance) {
+	// bearing should be a number between 0 and 1
+	// returns a color from the rainbow spectrum
+	
+	dim = (1 - (distance * .04)) * 255;
+	//dim = 255;
+	r = 0;
+	g = 0;
+	b = 0;	
+
+	p = bearing * 6;  // section of field
+	q = p - Math.floor(p); // position within section
+	if (p == 6) { q = 0.9999 };
+	if ((p >= 0) && (p < 1)) {
+		r = 1;
+		g = q;
+	}
+	if ((p >= 1) && (p < 2)) {
+		r = 1-q;
+		g = 1;
+	}
+	if ((p >= 2) && (p < 3)) {
+		g = 1;
+		b = q;
+	}
+	if ((p >= 3) && (p < 4)) {
+		g = 1-q;
+		b = 1;
+	}
+	if ((p >= 4) && (p < 5)) {
+		r = q;
+		b = 1;
+	}
+	if (p >= 5) {
+		r = 1;
+		b = 1-q;
+	}
+
+	r = Math.floor(r * dim);
+	g = Math.floor(g * dim);
+	b = Math.floor(b * dim);
+	
+	if (bearing > 1) {
+		r = 255;
+		g = 255;
+		b = 255;
+	}
+	color_str = "rgb("+r+","+g+","+b+")";
+	return color_str;
+	
+}
+
+//-----------------------------------------------------------------------------
+
+
+
+//-----------------------------------------------------------------------------
+function cell_select(cell_name) {
+	// mark the specified cell as the "selected" cell on the grid
+	if (grid.selected_cell_name) {
+		var old_name = grid.selected_cell_name;
+		grid.selected_cell_name = '';
+		cell_update(old_name);
+	}
+	grid.selected_cell_name = cell_name;
+	
+	if (grid.mode_selected == "paint") {
+		grid.board[cell_name].color = grid.color_selected;
+		cell_update(cell_name);
+	}
+	if (grid.mode_selected == "flood") {
+		cell_flood(cell_name, grid.color_selected);
+	}
+	if (grid.mode_selected == "color-field") {
+		grid_color_field();
+	}
+	if (grid.mode_selected == "color-wheel") {
+		grid_color_wheel();
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+function grid_color_field() {
+	// formerly known as 'color-wheel'
+	cell_count = Object.keys(grid.board).length;
+	i = (grid.timer_count % cell_count) ;
+	for (key in grid.board) {
+		i++;
+		pos = (i / cell_count);
+		pos = pos - Math.floor(pos);
+		cell = grid.board[key];
+		cell.color = color_field(pos);
+		cell_update(cell.name);
+		
+	}
+}
+
+//-----------------------------------------------------------------------------
+function grid_color_wheel() {
+	// color-wheel
+	if (true) {
+		center_col = 5;
+		center_row =  5;
+	} else {
+		center_col = 0;
+		center_row =  0;
+	}
+	//cell_count = Object.keys(grid.board).length;
+	cell_count = 100;
+	i = (grid.timer_count % cell_count) / cell_count;
+	//alert("color wheel "+i);
+	for (key in grid.board) {
+		cell = grid.board[key];
+		
+		cell_col = cell.name.split("_")[2];
+		cell_row = cell.name.split("_")[1];
+		x_dist = Math.abs(center_col - cell_col);
+		y_dist = Math.abs(center_row - cell_row);
+		distance = Math.sqrt((x_dist*x_dist)+(y_dist*y_dist));
+		
+		a = Math.atan2(x_dist, y_dist);
+		if (cell_col < center_col) { a += (3.141/2) };
+		bearing = ((a*(1/1.58)) + i) / (2);
+		bearing = (a/3.141);
+		//bearing = bearing - Math.floor(bearing);
+		
+		cell.color = color_wheel(bearing, distance);
+		cell_update(cell.name);
+		
+	}
+}
+
+
+function bearingx(x,y) {
+	//
+	//return "ok";
+	pi = 3.141;
+	//if ((x >= 0) && (y > 0)) { a = (pi/2) - Math.atan2(x,y) };
+	//if ((x > 0) && (y <= 0)) { a = (pi/2) + Math.atan2(x,y) };
+	//if ((x <= 0) && (y < 0)) { a = 0 };
+	//if ((x < 0) && (y >= 0)) { a = 0 };
+	//b = (a / (pi*2));
+	b = 0;
+	return b;
+	
+}
+
+//-----------------------------------------------------------------------------
+function cell_flood(cell_name, color) {
+	// flood the color
+	range = grid.flood_range;
+	cell = grid.board[cell_name];
+	if(!cell) {
+		alert('unknown cell name: '+cell_name);
+	}
+	a_row = grid.board[cell_name].row;
+	a_col = grid.board[cell_name].col;
+	for(key in grid.board) {
+		cell = grid.board[key];
+		x_dist = Math.abs(a_col - cell.col);
+		y_dist = Math.abs(a_row - cell.row);
+		distance = Math.sqrt((x_dist*x_dist)+(y_dist*y_dist));
+		dim_percent = distance / range;
+		dim_color = color_dim(grid.color_selected, dim_percent);
+		new_color = color_add(cell.color, dim_color);
+		cell.color = new_color
+		cell_update(key);
+	}
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// end of javascript
+//-----------------------------------------------------------------------------
+</script> 
+
+</head>
+<body id="body" class="dimmed" onload="setup()"; >
+<div id="grid" class="grid_style">
+	<div id="cells"></div>
+</div>
+<br>
+<div id="layers" class="grayback_bordered">
+<table class="bordered">
+	<tr>
+		<td><input type="radio" name="Layer" value="Layer 1" checked>Layer 1</td>
+		<td id="layer 1 mode">pixel paint</td>
+	</tr><tr>
+		<td><input type="radio" name="Layer" value="Layer 2">Layer 2</td>
+		<td id="layer 2 mode">shadow-filter</td>
+	</tr><tr>
+		<td><input type="radio" name="Layer" value="Layer 3">Layer 3</td>
+		<td id="layer 3 mode">color-field</td>
+	</tr><tr>
+		<td><button id="new_layer">Add New Layer</button></td>
+	</tr>
+</table>
+</div>
+<div id="buttons" class="dimmed">
+	<span id="mode_select_span"></span>
+	<button id="clear_button">Clear</button>
+	<span id="palette_select_span"></span>
+	<button id="start_button">Start</button>
+	<button id="stop_button">Stop</button>
+	<button id="step_button">Single Step</button>
+	<span id="flood_range_select_span"></span>
+	<span id="tick_counter" class="widget"></span>
+	<button id="show_settings_button">Show Settings</button>
+	<button id="save_settings_button">Save Settings</button>
+</div>	
+<br>
+<div id="color_bar_div">
+	<span id="color_selected" class="colorbar">
+		color
+	</span>
+	&nbsp;
+	<span id="color_bar" class="colorbar">
+		color bar palette<br>
+	</span>
+	<br>
+</div>
+<div id="color_field_controls" class="grayback_bordered">
+	<span id="color wheel">
+		color-field controls - 
+		start color <span id="start_color_select_span"></span>
+		stop color <span id="stop_color_select_span"></span>
+	</span>
+</div>
+<hr>
+<span>	
+	<span id="tick_status" class="widget">timer</span>
+	<span id="position" class="widget">position</span>
+</span>
+<div id="buttons2" class="dimmed">
+	<button id="start_send_button">Start to server</button>
+	<button id="stop_send_button">Stop to server</button>
+	<button id="start_rec_button">Start Recording</button>
+	<button id="stop_rec_button">Stop Recording</button>
+	These buttons do not do anything yet
+</div>
+<div id="settings_div" class="grayback_bordered">
+<table  id="settings" >
+	<tr>
+		<td>
+			Settings
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>
+			<table>
+				<tr>
+					<td>
+						columns
+					</td>
+					<td>
+						<div id="input_cols_div"><input id="input_cols" type="text" size="5" value="24"/></div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						rows
+					</td>
+					<td>
+						<div id="input_rows_div"><input id="input_rows" type="text" size="5" value="12"/></div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						background color
+					</td>
+					<td>
+						<div id="input_bgcolor"><input type="text" size="5" width="5" value="#000"/></div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						LED width
+					</td>
+					<td>
+						<div id="input_ledwidth"><input type="text" size="5" width="5" value="10"/></div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						LED height
+					</td>
+					<td>
+						<div id="input_ledheight"><input type="text" size="5" width="5" value="10"/></div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Screen width
+					</td>
+					<td>
+						<div id="input_screenwidth"><input type="text" size="5" width="5" value="640"/></div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Screen height
+					</td>
+					<td>
+						<div id="input_scrreenheight"><input type="text" size="5" width="5" value="4"/></div>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</div>
+<div id="xml">
+xml
+</div>
+<iframe id="iframe" src="http://localhost:8888/grid/" height="100" width="500" frameborder="0"></iframe>
+</body>
+</html>

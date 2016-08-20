@@ -1,0 +1,44 @@
+  body {margin:0; padding:0; background:#000; color:#c0c0c0;}
+  /*table {line-height:2pt;}*/
+
+
+/**************************************
+*
+* Layout 
+*
+/**************************************/
+
+header { width:100%; padding:0 10px; background:#111; border-bottom:1px solid #222;}
+nav { position:absolute; width:20%; left:0px; top:0px; bottom:0px; overflow-y:scroll; overflow-x: hidden; }
+main { width:80%; float:right; }
+
+/**************************************
+*
+*  Layers
+*
+/**************************************/
+
+div#new { background:#222; padding:15px; border:1px soid #111;}
+li.layer {  }
+
+/**************************************
+*
+*  Forms
+*
+/**************************************/
+
+
+
+/**************************************
+*
+*  Grid
+*
+/**************************************/
+
+td {height:5px;}
+
+/**************************************
+*
+*  
+*
+/**************************************/
