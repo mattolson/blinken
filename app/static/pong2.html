@@ -3,7 +3,7 @@
     <meta charset="utf-8">
     <link href="https://fonts.googleapis.com/css?family=Lato|Rubik+Mono+One" rel="stylesheet">
     <style type="text/css">
-        body { background:#000; font-family: 'Lato', sans-serif; }
+        body { margin: 0; padding: 0;   width: 100%; height: 100%;  overflow: hidden; background:#000; font-family: 'Lato', sans-serif; }
 
         div.state { display:none; position:absolute; top:0px; left:0px; right:0px; bottom:0px; } 
         body#waiting .waiting.state { display:block; }
@@ -16,8 +16,9 @@
         body#finished .finished.state.won .won {display:block;}
         body#finished .finished.state.lost .lost {display:block;}
 
-        .meta {display:none; text-align:center; width:100%; position:absolute; display:inline-block;}
+        .meta {display:none; text-align:center; width:100%; position:absolute;}
         body#idle .meta, body#waiting .meta {display:block;}
+
         .title {top:5px; color:#BADA55; font-size:3vw; font-family: 'Rubik Mono One', sans-serif;}
         .plebes {bottom:5px; font-size:8pt; color:#c0c0c0;}
         .version {font-size:11pt;color:#f0f0f0;}
@@ -35,6 +36,7 @@
     </style>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/assets/js/jquery-3.1.0.min.js"></script>
+    <script src="/assets/js/funfetti.js"></script>
     <script>
         //-----------------------------------------------------------------------------
         var grid = Object();  // global object
@@ -265,6 +267,7 @@
                 $('.finished')
                     .removeClass('lost')
                     .addClass('won');
+                funfetti();
             });
 
             grid.namespace.on('lost', function(player){
@@ -302,6 +305,7 @@
 
           });    
         }
+
         // })(jQuery);
 
         //-----------------------------------------------------------------------------
@@ -337,6 +341,7 @@
     </div>
     
     <div class="finished state">
+        <canvas id="funfetti" class="won"></canvas>
         <span class="status-text won">You Won!</span>
         <span class="status-text lost">You Lost.</span>
     </div>
@@ -344,7 +349,6 @@
     <div class="plebes meta">
         <span>Michael Weisse</span>
         <span>Sean Mitchell</span>
-        <span>Jordan Layman</span>
         <span>Matt Olson</span>
     </div>
 
