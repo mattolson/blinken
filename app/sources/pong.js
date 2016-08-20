@@ -353,7 +353,7 @@ function Pong(grid, options) {
 
     io.of('/pong').on('connection', function(socket) {
         console.log(socket.id + " connected to pong");
-        // self.connections++;  // it seems weisse to keep track
+        self.connections++;  // it seems weisse to keep track
 
         self.attach(socket);
         
@@ -364,7 +364,7 @@ function Pong(grid, options) {
         });
 
         socket.on('attach', function() {
-            // self.attach(socket);
+            self.attach(socket);
         });
 
         socket.on('detach', function() {
@@ -455,43 +455,45 @@ Pong.prototype.step = function() {
     // Ever seen a realllllllly ugly if? Well, you're about to. Seriously, don't change the order. 
     //It's done like this to limit spaghetti code, without this pattern, state setting and running occurs all over the place, and is difficult to change.
                                                                             
-                                                                            //This is where it loops around, so we need allow "finished" to complete.
-    if          (   this.total_attached() == 0 )                                      
-                                                                            this.state_set("idle") 
+    //This is where it loops around, so we need allow "finished" to complete.
+    if( this.total_attached() == 0 )                                      
+            this.state_set("idle") 
 
-                                                                            //Only one player is attached
-    if          (   this.total_attached() == 1 && !this.state_is("playing") && !this.state_is("forfeit") )
+    //Only one player is attached
+    if( this.total_attached() == 1 && !this.state_is("playing") && !this.state_is("forfeit") )
     {                                     
-                                                                            this.state_set("waiting"); 
-                                                                            this.resetScores();
+            this.state_set("waiting"); 
+            this.resetScores();
     }
     
-    if          ( this.state_is("forfeit") || (this.state_is("playing") && this.total_attached() == 1) )
+    //A player left in the middle of the game.
+    if( this.state_is("forfeit") || (this.state_is("playing") && this.total_attached() == 1) )
     {
-                                                                            this.state_set("forfeit");
+        this.state_set("forfeit");
     }
-                                                                            //They were waiting, but no longer
-    if          (   this.state_is("waiting") && this.total_attached() == 2 )         
-                                                                            this.state_set("countdown"); 
+    
+    //They were waiting, but no longer
+    if( this.state_is("waiting") && this.total_attached() == 2 )         
+        this.state_set("countdown"); 
 
-                                                                            //Time to move on to the game :)
-    if          ( 
-                    (this.state_is("countdown") && this.countdown_elapsed > 5) 
-                ||  (this.state_is("playing") && !checkWin.call(this))
-                )  
-                                                                            this.state_set("playing");
-
-
-                                                                            //Someone just won.
-    if          (   this.state_is("playing") && checkWin.call(this) )    
+    //Time to move on to the game :)
+    if( 
+        (this.state_is("countdown") && this.countdown_elapsed > 5) ||
+        (this.state_is("playing") && !checkWin.call(this))
+      )  
+    {
+        this.state_set("playing");
+    }
+    //Someone just won.
+    if( this.state_is("playing") && checkWin.call(this) )    
     {          
-                                                                            this.state_set("finished");
+        this.state_set("finished");
     }
-                                                                            //Finished state will remove attached players after some time, triggering idle.
-    if          (   this.state_is("finished") && this.total_attached() == 0) 
+    //Finished state will remove attached players after some time, triggering idle.
+    if( this.state_is("finished") && this.total_attached() == 0) 
     {                
-                                                                            this.state_set("idle");
-                                                                            this.reset(); 
+        this.state_set("idle");
+        this.reset(); 
     }
 
     //Only emit state once. 
