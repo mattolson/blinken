@@ -365,6 +365,7 @@ function Pong(grid, options) {
         self.connections++;  // it seems weisse to keep track
 
         self.attach(socket);
+        self.emit_state();
         
         socket.on('disconnect', function() {
             console.log(socket.id + " disconnected from pong");
@@ -547,16 +548,6 @@ Pong.prototype.state_set = function(state){
     this.state = state;
 }
 
-Pong.prototype.state_change = function(){
-    console.log(this.state_cache, this.state);
-    if(this.state !== this.state_cache){
-        this.state_cache = this.state;
-        console.log("State changed from "+this.state_cache+" to "+this.state);
-        return true;
-    }
-    return false;
-}
-
 
 Pong.prototype.idle = function(){
     updatePaddlePositions.call(this);
@@ -682,6 +673,7 @@ Pong.prototype.attach = function(socket){
     } else {
         console.log("cannot attach to player");
         socket.emit('errorMsg', {text: 'No Player Available'});
+        socket.emit('state', 'busy');
     //              socketError(socket, 'No Snake Available');
     }
 }

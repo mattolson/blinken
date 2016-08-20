@@ -10,6 +10,7 @@
         body#countdown .countdown.state { display:block; }
         body#playing .playing.state { display:block; }
         body#finished .finished.state { display:block; }
+        body#busy .busy.state { display:block; }
         body#idle .idle.state { display:block; }
 
         body#finished .finished.state > span {display:none;}
@@ -203,13 +204,11 @@
             bind_idle();
         }
         
-        grid.state.waiting = function(state){
-            
-        }
+        grid.state.waiting = function(state){}
 
-        grid.state.countdown = function(state){
-            
-        }
+        grid.state.countdown = function(state){}
+
+        grid.state.busy = function(state){}
 
         grid.state.playing = function(state){
             grid.paddle.on();
@@ -333,6 +332,10 @@
     
     <div class="waiting state">
         <span class="status-text">Waiting for Opponent</span>
+    </div>
+
+    <div class="busy state">
+        <span class="status-text">There's already a game in progress.</span>
     </div>
     
     <div class="countdown state">
