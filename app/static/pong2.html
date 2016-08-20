@@ -19,7 +19,7 @@
         body#finished .finished.state.lost .lost {display:block;}
 
         .meta {display:none; text-align:center; width:100%; position:absolute;}
-        body#idle .meta, body#waiting .meta {display:block;}
+        body#idle .meta, body#waiting .meta, body#busy .meta {display:block;}
 
         .title {top:5px; color:#BADA55; font-size:3vw; font-family: 'Rubik Mono One', sans-serif;}
         .plebes {bottom:5px; font-size:8pt; color:#c0c0c0;}
@@ -211,6 +211,7 @@
                 grid.audio.countdown.pause();
                 grid.audio.lose.pause();
             }, 3000);
+            if($('.finished.state canvas').length) funfetti_remove();
         }
         
         grid.state.waiting = function(state){
@@ -318,7 +319,7 @@
                 $('.finished')
                     .removeClass('lost')
                     .addClass('won');
-                funfetti();
+                funfetti.call(window, '.finished.state');
                 grid.audio.win.play();
             });
 
@@ -409,7 +410,6 @@
     </div>
     
     <div class="finished state">
-        <canvas id="funfetti" class="won"></canvas>
         <span class="status-text won">You Won!</span>
         <span class="status-text lost">You Lost.</span>
     </div>
