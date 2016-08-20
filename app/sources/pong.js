@@ -697,8 +697,14 @@ Pong.prototype.detach = function(socket){
 Pong.prototype.detachAll = function(){
     // if(this.player1.socket) this.player1.socket.emit();
     // if(this.player2.socket) this.detach(this.player2.socket);
-    if(this.player1.socket) this.player1.socket.emit('detach');
-    if(this.player2.socket) this.player2.socket.emit('detach');
+    if(this.player1.socket) {
+        this.detach(this.player1.socket);
+        delete this.player1.socket;
+    }
+    if(this.player2.socket) {
+        this.detach(this.player2.socket);
+        delete this.player2.socket;
+    }
 }
 
 Pong.prototype.paddles = function(){

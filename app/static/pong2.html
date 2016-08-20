@@ -105,8 +105,9 @@
         function bind_idle(){
             console.log('bind', 'play button')
             $('.play-btn').on('mousedown', function(){
-                grid.namespace.emit('attach');
-                console.log('press', 'play button')
+                location.reload();
+                // grid.namespace.emit('attach');
+                // console.log('press', 'play button')
             })
         }
 
