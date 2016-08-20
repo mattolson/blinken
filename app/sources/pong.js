@@ -218,10 +218,14 @@ function checkWin()
 {
     if (this.player1.score >= this.options.scoreToWin)
     {
+        this.winner = "player1"
+        this.loser = "player2"
         return 1;
     }
     else if (this.player2.score >= this.options.scoreToWin)
     {
+        this.winner = "player2"
+        this.loser = "player1"
         return 2;
     }
 
@@ -304,8 +308,16 @@ function drawCountdown(player)
     // this.grid.setCursor(8, 2);
     // this.grid.print("Begins in");
     
-    this.grid.setCursor(20, 20);
-    this.grid.print(5-this.countdown_elapsed);
+    this.grid.setCursor(25, 20);
+    var tminus = 5-this.countdown_elapsed;
+    if(tminus < 1) {
+        this.grid.print("Go!");
+    }
+    else 
+    {
+        this.grid.print(tminus);    
+    }
+    
     var pong = this;
 }
 
@@ -341,12 +353,16 @@ function Pong(grid, options) {
     this.queue = new Array();
     this.triggers = new Array();
     this.countdown_elapsed = 0;
+    this.countdown_begin = 0;
     this.total = 0;
     this.timeout = false;
 
+    this.winner = false;
+    this.loser = false;
+
     io.of('/pong').on('connection', function(socket) {
         console.log(socket.id + " connected to pong");
-        // self.connections++;  // it seems weisse to keep track
+        self.connections++;  // it seems weisse to keep track
 
         self.attach(socket);
         
@@ -357,17 +373,17 @@ function Pong(grid, options) {
         });
 
         socket.on('attach', function() {
-            // self.attach(socket);
+            self.attach(socket);
         });
 
         socket.on('detach', function() {
-            // self.detach(socket);
+            self.detach(socket);
         });
 
         socket.on('pos', function(position) {
             if (socket.player !== undefined) {
-                socket.player.posY = constrainPosition.call(self, parseFloat(position.pos));
-                console.log("pos " + position.pos + " for player " + socket.player.id + " constrained " + socket.player.posY);
+                socket.player.posY = constrainPosition.call(self, parseFloat(position));
+                console.log("pos " + position + " for player " + socket.player.id + " constrained " + socket.player.posY);
             }
         });
     });
@@ -420,7 +436,6 @@ function Pong(grid, options) {
 
     // these probably never change
     this.paddles();
-
     this.reset();
 
 /*    this.grid.setCursor(12, 5);
@@ -449,45 +464,61 @@ Pong.prototype.step = function() {
     // Ever seen a realllllllly ugly if? Well, you're about to. Seriously, don't change the order. 
     //It's done like this to limit spaghetti code, without this pattern, state setting and running occurs all over the place, and is difficult to change.
                                                                             
-                                                                            //This is where it loops around, so we need allow "finished" to complete.
-    if          (   this.total_attached() == 0 )                                      
-                                                                            this.state_set("idle") 
+    //This is where it loops around, so we need allow "finished" to complete.
+    if( this.total_attached() == 0 )   
+    {                                   
+        this.state_set("idle") 
+    }
 
-                                                                            //Only one player is attached
-    if          (   this.total_attached() == 1 && !this.state_is("playing") && !this.state_is("forfeit") )
+    //Only one player is attached
+    else if( this.total_attached() == 1 && !this.state_is("playing") && !this.state_is("forfeit") )
     {                                     
-                                                                            this.state_set("waiting"); 
-                                                                            this.resetScores();
+        this.state_set("waiting"); 
+        this.resetScores();
     }
     
-    if          ( this.state_is("forfeit") || (this.state_is("playing") && this.total_attached() == 1) )
+    //A player left in the middle of the game.
+    else if( this.state_is("forfeit") || (this.state_is("playing") && this.total_attached() == 1) )
     {
-                                                                            this.state_set("forfeit");
+        this.state_set("forfeit");
     }
-                                                                            //They were waiting, but no longer
-    if          (   this.state_is("waiting") && this.total_attached() == 2 )         
-                                                                            this.state_set("countdown"); 
 
-                                                                            //Time to move on to the game :)
-    if          ( 
-                    (this.state_is("countdown") && this.countdown_elapsed > 5) 
-                ||  (this.state_is("playing") && !checkWin.call(this))
-                )  
-                                                                            this.state_set("playing");
+    //They were waiting, but no longer
+    else if( this.state_is("waiting") && this.total_attached() == 2 )   
+    {      
+        this.state_set("countdown"); 
+    }
 
+    //Time to move on to the game :)
+    else if( 
+        (this.state_is("countdown") && this.countdown_elapsed > 5) ||
+        (this.state_is("playing") && !checkWin.call(this))
+      )  
+    {
+        this.countdown_elapsed = 0
+        ,this.countdown_begin = 0;
+        this.state_set("playing");
+    }
 
-                                                                            //Someone just won.
-    if          (   this.state_is("playing") && checkWin.call(this) )    
+    //Someone just won.
+    else if( this.state_is("playing") && checkWin.call(this) )    
     {          
-                                                                            this.state_set("finished");
-    }
-                                                                            //Finished state will remove attached players after some time, triggering idle.
-    if          (   this.state_is("finished") && this.total_attached() == 0) 
-    {                
-                                                                            this.state_set("idle");
-                                                                            this.reset(); 
+        this.state_set("finished");
     }
 
+    //Finished state will remove attached players after some time, triggering idle.
+    else if( this.state_is("finished") && this.total_attached() == 0) 
+    {                
+        this.state_set("idle");
+        this.reset(); 
+    }
+
+    //Only emit state once. 
+    if( this.state != this.state_cache ) {
+        this.emit_state();
+        this.state_cache = this.state;
+        console.log("changed state", this.state);
+    }
 
     this.state_run();
 
@@ -514,7 +545,6 @@ Pong.prototype.state_run = function(){
 
 Pong.prototype.state_set = function(state){
     this.state = state;
-    console.log("changed state", this.state);
 }
 
 Pong.prototype.state_change = function(){
@@ -532,6 +562,7 @@ Pong.prototype.idle = function(){
     updatePaddlePositions.call(this);
     moveBall.call(this);
     drawGame.call(this);
+    this.resetScores(); //Hack for  glitch
 }
 
 Pong.prototype.waiting = function(){
@@ -552,6 +583,24 @@ Pong.prototype.countdown = function(){
     drawCountdown.call(this);
 }
 
+
+Pong.prototype.emit_state = function(){
+    if(this.state == "idle") {
+       io.of('/pong').emit("state", this.state);
+    }
+    else 
+    {
+        if(this.player1.socket) {
+            this.player1.socket.emit("state", this.state);
+        }
+        if(this.player2.socket) {
+            this.player2.socket.emit("state", this.state);
+        }
+    }
+}
+
+
+// States -------------------------------------------------
 Pong.prototype.playing = function(){
     updatePaddlePositions.call(this);
     moveBall.call(this);
@@ -559,10 +608,11 @@ Pong.prototype.playing = function(){
     // this.state_set("playing");
 }
 
-
 Pong.prototype.finished = function(){
     drawWin.call(this, checkWin.call(this));
     if(!this.timeout) {
+        this[this.winner].socket.emit('won');
+        this[this.loser].socket.emit('lost');
         var self = this;
         this.timeout = setTimeout(function(){
             self.detachAll(); // This will reset state to IDLE or ... Grab from Queue?
@@ -574,7 +624,9 @@ Pong.prototype.finished = function(){
 Pong.prototype.forfeit = function(){
     var forfeiter = checkForfeit.call(this);
     var winner = forfeiter == 1 ? 2 : 1;
+    // this["player"+forfeiter].socket.emit('lost');
     if(!this.timeout) {
+        this["player"+winner].socket.emit('won');
         drawForfeit.call(this, forfeiter);
         var self = this;
         this.timeout = setTimeout(function(){
@@ -607,12 +659,16 @@ Pong.prototype.resetScores = function(){
     //Reset scores
     this.player1.score = 0;
     this.player2.score = 0;
+    //Reset winners/losers.
+    this.winner = false;
+    this.loser = false;
 }
 
 Pong.prototype.attach = function(socket){
     console.log("got an attach");
     // so we should attach this socket to a player
     socket.player = findFreePlayer.call(this);
+    console.log("attached now", this.total_attached());
     if (socket.player !== undefined) {
         socket.player.socket = socket;
         console.log("attached to player " + socket.player.id);
@@ -622,6 +678,7 @@ Pong.prototype.attach = function(socket){
                 color: socket.player.color,
                 height: this.paddle.height
             });
+        // this.emit_state();
     } else {
         console.log("cannot attach to player");
         socket.emit('errorMsg', {text: 'No Player Available'});
@@ -637,16 +694,24 @@ Pong.prototype.detach = function(socket){
     }
 }
 
+Pong.prototype.detachAll = function(){
+    // if(this.player1.socket) this.player1.socket.emit();
+    // if(this.player2.socket) this.detach(this.player2.socket);
+    if(this.player1.socket) {
+        this.detach(this.player1.socket);
+        delete this.player1.socket;
+    }
+    if(this.player2.socket) {
+        this.detach(this.player2.socket);
+        delete this.player2.socket;
+    }
+}
+
 Pong.prototype.paddles = function(){
     this.paddle.width = 1;
     this.paddle.height =  this.grid.num_pixels_y / 4.0;
     this.paddle.halfWidth = this.paddle.width / 2.0;
     this.paddle.halfHeight = this.paddle.height / 2.0;
-}
-
-Pong.prototype.detachAll = function(){
-    if(this.player1.socket) this.detach(this.player1.socket);
-    if(this.player2.socket) this.detach(this.player2.socket);
 }
 
 // Return js object containing all params and their types
