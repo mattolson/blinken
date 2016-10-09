@@ -38,10 +38,14 @@
     </style>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/assets/js/jquery-3.1.0.min.js"></script>
+    <script src="/assets/js/jquery.vibrate.min.js"></script>
+    <script src="/assets/js/jquery.mb.audio.js"></script>
     <script src="/assets/js/funfetti.js"></script>
     <script>
         //-----------------------------------------------------------------------------
         var grid = Object();  // global object
+        var audio = false;
+        $(document).on("initAudio", function () { audio = true; });
 
         //-----------------------------------------------------------------------------
         function setup() {
@@ -51,8 +55,8 @@
             namespace_setup();
             unselectable();
             anonymize_plebes()
-            grid.audio = audio_init();
-            // insert content into html span
+            audio_init();
+            vibrator();
         }
         //-----------------------------------------------------------------------------
         var Paddle = function(){
@@ -182,6 +186,11 @@
             touch.target.dispatchEvent(simulatedEvent);
             event.preventDefault();
         }
+
+        function vibrator(){
+            $(document).vibrate({trigger: "miss", pattern: [500]});
+            $(document).vibrate({trigger: "hit", duration: 50});
+        }
         //-----------------------------------------------------------------------------
 
         var Normalize = function(max_input){
@@ -204,37 +213,31 @@
 
         grid.state.idle = function(state){
             bind_idle();
-            setTimeout(function(){
-                grid.audio.win.pause();
-                grid.audio.busy.pause();
-                grid.audio.waiting.pause();
-                grid.audio.countdown.pause();
-                grid.audio.lose.pause();
-            }, 3000);
             if($('.finished.state canvas').length) funfetti_remove();
+            if(isStandAlone || !isDevice && audio) $.mbAudio.play('background', 'busy');
         }
         
         grid.state.waiting = function(state){
-            grid.audio.waiting.play();
+
         }
 
         grid.state.countdown = function(state){
-            grid.audio.countdown.play();
-            setTimeout(function(){
-                grid.audio.waiting.pause();
-            }, 3000)
+          if(isStandAlone || !isDevice && audio) $.mbAudio.pause('background', 'busy');
+          setTimeout(function(){
+            if(audio) $.mbAudio.play('effect', 'countdown');
+          }, 500);
         }
 
         grid.state.busy = function(state){
-            grid.audio.busy.play();
+            if(isStandAlone || !isDevice && audio) $.mbAudio.play('background', 'busy');
         }
 
         grid.state.forfeit = function(state){}
 
         grid.state.playing = function(state){
+            if(audio) $.mbAudio.pause('effect', 'countdown');
             grid.paddle.on();
             grid.paddle.paint();
-            grid.audio.countdown.pause();
         }
 
         grid.state.finished = function(state){
@@ -244,28 +247,43 @@
         //-----------------------------------------------------------------------------
 
         var audio_init = function(){
-            var audio = {};
-                audio.waiting = new Audio("/assets/audio/busy.wav");
-                audio.countdown = new Audio("/assets/audio/countdown.wav");
-                audio.busy = new Audio("/assets/audio/busy.wav");
-                audio.hit = new Audio("/assets/audio/hit.wav");
-                audio.lose = new Audio("/assets/audio/lose.wav");
-                audio.win = new Audio("/assets/audio/win.wav");
-            return audio;
+            $.mbAudio.sounds = {
+                effect: {
+                    id    : "effect",
+                    ogg   : "/assets/audio/effects.ogg",
+                    mp3   : "/assets/audio/effects.mp3",
+                    //example of sprite
+                    sprite: {
+                        countdown : {id: "countdown", start: 0, end: 30.0519, loop: true},
+                        lose      : {id: "lose", start: 33.697, end: 38.51, loop: false},
+                        win       : {id: "win", start: 42.362, end: 47.794, loop: false},
+                        hit       : {id: "hit", start: 51.095, end: 51.314, loop: false}
+                    }
+                },
+                background: {
+                    id    : "background",
+                    ogg   : "/assets/audio/background.ogg",
+                    mp3   : "/assets/audio/background.mp3",
+                    //example of sprite
+                    sprite: {
+                        busy   : {id: "busy", start: 0, end: 41, loop: true}
+                    }
+                }
+            }
         }
+         
+        // var audio = function(file){
+        //     this.file = new Audio('file');
+        // }
 
-        var audio = function(file){
-            this.file = new Audio('file');
-        }
+        // audio.prototype.play = function(){
+        //     this.file.play();
+        // }
 
-        audio.prototype.play = function(){
-            this.file.play();
-        }
-
-        audio.prototype.pause = function(){
-            this.file.pause();
-            this.file.currentTime = 0;
-        }
+        // audio.prototype.pause = function(){
+        //     this.file.pause();
+        //     this.file.currentTime = 0;
+        // }
 
         
         
@@ -314,13 +332,23 @@
                 }
             });
 
+            grid.namespace.on('hit', function(){
+                if(audio) $.mbAudio.play('effect', 'hit');
+                $(document).trigger('hit');
+            });
+
+
+            grid.namespace.on('miss', function(){
+                $(document).trigger('miss');
+            });
+
             grid.namespace.on('won', function(player){
                 console.log('You Won!')
                 $('.finished')
                     .removeClass('lost')
                     .addClass('won');
                 funfetti.call(window, '.finished.state');
-                grid.audio.win.play();
+                if(audio) $.mbAudio.play('effect', 'win');
             });
 
             grid.namespace.on('lost', function(player){
@@ -328,7 +356,7 @@
                 $('.finished')
                     .removeClass('won')
                     .addClass('lost');
-                grid.audio.lose.play();
+                if(audio) $.mbAudio.play('effect', 'lose');
             });
 
             grid.namespace.on('connect_failed', function() {
@@ -415,7 +443,7 @@
     </div>
 
     <div class="plebes meta">
-        <span>Michael Weisse</span>
+        <span>Michael Weiss</span>
         <span>Sean Mitchell</span>
         <span>Matt Olson</span>
     </div>
