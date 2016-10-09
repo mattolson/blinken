@@ -1,0 +1,160 @@
+<!DOCTYPE html5>
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<body id="body" onload="setup()">
+<button id='start_button' name='start' value='start'>Start</button>
+<button id='stop_button' name='stop' value='stop'>Stop</button>   
+<span id='status_div' style='margin-left:20px'></span>
+<br>    
+<canvas id='canvas' width='800' height='600'></canvas>
+<script>
+//-----------------------------------------------------------------------------
+
+var grid = Object();  // global object
+
+//-----------------------------------------------------------------------------
+function setup() {
+	document.title = "Blinken Display";
+    
+    document.getElementById("body").style.backgroundColor = "#555";
+    
+	grid.color_background = '#000000';  // black
+	grid.color_default = '#000000';  // black
+
+	grid.cols = 60;
+	grid.rows = 48;
+	grid.pixel_margin = 2;
+	grid.pixel_height = 8;
+	grid.pixel_width = 8;
+	
+	grid.x_margin = 20;
+	grid.y_margin = 20;
+
+	grid.timer_tick_interval_ms = 50; // milliseconds per timer tick
+	
+	grid.running = false;
+	grid.timer_count = 0;
+	
+	// initialize grid of pixels
+	for(row=1; row<=grid.rows; row++) {
+		for(col=1; col<=grid.cols; col++) {
+			pixel_update_color(col, row, grid.color_default);
+		}
+	}
+	
+	// setup events
+	document.getElementById("start_button").onclick = start_button_click;
+	document.getElementById("stop_button").onclick = stop_button_click;
+
+	grid.availWidth = screen.availWidth;
+	grid.availHeight = screen.availHeight;
+	grid.screen_width = screen.width;
+	grid.screen_height = screen.height;
+
+	//start_button_click(); // start timer tick event
+	status_update("OK");
+}
+
+
+//-----------------------------------------------------------------------------
+function timer_tick() {
+	// timer event called at regular interval
+    //
+    var frames_per_sec = 1/(grid.timer_tick_interval_ms/1000);
+    
+	grid.timer_count++;
+	if (grid.running) {
+        display_update();  // get the display pixel colors from the server
+		msg = "Running ";
+		msg += frames_per_sec +" frames/sec - ";
+		msg +=  " tick "+grid.timer_count;
+	} else {
+		msg = "Stopped";
+	}
+	status_update(msg);	
+}
+
+
+//-----------------------------------------------------------------------------
+function start_button_click() {
+	// event called when "start" button is clicked
+	if (grid.running == false) {
+		grid.running = true;
+        status_update("Running");
+		var ms = grid.timer_tick_interval_ms;
+		grid.timer_handle = window.setInterval(timer_tick, ms);
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+function stop_button_click() {
+	// event called when "stop" button is clicked
+	if (grid.running == true) {
+		grid.running = false;
+        status_update("Stopped");
+		window.clearInterval(grid.timer_handle);
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+function pixel_update_color(x,y,color) {
+    // update the color of the "pixel" on the canvas
+	var x = grid.x_margin + (x * (grid.pixel_width + grid.pixel_margin));
+	var y = grid.y_margin + (y * (grid.pixel_height + grid.pixel_margin));
+	var canvas_el = document.getElementById("canvas");
+	var canvas_context = canvas_el.getContext("2d");
+	canvas_context.fillStyle = color;
+	canvas_context.fillRect(x, y, grid.pixel_width, grid.pixel_height);
+}
+
+
+//-----------------------------------------------------------------------------
+function status_update(status_str) {
+	html = "<font color='#fff'>" + status_str + "</font>";
+	document.getElementById("status_div").innerHTML = html;
+}
+
+
+//-----------------------------------------------------------------------------
+function int_to_hex(d) {
+    // convert a number to a hex string
+    var hex = Number(d).toString(16);
+    while (hex.length < 2) {
+        hex = "0" + hex;
+    }
+    return hex;
+}
+
+
+//-----------------------------------------------------------------------------
+function display_update() {
+    //
+	// get the current grid pixel colors from the server 
+    // and update the display pixels to the current colors
+    //
+	var xmlhttp=new XMLHttpRequest();	
+	xmlhttp.onreadystatechange=function() {
+	  if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+		grid_data = JSON.parse(xmlhttp.responseText);
+		var i = 0;
+		for(row=1; row<=grid.rows; row++) {
+			for(col=1; col<=grid.cols; col++) {
+				color = grid_data[i];
+				color_str = "#" + int_to_hex(color[0]) + int_to_hex(color[1]) + int_to_hex(color[2]);
+				pixel_update_color(col, row, color_str);
+				i++;
+			}
+		}
+	  }
+	}
+ 	xmlhttp.open("GET","http://" + window.location.host + "/output",true);
+	xmlhttp.send();
+}
+
+</script>
+</body>
+</html>

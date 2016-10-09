@@ -1,0 +1,98 @@
+<!DOCTYPE html5>
+<html>
+<head>
+<title>Blinken Layers</title>
+<meta charset="utf-8">
+<script type="text/javascript" src="http://localhost:8888/jquery-1.11.1.min.js"></script>
+<script>
+
+function send() {
+    post_screen();
+    alert("posted");
+}
+
+function post_layer() {
+    // create a new layer
+   
+    //Define Request Options
+    var options = {};
+    //options['source[options][frame]'] = grid_data;
+     options = {
+        'source' : {
+            name : 'frames2',
+            active : true,
+            period : 44,
+        }
+     };
+ 
+     //Create XMLHTTP Object and send. 
+    $.ajax({
+        //type: "PUT",
+        type: "POST",
+        url: "http://localhost:8888/layers",
+        //data: { name: 'frames', active: true, options: { frame: [ [ [ 255,0,0 ] ] ] } }
+        data: options
+    })
+    
+//    function ajaxFunction() { ... xmlhttp.open("POST","example.php",true); 
+//xmlhttp.onreadystatechange = handleServerResponse;
+//xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+//xmlhttp.send('x=' + encodeURIComponent(arg0) + '&t=' + encodeURIComponent(arg1));
+
+}
+
+function put_frame() {
+    //console.log("puting frame");
+    // send grid to server
+    
+    //Define Request Options
+    var options = {};
+    //options['source[options][frame]'] = grid_data;
+    options = {
+        'source' : {
+            name : 'frames2',
+            active : true,
+            period : 44,
+        }
+    };
+ 
+     //Create XMLHTTP Object and send. 
+    $.ajax({
+        type: "PUT",
+        url: "http://localhost:8888/layers/1",
+        data: options
+    });
+    
+    
+//data: { name: 'frames', active: true, options: { frame: [ [ [ 255,0,0 ] ] ] } }
+
+//    function ajaxFunction() { ... xmlhttp.open("POST","example.php",true); 
+//xmlhttp.onreadystatechange = handleServerResponse;
+//xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+//xmlhttp.send('x=' + encodeURIComponent(arg0) + '&t=' + encodeURIComponent(arg1));
+
+}
+
+
+function init() {
+    document.getElementById('post_layer').onclick = post_layer;
+    document.getElementById('put_frame').onclick = put_frame;
+}
+
+window.onload = init; 
+</script>
+</head>
+<body id="body">
+<a href="/">Home</a>
+<br>Blinken - POST /layers
+<form action="/layers" method="post">
+source[name]: <input name="source[name]" type="text" size=20 value="color_wheel"></input>
+<br>
+period: <input name="source[options][period]" type="text" size=5 value="33"></input>
+<br><input type="submit" value="POST">
+<br>
+<br><input type="button" id="post_layer" name="Setup Layer" value="Setup Layer"></input>
+<br><input type="button" id="put_frame" name="Put Frame" value="Put Frame"></input>
+</form>
+</body>
+</html>
